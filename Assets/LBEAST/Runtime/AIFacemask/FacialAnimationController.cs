@@ -49,7 +49,17 @@ namespace LBEAST.AIFacemask
 
     /// <summary>
     /// Controls facial animation for AI-driven avatars
-    /// Supports live actor-driven animation, prerecorded playback, and procedural animation
+    /// 
+    /// Designed as a bridge to NVIDIA Audio2Face (Neural Face) technology for autonomous
+    /// conversational avatars that can interact with players without manual control.
+    /// 
+    /// The live actor does NOT manually control facial expressions - the AI does this autonomously
+    /// based on conversation, emotion detection, and narrative context. The live actor focuses on
+    /// directing the experience through wrist-mounted state machine controls.
+    /// 
+    /// Future Integration: NVIDIA Omniverse Audio2Face (requires separate server for Unity)
+    /// 
+    /// Supports live autonomous animation, prerecorded playback, and procedural animation.
     /// </summary>
     public class FacialAnimationController : MonoBehaviour
     {

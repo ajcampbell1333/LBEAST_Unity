@@ -10,32 +10,42 @@ namespace LBEAST.ExperienceTemplates
     /// <summary>
     /// AI Facemask Experience Template
     /// 
-    /// Live actor-driven multiplayer VR experience with AI facial animation.
-    /// Combines:
-    /// - Live actor-driven facial animation
-    /// - Multiple networked players
-    /// - Embedded systems integration (buttons, haptics)
-    /// - Narrative state machine support
+    /// Pre-configured experience for LAN multiplayer VR with immersive theater live actors.
+    /// 
+    /// Architecture:
+    /// - AI facial animation operates AUTONOMOUSLY (driven by NVIDIA Audio2Face)
+    /// - Live actors wear wrist-mounted button controls (4 buttons: 2 left, 2 right)
+    /// - Buttons control the Experience Loop state machine (not the AI face)
+    /// 
+    /// Button Layout:
+    /// - Left Wrist:  Button 0 (Forward), Button 1 (Backward)
+    /// - Right Wrist: Button 2 (Forward), Button 3 (Backward)
+    /// 
+    /// The live actor directs the experience flow, while the AI face handles
+    /// natural conversation and emotional responses autonomously.
     /// 
     /// Perfect for escape rooms, interactive theater, live actor-driven VR experiences,
     /// and any LBE installation requiring live human performance.
     /// </summary>
     public class AIFacemaskExperience : LBEASTExperienceBase
     {
-        [Header("Facial Animation")]
+        [Header("Components")]
         [SerializeField] private FacialAnimationController facialController;
-        [SerializeField] private GameObject avatarPrefab;
-        [SerializeField] private FacialAnimationMode defaultAnimationMode = FacialAnimationMode.Live;
+        [SerializeField] private SerialDeviceController costumeController;
+        [SerializeField] private ExperienceStateMachine experienceLoop;
 
-        [Header("Embedded Systems")]
-        [SerializeField] private SerialDeviceController serialDevice;
-        [SerializeField] private int numberOfButtons = 8;
+        [Header("Live Actor Configuration")]
+        [SerializeField] private GameObject avatarPrefab;
+        [SerializeField] private SkinnedMeshRenderer liveActorMesh;
+        [SerializeField] private int numberOfLiveActors = 1;
+        [SerializeField] private int numberOfPlayers = 4;
 
         [Header("Live Actor Connection")]
         [SerializeField] private string liveActorStreamIP = "192.168.1.50";
         [SerializeField] private int liveActorStreamPort = 9000;
 
         private GameObject spawnedAvatar;
+        private bool[] previousButtonStates = new bool[4];
 
         protected override void Awake()
         {
@@ -43,7 +53,7 @@ namespace LBEAST.ExperienceTemplates
 
             // Enable multiplayer
             enableMultiplayer = true;
-            maxPlayers = 4;  // Can be configured
+            maxPlayers = numberOfLiveActors + numberOfPlayers;
 
             // Find or create facial controller
             if (facialController == null)
@@ -52,12 +62,22 @@ namespace LBEAST.ExperienceTemplates
             }
 
             // Find or create serial device controller
-            if (serialDevice == null)
+            if (costumeController == null)
             {
-                serialDevice = GetComponent<SerialDeviceController>();
-                if (serialDevice == null)
+                costumeController = GetComponent<SerialDeviceController>();
+                if (costumeController == null)
                 {
-                    serialDevice = gameObject.AddComponent<SerialDeviceController>();
+                    costumeController = gameObject.AddComponent<SerialDeviceController>();
+                }
+            }
+
+            // Find or create experience loop
+            if (experienceLoop == null)
+            {
+                experienceLoop = GetComponent<ExperienceStateMachine>();
+                if (experienceLoop == null)
+                {
+                    experienceLoop = gameObject.AddComponent<ExperienceStateMachine>();
                 }
             }
         }
@@ -69,14 +89,19 @@ namespace LBEAST.ExperienceTemplates
             {
                 spawnedAvatar = Instantiate(avatarPrefab, transform);
                 
-                // Find facial controller on spawned avatar
+                // Find facial controller and mesh on spawned avatar
                 if (facialController == null)
                 {
                     facialController = spawnedAvatar.GetComponentInChildren<FacialAnimationController>();
                 }
+                
+                if (liveActorMesh == null)
+                {
+                    liveActorMesh = spawnedAvatar.GetComponentInChildren<SkinnedMeshRenderer>();
+                }
             }
 
-            // Initialize facial animation
+            // Initialize facial animation (autonomous)
             if (facialController != null)
             {
                 if (!facialController.Initialize())
@@ -85,26 +110,57 @@ namespace LBEAST.ExperienceTemplates
                 }
                 else
                 {
-                    facialController.SetAnimationMode(defaultAnimationMode);
+                    facialController.SetAnimationMode(FacialAnimationMode.Live);  // Autonomous AI-driven
                     facialController.StartAnimation();
+                    Debug.Log("[LBEAST] AIFacemaskExperience: AI Face initialized (autonomous mode)");
                 }
             }
 
-            // Initialize embedded systems
-            if (serialDevice != null)
+            // Initialize costume controller (wrist-mounted buttons + haptics)
+            if (costumeController != null)
             {
-                if (!serialDevice.ConnectToDevice())
+                if (!costumeController.ConnectToDevice())
                 {
                     Debug.LogWarning("[LBEAST] AIFacemaskExperience: Failed to connect to embedded device");
                 }
+                else
+                {
+                    Debug.Log("[LBEAST] AIFacemaskExperience: Wrist controls connected (4 buttons)");
+                }
             }
 
-            Debug.Log("[LBEAST] AIFacemaskExperience initialized successfully");
+            // Initialize Experience Loop with default states
+            if (experienceLoop != null)
+            {
+                var defaultStates = new System.Collections.Generic.List<ExperienceState>
+                {
+                    new ExperienceState("Intro", "Introduction sequence"),
+                    new ExperienceState("Tutorial", "Player tutorial"),
+                    new ExperienceState("Act1", "First act"),
+                    new ExperienceState("Act2", "Second act"),
+                    new ExperienceState("Finale", "Finale sequence"),
+                    new ExperienceState("Credits", "End credits")
+                };
+
+                experienceLoop.Initialize(defaultStates);
+                experienceLoop.onStateChanged.AddListener(OnExperienceStateChanged);
+                experienceLoop.StartExperience();
+
+                Debug.Log($"[LBEAST] AIFacemaskExperience: Experience Loop initialized with {defaultStates.Count} states");
+            }
+
+            Debug.Log($"[LBEAST] AIFacemaskExperience: Initialized with {numberOfLiveActors} live actors and {numberOfPlayers} players");
             return true;
         }
 
         protected override void ShutdownExperienceImpl()
         {
+            // Stop experience loop
+            if (experienceLoop != null)
+            {
+                experienceLoop.StopExperience();
+            }
+
             // Stop facial animation
             if (facialController != null)
             {
@@ -112,9 +168,9 @@ namespace LBEAST.ExperienceTemplates
             }
 
             // Disconnect embedded systems
-            if (serialDevice != null)
+            if (costumeController != null)
             {
-                serialDevice.DisconnectFromDevice();
+                costumeController.DisconnectFromDevice();
             }
 
             // Clean up spawned avatar
@@ -124,112 +180,97 @@ namespace LBEAST.ExperienceTemplates
             }
         }
 
-        #region Public API - Facial Animation
-
-        /// <summary>
-        /// Set facial animation mode
-        /// </summary>
-        public void SetAnimationMode(FacialAnimationMode mode)
+        private void Update()
         {
-            if (facialController != null)
+            if (!isInitialized)
+                return;
+
+            // Process button input from wrist-mounted controls
+            ProcessButtonInput();
+        }
+
+        private void ProcessButtonInput()
+        {
+            if (costumeController == null || !costumeController.IsConnected() || experienceLoop == null)
             {
-                facialController.SetAnimationMode(mode);
+                return;
+            }
+
+            // Read current button states
+            bool[] currentButtonStates = new bool[4];
+            for (int i = 0; i < 4; i++)
+            {
+                currentButtonStates[i] = costumeController.IsButtonPressed(i);
+            }
+
+            // Button 0 (Left Wrist Forward) or Button 2 (Right Wrist Forward)
+            if ((currentButtonStates[0] && !previousButtonStates[0]) ||
+                (currentButtonStates[2] && !previousButtonStates[2]))
+            {
+                AdvanceExperience();
+            }
+
+            // Button 1 (Left Wrist Backward) or Button 3 (Right Wrist Backward)
+            if ((currentButtonStates[1] && !previousButtonStates[1]) ||
+                (currentButtonStates[3] && !previousButtonStates[3]))
+            {
+                RetreatExperience();
+            }
+
+            // Store current states for next frame
+            for (int i = 0; i < 4; i++)
+            {
+                previousButtonStates[i] = currentButtonStates[i];
             }
         }
 
+        #region Experience Loop Control
+
         /// <summary>
-        /// Set a specific facial blend shape weight
+        /// Get the current experience state
         /// </summary>
-        public void SetBlendShapeWeight(string blendShapeName, float weight)
+        public string GetCurrentExperienceState()
         {
-            if (facialController != null)
+            if (experienceLoop != null)
             {
-                facialController.SetBlendShapeWeight(blendShapeName, weight);
+                return experienceLoop.GetCurrentStateName();
             }
+            return "";
         }
 
         /// <summary>
-        /// Start recording facial animation
+        /// Manually advance the experience to the next state (usually triggered by buttons)
         /// </summary>
-        public void StartRecording()
+        public bool AdvanceExperience()
         {
-            if (facialController != null)
+            if (experienceLoop != null)
             {
-                facialController.StartRecording();
-            }
-        }
-
-        /// <summary>
-        /// Stop recording and save facial animation
-        /// </summary>
-        public void StopRecording()
-        {
-            if (facialController != null)
-            {
-                var recording = facialController.StopRecording();
-                Debug.Log($"[LBEAST] Recorded {recording.Count} frames");
-            }
-        }
-
-        #endregion
-
-        #region Public API - Embedded Systems
-
-        /// <summary>
-        /// Check if a button is currently pressed
-        /// </summary>
-        public bool IsButtonPressed(int buttonID)
-        {
-            if (serialDevice != null)
-            {
-                return serialDevice.IsButtonPressed(buttonID);
+                return experienceLoop.AdvanceState();
             }
             return false;
         }
 
         /// <summary>
-        /// Check if button was just pressed this frame
+        /// Manually retreat the experience to the previous state (usually triggered by buttons)
         /// </summary>
-        public bool GetButtonDown(int buttonID)
+        public bool RetreatExperience()
         {
-            if (serialDevice != null)
+            if (experienceLoop != null)
             {
-                return serialDevice.GetButtonDown(buttonID);
+                return experienceLoop.RetreatState();
             }
             return false;
         }
 
         /// <summary>
-        /// Send haptic pulse to embedded device
+        /// Handle state change events
+        /// Override this in your derived class to trigger game events
         /// </summary>
-        public void SendHapticPulse(byte intensity, int duration)
+        protected virtual void OnExperienceStateChanged(string oldState, string newState, int newStateIndex)
         {
-            if (serialDevice != null)
-            {
-                serialDevice.SendHapticPulse(intensity, duration);
-            }
-        }
+            Debug.Log($"[LBEAST] AIFacemaskExperience: State changed from '{oldState}' to '{newState}' (Index: {newStateIndex})");
 
-        /// <summary>
-        /// Set LED color on embedded device
-        /// </summary>
-        public void SetLEDColor(int ledID, byte r, byte g, byte b)
-        {
-            if (serialDevice != null)
-            {
-                serialDevice.SetLEDColor(ledID, r, g, b);
-            }
-        }
-
-        /// <summary>
-        /// Send custom command to embedded device
-        /// </summary>
-        public void SendCustomCommand(string command)
-        {
-            if (serialDevice != null)
-            {
-                serialDevice.SendCustomCommand(command);
-            }
+            // Override this method to trigger game events based on state changes
         }
 
         #endregion
@@ -255,4 +296,3 @@ namespace LBEAST.ExperienceTemplates
         #endregion
     }
 }
-

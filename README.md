@@ -119,31 +119,66 @@ Experience Templates are complete, pre-configured MonoBehaviours that you can ad
 
 **Class:** `AIFacemaskExperience`
 
-Live actor-driven multiplayer VR experience with live facial animation. Designed for interactive theater, escape rooms, and narrative-driven experiences.
+Deploy LAN multiplayer VR experiences where immersive theater live actors drive avatars with **autonomous AI-generated facial expressions**. The AI face operates independently using NVIDIA Audio2Face (Neural Face via Omniverse server), while live actors control the experience flow through wrist-mounted buttons.
+
+**Architecture:**
+- **AI Face**: Fully autonomous, driven by NVIDIA Audio2Face for natural conversation
+- **Live Actor Role**: Experience director, NOT puppeteer
+- **Wrist Controls**: 4 buttons (2 left, 2 right) to advance/retreat through experience states
+- **Experience Loop**: Built-in state machine (Intro → Tutorial → Act1 → Act2 → Finale → Credits)
 
 **Includes:**
-- Live actor-to-avatar facial animation streaming
-- Supports prerecorded playback for autonomous NPCs
-- Embedded systems integration (buttons, haptics, LEDs)
-- LAN multiplayer support
-- Narrative state machine support
+- Pre-configured `FacialAnimationController` (autonomous facial animation bridge)
+- Pre-configured `SerialDeviceController` (wrist buttons)
+- Pre-configured `ExperienceStateMachine` (story progression)
+- LAN multiplayer support (configurable live actor/player counts)
+
+**Button Layout:**
+- **Left Wrist**: Button 0 (Forward), Button 1 (Backward)
+- **Right Wrist**: Button 2 (Forward), Button 3 (Backward)
 
 **Quick Start:**
 ```csharp
-var facemask = gameObject.AddComponent<AIFacemaskExperience>();
-facemask.InitializeExperience();
+var experience = gameObject.AddComponent<AIFacemaskExperience>();
+experience.InitializeExperience();
 
-// Check for button presses from embedded systems
-if (facemask.IsButtonPressed(0))
+// React to experience state changes
+string currentState = experience.GetCurrentExperienceState();
+
+// Manually trigger state changes (usually handled by wrist buttons automatically)
+experience.AdvanceExperience();
+experience.RetreatExperience();
+```
+
+**Custom State Machine:**
+```csharp
+// Define custom experience states
+var customStates = new List<ExperienceState>
 {
-    Debug.Log("Button 0 pressed!");
+    new ExperienceState("Intro", "Welcome sequence"),
+    new ExperienceState("Challenge1", "First puzzle"),
+    new ExperienceState("Boss", "Final boss fight")
+};
+
+// Initialize with custom states
+var loop = GetComponent<ExperienceStateMachine>();
+loop.Initialize(customStates);
+loop.StartExperience();
+```
+
+**Handle State Changes:**
+Override `OnExperienceStateChanged` in your derived class:
+```csharp
+protected override void OnExperienceStateChanged(string oldState, string newState, int newStateIndex)
+{
+    base.OnExperienceStateChanged(oldState, newState, newStateIndex);
+    
+    if (newState == "Boss")
+    {
+        SpawnBossEnemy();
+        PlayDramaticMusic();
+    }
 }
-
-// Control facial animation
-facemask.SetBlendShapeWeight("smile", 80f);
-
-// Send haptic feedback
-facemask.SendHapticPulse(200, 500);  // intensity, duration(ms)
 ```
 
 #### 🎢 Moving Platform Experience
