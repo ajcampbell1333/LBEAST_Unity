@@ -73,11 +73,21 @@ public class CostumeController : MonoBehaviour
 
 ### **ESP32 Side (Arduino)**
 
+**Upload firmware from:** `Assets/LBEAST/Resources/ESP32_Example_Firmware_Secured.ino`
+
 ```cpp
-// Use: ESP32_Example_Firmware_Secured.ino
+// Configuration (edit in Arduino IDE)
+const char* ssid = "VR_Arcade_LAN";
+const char* password = "your_password_here";
+
+IPAddress gameEngineIP(192, 168, 1, 100);  // Your Unity PC's IP
 const char* sharedSecret = "MyVenueSecret_2025";  // MUST match Unity
 const int securityLevel = 2;  // 2 = AES-128 + HMAC
 ```
+
+**Two firmware versions available:**
+- `ESP32_Example_Firmware.ino` - Unsecured (development only)
+- `ESP32_Example_Firmware_Secured.ino` - **AES-128 + HMAC (use this for production!)**
 
 ---
 
@@ -430,10 +440,14 @@ Socket->SendTo(Data.GetData(), Data.Num(), BytesSent, *RemoteAddr);
 
 ## 📚 Additional Resources
 
-- **ESP32 Firmware (Unsecured):** `/Resources/ESP32_Example_Firmware.ino` (Development only)
-- **ESP32 Firmware (Secured):** `/Resources/ESP32_Example_Firmware_Secured.ino` (**Production**)
+- **ESP32 Firmware (Unsecured):** `Assets/LBEAST/Resources/ESP32_Example_Firmware.ino` ⚠️ Development only
+- **ESP32 Firmware (Secured):** `Assets/LBEAST/Resources/ESP32_Example_Firmware_Secured.ino` ✅ **Production**
+- **Example Usage:** `Assets/LBEAST/Runtime/EmbeddedSystems/Examples/ExampleCostumeController.cs`
 - **Unreal Implementation:** `LBEAST_Unreal/Plugins/LBEAST/Source/EmbeddedSystems/`
 - **Protocol Spec:** Same as Unreal (byte-for-byte compatible)
+- **Comparison Guide:** `Assets/LBEAST/Runtime/EmbeddedSystems/UNITY_VS_UNREAL.md`
+
+**✅ The ESP32 firmware works with BOTH Unity and Unreal!** No changes needed to switch engines.
 
 ---
 
