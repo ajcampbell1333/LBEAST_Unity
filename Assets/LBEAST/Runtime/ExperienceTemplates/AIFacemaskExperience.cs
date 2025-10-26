@@ -10,14 +10,14 @@ namespace LBEAST.ExperienceTemplates
     /// <summary>
     /// AI Facemask Experience Template
     /// 
-    /// Actor-driven multiplayer VR experience with AI facial animation.
+    /// Live actor-driven multiplayer VR experience with AI facial animation.
     /// Combines:
     /// - Live actor-driven facial animation
     /// - Multiple networked players
     /// - Embedded systems integration (buttons, haptics)
     /// - Narrative state machine support
     /// 
-    /// Perfect for escape rooms, interactive theater, actor-driven VR experiences,
+    /// Perfect for escape rooms, interactive theater, live actor-driven VR experiences,
     /// and any LBE installation requiring live human performance.
     /// </summary>
     public class AIFacemaskExperience : LBEASTExperienceBase
@@ -31,9 +31,9 @@ namespace LBEAST.ExperienceTemplates
         [SerializeField] private SerialDeviceController serialDevice;
         [SerializeField] private int numberOfButtons = 8;
 
-        [Header("Actor Connection")]
-        [SerializeField] private string actorStreamIP = "192.168.1.50";
-        [SerializeField] private int actorStreamPort = 9000;
+        [Header("Live Actor Connection")]
+        [SerializeField] private string liveActorStreamIP = "192.168.1.50";
+        [SerializeField] private int liveActorStreamPort = 9000;
 
         private GameObject spawnedAvatar;
 
@@ -234,22 +234,22 @@ namespace LBEAST.ExperienceTemplates
 
         #endregion
 
-        #region Public API - Actor Connection
+        #region Public API - Live Actor Connection
 
         /// <summary>
-        /// Set the actor stream IP address
+        /// Set the live actor stream IP address
         /// </summary>
-        public void SetActorStreamIP(string ip)
+        public void SetLiveActorStreamIP(string ip)
         {
-            actorStreamIP = ip;
+            liveActorStreamIP = ip;
         }
 
         /// <summary>
-        /// Set the actor stream port
+        /// Set the live actor stream port
         /// </summary>
-        public void SetActorStreamPort(int port)
+        public void SetLiveActorStreamPort(int port)
         {
-            actorStreamPort = port;
+            liveActorStreamPort = port;
         }
 
         #endregion

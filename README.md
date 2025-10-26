@@ -52,7 +52,7 @@ Foundation modules providing core functionality:
 
 ### Tier 2: Experience Templates (Pre-Configured MonoBehaviours)
 Ready-to-use complete experiences combining multiple APIs:
-- `AIFacemaskExperience` - Actor-driven multiplayer VR
+- `AIFacemaskExperience` - Live actor-driven multiplayer VR
 - `MovingPlatformExperience` - Standing hydraulic platform
 - `GunshipExperience` - 4-player seated platform
 - `CarSimExperience` - Racing/driving simulator
@@ -71,7 +71,7 @@ Build your specific experience on top of templates or APIs.
 | Building a racing game | `CarSimExperience` | Simplified driving API, optimized motion profiles |
 | Building a space combat game | `FlightSimExperience` | HOTAS integration ready, continuous rotation supported |
 | Custom 3-player standing platform | Low-Level APIs | Need custom configuration not covered by templates |
-| Actor-driven escape room | `AIFacemaskExperience` | Actor support, multiplayer, and embedded systems ready |
+| Live actor-driven escape room | `AIFacemaskExperience` | Live actor support, multiplayer, and embedded systems ready |
 | Unique hardware configuration | Low-Level APIs | Full control over all actuators and systems |
 
 **Rule of thumb:** Start with templates, drop to APIs only when you need customization beyond what templates offer.
@@ -119,7 +119,7 @@ Experience Templates are complete, pre-configured MonoBehaviours that you can ad
 
 **Class:** `AIFacemaskExperience`
 
-Actor-driven multiplayer VR experience with live facial animation. Designed for interactive theater, escape rooms, and narrative-driven experiences.
+Live actor-driven multiplayer VR experience with live facial animation. Designed for interactive theater, escape rooms, and narrative-driven experiences.
 
 **Includes:**
 - Live actor-to-avatar facial animation streaming
@@ -534,7 +534,7 @@ public class GunshipGameController : MonoBehaviour
 - [ ] Meta Quest 3 native integration
 - [ ] Unity Input System HOTAS profiles
 - [ ] Sample Arduino/ESP32 firmware
-- [ ] WebSocket alternative for actor streaming
+- [ ] WebSocket alternative for live actor streaming
 
 ### 🎯 Planned (v2.0)
 - [ ] Apple Vision Pro support
