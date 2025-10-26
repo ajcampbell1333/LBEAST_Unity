@@ -1,15 +1,28 @@
-// Copyright (c) 2025 AJ Campbell. Licensed under the MIT License.
+/*
+ * LBEAST Serial Device Controller (Unity)
+ * 
+ * Secure bidirectional communication with embedded microcontrollers
+ * Supports: AES-128-CTR encryption, HMAC-SHA1 authentication, UDP/Serial protocols
+ * 
+ * Copyright (c) 2025 AJ Campbell. Licensed under the MIT License.
+ */
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
-using System.IO.Ports;
+using UnityEngine.Events;
 
 namespace LBEAST.EmbeddedSystems
 {
-    /// <summary>
-    /// Supported microcontroller types
-    /// </summary>
+    // =====================================
+    // Enums
+    // =====================================
+
     public enum MicrocontrollerType
     {
         Arduino,
@@ -20,428 +33,822 @@ namespace LBEAST.EmbeddedSystems
         Custom
     }
 
-    /// <summary>
-    /// Serial device configuration
-    /// </summary>
-    [Serializable]
-    public class SerialDeviceConfig
+    public enum CommProtocol
     {
-        public string portName = "COM3";
+        Serial,
+        WiFi,
+        Bluetooth,
+        Ethernet
+    }
+
+    public enum SecurityLevel
+    {
+        None,       // Development only
+        HMAC,       // Authentication only
+        Encrypted   // AES-128 + HMAC (recommended)
+    }
+
+    public enum DataType : byte
+    {
+        Bool = 0,
+        Int32 = 1,
+        Float = 2,
+        String = 3,
+        Bytes = 4,
+        Struct = 5
+    }
+
+    // =====================================
+    // Configuration
+    // =====================================
+
+    [System.Serializable]
+    public class EmbeddedDeviceConfig
+    {
+        [Header("Device")]
+        public MicrocontrollerType deviceType = MicrocontrollerType.ESP32;
+        public CommProtocol protocol = CommProtocol.WiFi;
+        public string deviceAddress = "192.168.1.50";
+        public int port = 8888;
         public int baudRate = 115200;
-        public Parity parity = Parity.None;
-        public int dataBits = 8;
-        public StopBits stopBits = StopBits.One;
-        public int readTimeout = 100;
-        public int writeTimeout = 100;
+
+        [Header("Channels")]
+        public int inputChannelCount = 8;
+        public int outputChannelCount = 8;
+
+        [Header("Security")]
+        public SecurityLevel securityLevel = SecurityLevel.Encrypted;
+        [Tooltip("Shared secret key for encryption (must match ESP32 firmware)")]
+        public string sharedSecret = "CHANGE_ME_IN_PRODUCTION_2025";
+
+        [Header("Debug")]
+        [Tooltip("Use JSON packets for Wireshark inspection (disables encryption!)")]
+        public bool debugMode = false;
     }
 
-    /// <summary>
-    /// Button state data
-    /// </summary>
-    [Serializable]
-    public class ButtonState
-    {
-        public int buttonID;
-        public bool isPressed;
-        public float pressDuration;
-        public DateTime lastPressTime;
+    // =====================================
+    // Events
+    // =====================================
 
-        public ButtonState(int id)
-        {
-            buttonID = id;
-            isPressed = false;
-            pressDuration = 0f;
-            lastPressTime = DateTime.MinValue;
-        }
-    }
+    [System.Serializable] public class BoolEvent : UnityEvent<int, bool> { }
+    [System.Serializable] public class Int32Event : UnityEvent<int, int> { }
+    [System.Serializable] public class FloatEvent : UnityEvent<int, float> { }
+    [System.Serializable] public class StringEvent : UnityEvent<int, string> { }
+    [System.Serializable] public class BytesEvent : UnityEvent<int, byte[]> { }
 
-    /// <summary>
-    /// Controls serial communication with embedded systems (Arduino, ESP32, STM32, etc.)
-    /// Manages buttons, haptic feedback, and custom hardware integration
-    /// </summary>
+    // =====================================
+    // Main Controller
+    // =====================================
+
     public class SerialDeviceController : MonoBehaviour
     {
-        [Header("Device Configuration")]
-        [SerializeField] private MicrocontrollerType deviceType = MicrocontrollerType.Arduino;
-        [SerializeField] private SerialDeviceConfig config = new SerialDeviceConfig();
-        [SerializeField] private bool autoConnect = true;
+        [Header("Configuration")]
+        public EmbeddedDeviceConfig config = new EmbeddedDeviceConfig();
 
-        [Header("Button Configuration")]
-        [SerializeField] private int numberOfButtons = 8;
+        [Header("Events")]
+        public BoolEvent onBoolReceived = new BoolEvent();
+        public Int32Event onInt32Received = new Int32Event();
+        public FloatEvent onFloatReceived = new FloatEvent();
+        public StringEvent onStringReceived = new StringEvent();
+        public BytesEvent onBytesReceived = new BytesEvent();
 
-        private SerialPort serialPort;
+        // Networking
+        private UdpClient udpClient;
+        private IPEndPoint remoteEndPoint;
         private bool isConnected = false;
-        private Dictionary<int, ButtonState> buttonStates = new Dictionary<int, ButtonState>();
-        private Queue<string> incomingMessages = new Queue<string>();
-        private Queue<string> outgoingMessages = new Queue<string>();
 
-        #region Initialization
+        // Cryptography
+        private byte[] derivedAESKey = new byte[16];   // 128-bit
+        private byte[] derivedHMACKey = new byte[32];  // 256-bit
+        private RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 
-        private void Awake()
+        // Protocol
+        private const byte PACKET_START_MARKER = 0xAA;
+        private Dictionary<int, float> inputValueCache = new Dictionary<int, float>();
+
+        // =====================================
+        // Lifecycle
+        // =====================================
+
+        void Start()
         {
-            // Initialize button states
-            for (int i = 0; i < numberOfButtons; i++)
-            {
-                buttonStates[i] = new ButtonState(i);
-            }
+            InitializeDevice(config);
         }
 
-        private void Start()
-        {
-            if (autoConnect)
-            {
-                ConnectToDevice();
-            }
-        }
-
-        private void OnDestroy()
-        {
-            DisconnectFromDevice();
-        }
-
-        /// <summary>
-        /// Connect to the serial device
-        /// </summary>
-        public bool ConnectToDevice()
+        void Update()
         {
             if (isConnected)
             {
-                Debug.LogWarning("[LBEAST] Already connected to device");
-                return true;
+                ProcessIncomingData();
+            }
+        }
+
+        void OnDestroy()
+        {
+            DisconnectDevice();
+        }
+
+        // =====================================
+        // Initialization
+        // =====================================
+
+        public bool InitializeDevice(EmbeddedDeviceConfig cfg)
+        {
+            config = cfg;
+
+            // Security warning if debug mode conflicts with security
+            if (config.debugMode && config.securityLevel != SecurityLevel.None)
+            {
+                Debug.LogWarning("========================================");
+                Debug.LogWarning("⚠️  SECURITY WARNING ⚠️");
+                Debug.LogWarning("========================================");
+                Debug.LogWarning("Debug mode DISABLES encryption for Wireshark packet inspection!");
+                Debug.LogWarning($"SecurityLevel is set to '{config.securityLevel}' but will be IGNORED in debug mode.");
+                Debug.LogWarning("All packets will be sent as PLAIN JSON (no encryption).");
+                Debug.LogWarning("");
+                Debug.LogWarning("⛔ NEVER USE DEBUG MODE IN PRODUCTION! ⛔");
+                Debug.LogWarning("========================================");
             }
 
+            // Derive encryption keys (only if not in debug mode)
+            if (config.securityLevel != SecurityLevel.None && !config.debugMode)
+            {
+                DeriveKeysFromSecret();
+                Debug.Log($"EmbeddedDeviceController: Security enabled ({config.securityLevel})");
+            }
+            else if (config.securityLevel == SecurityLevel.None)
+            {
+                Debug.LogWarning("EmbeddedDeviceController: Security DISABLED (Development Only)");
+            }
+
+            // Establish connection
+            bool success = false;
+            switch (config.protocol)
+            {
+                case CommProtocol.WiFi:
+                case CommProtocol.Ethernet:
+                    success = InitializeWiFiConnection();
+                    break;
+
+                case CommProtocol.Serial:
+                    Debug.LogWarning("Serial communication not yet implemented");
+                    break;
+
+                case CommProtocol.Bluetooth:
+                    Debug.LogWarning("Bluetooth not yet implemented");
+                    break;
+            }
+
+            if (!success)
+            {
+                Debug.LogError($"Failed to initialize {config.protocol} connection");
+                return false;
+            }
+
+            // Initialize input cache
+            inputValueCache.Clear();
+            for (int i = 0; i < config.inputChannelCount; i++)
+            {
+                inputValueCache[i] = 0f;
+            }
+
+            isConnected = true;
+            Debug.Log($"EmbeddedDeviceController: Initialized successfully ({(config.debugMode ? "JSON Debug" : "Binary")} mode, {config.securityLevel})");
+            return true;
+        }
+
+        private bool InitializeWiFiConnection()
+        {
             try
             {
-                serialPort = new SerialPort(config.portName, config.baudRate, config.parity, config.dataBits, config.stopBits);
-                serialPort.ReadTimeout = config.readTimeout;
-                serialPort.WriteTimeout = config.writeTimeout;
-                serialPort.Open();
+                // Create UDP client
+                udpClient = new UdpClient();
+                udpClient.Client.Blocking = false;  // Non-blocking
+                udpClient.Client.ReceiveBufferSize = 8192;
 
-                isConnected = true;
-                Debug.Log($"[LBEAST] Connected to {deviceType} on {config.portName} at {config.baudRate} baud");
+                // Parse remote endpoint
+                IPAddress ipAddress;
+                if (!IPAddress.TryParse(config.deviceAddress, out ipAddress))
+                {
+                    Debug.LogError($"Invalid IP address: {config.deviceAddress}");
+                    return false;
+                }
+
+                remoteEndPoint = new IPEndPoint(ipAddress, config.port);
+
+                Debug.Log($"UDP socket created successfully (target: {config.deviceAddress}:{config.port})");
                 return true;
             }
             catch (Exception e)
             {
-                Debug.LogError($"[LBEAST] Failed to connect to device: {e.Message}");
+                Debug.LogError($"Failed to create UDP socket: {e.Message}");
                 return false;
             }
         }
 
-        /// <summary>
-        /// Disconnect from the serial device
-        /// </summary>
-        public void DisconnectFromDevice()
+        public void DisconnectDevice()
         {
-            if (serialPort != null && serialPort.IsOpen)
+            if (udpClient != null)
             {
-                serialPort.Close();
-                serialPort.Dispose();
-                isConnected = false;
-                Debug.Log("[LBEAST] Disconnected from device");
+                udpClient.Close();
+                udpClient = null;
             }
+
+            isConnected = false;
+            inputValueCache.Clear();
+            Debug.Log("EmbeddedDeviceController: Disconnected");
         }
 
-        #endregion
-
-        #region Update Loop
-
-        private void Update()
+        public bool IsDeviceConnected()
         {
-            if (!isConnected)
-            {
-                return;
-            }
-
-            // Read incoming data
-            ReadIncomingData();
-
-            // Send outgoing messages
-            SendOutgoingMessages();
-
-            // Process incoming messages
-            ProcessIncomingMessages();
+            return isConnected;
         }
 
-        private void ReadIncomingData()
+        // =====================================
+        // Cryptography - Key Derivation
+        // =====================================
+
+        private void DeriveKeysFromSecret()
         {
-            if (serialPort == null || !serialPort.IsOpen)
+            byte[] secretBytes = Encoding.UTF8.GetBytes(config.sharedSecret);
+
+            // Derive AES key: SHA1(Secret + "AES128_LBEAST_2025")
+            using (var sha1 = SHA1.Create())
             {
-                return;
+                byte[] aesInput = CombineBytes(secretBytes, Encoding.UTF8.GetBytes("AES128_LBEAST_2025"));
+                byte[] aesHash = sha1.ComputeHash(aesInput);
+                Array.Copy(aesHash, derivedAESKey, 16);  // First 16 bytes
             }
 
-            try
+            // Derive HMAC key: SHA1(Secret + "HMAC_LBEAST_2025")
+            using (var sha1 = SHA1.Create())
             {
-                while (serialPort.BytesToRead > 0)
+                byte[] hmacInput = CombineBytes(secretBytes, Encoding.UTF8.GetBytes("HMAC_LBEAST_2025"));
+                byte[] hmacHash = sha1.ComputeHash(hmacInput);
+                Array.Copy(hmacHash, derivedHMACKey, 20);  // First 20 bytes
+            }
+
+            Debug.Log("Derived AES and HMAC keys from shared secret", this);
+        }
+
+        // =====================================
+        // Cryptography - AES-128-CTR
+        // =====================================
+
+        private byte[] EncryptAES128(byte[] plaintext, uint iv)
+        {
+            if (plaintext.Length == 0) return new byte[0];
+
+            byte[] ciphertext = new byte[plaintext.Length];
+
+            using (var aes = Aes.Create())
+            {
+                aes.Key = derivedAESKey;
+                aes.Mode = CipherMode.ECB;  // We implement CTR manually
+                aes.Padding = PaddingMode.None;
+
+                using (var encryptor = aes.CreateEncryptor())
                 {
-                    string message = serialPort.ReadLine().Trim();
-                    if (!string.IsNullOrEmpty(message))
+                    int blockCount = (plaintext.Length + 15) / 16;
+
+                    for (int blockIdx = 0; blockIdx < blockCount; blockIdx++)
                     {
-                        incomingMessages.Enqueue(message);
+                        // Create counter block
+                        byte[] counterBlock = new byte[16];
+                        uint currentCounter = iv + (uint)blockIdx;
+                        
+                        counterBlock[0] = (byte)(currentCounter & 0xFF);
+                        counterBlock[1] = (byte)((currentCounter >> 8) & 0xFF);
+                        counterBlock[2] = (byte)((currentCounter >> 16) & 0xFF);
+                        counterBlock[3] = (byte)((currentCounter >> 24) & 0xFF);
+                        counterBlock[4] = (byte)(blockIdx & 0xFF);
+                        counterBlock[5] = (byte)((blockIdx >> 8) & 0xFF);
+                        counterBlock[6] = (byte)((blockIdx >> 16) & 0xFF);
+                        counterBlock[7] = (byte)((blockIdx >> 24) & 0xFF);
+
+                        // Encrypt counter block
+                        byte[] encryptedCounter = new byte[16];
+                        encryptor.TransformBlock(counterBlock, 0, 16, encryptedCounter, 0);
+
+                        // XOR with plaintext
+                        int bytesInBlock = Math.Min(16, plaintext.Length - blockIdx * 16);
+                        for (int i = 0; i < bytesInBlock; i++)
+                        {
+                            ciphertext[blockIdx * 16 + i] = (byte)(plaintext[blockIdx * 16 + i] ^ encryptedCounter[i]);
+                        }
                     }
                 }
             }
-            catch (TimeoutException)
+
+            return ciphertext;
+        }
+
+        private byte[] DecryptAES128(byte[] ciphertext, uint iv)
+        {
+            // CTR mode decryption is identical to encryption
+            return EncryptAES128(ciphertext, iv);
+        }
+
+        // =====================================
+        // Cryptography - HMAC-SHA1
+        // =====================================
+
+        private byte[] CalculateHMAC(byte[] data)
+        {
+            using (var hmac = new HMACSHA1(derivedHMACKey))
             {
-                // Normal timeout, no data available
+                byte[] hash = hmac.ComputeHash(data);
+                byte[] truncated = new byte[8];
+                Array.Copy(hash, truncated, 8);  // Truncate to 8 bytes
+                return truncated;
+            }
+        }
+
+        private bool ValidateHMAC(byte[] data, byte[] expectedHMAC)
+        {
+            if (expectedHMAC.Length != 8) return false;
+
+            byte[] calculatedHMAC = CalculateHMAC(data);
+
+            // Constant-time comparison
+            byte diff = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                diff |= (byte)(calculatedHMAC[i] ^ expectedHMAC[i]);
+            }
+
+            return diff == 0;
+        }
+
+        // =====================================
+        // Random Number Generation
+        // =====================================
+
+        private uint GenerateRandomIV()
+        {
+            byte[] bytes = new byte[4];
+            rng.GetBytes(bytes);
+            return BitConverter.ToUInt32(bytes, 0);
+        }
+
+        // =====================================
+        // Sending - Primitive API
+        // =====================================
+
+        public void SendBool(int channel, bool value)
+        {
+            byte[] payload = new byte[] { (byte)(value ? 1 : 0) };
+            SendPacket(DataType.Bool, channel, payload);
+        }
+
+        public void SendInt32(int channel, int value)
+        {
+            byte[] payload = BitConverter.GetBytes(value);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(payload);
+            SendPacket(DataType.Int32, channel, payload);
+        }
+
+        public void SendFloat(int channel, float value)
+        {
+            byte[] payload = BitConverter.GetBytes(value);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(payload);
+            SendPacket(DataType.Float, channel, payload);
+        }
+
+        public void SendString(int channel, string value)
+        {
+            byte[] utf8Bytes = Encoding.UTF8.GetBytes(value);
+            int length = Math.Min(utf8Bytes.Length, 255);
+
+            byte[] payload = new byte[length + 1];
+            payload[0] = (byte)length;
+            Array.Copy(utf8Bytes, 0, payload, 1, length);
+
+            SendPacket(DataType.String, channel, payload);
+        }
+
+        public void SendBytes(int channel, byte[] data)
+        {
+            int length = Math.Min(data.Length, 255);
+
+            byte[] payload = new byte[length + 1];
+            payload[0] = (byte)length;
+            Array.Copy(data, 0, payload, 1, length);
+
+            SendPacket(DataType.Bytes, channel, payload);
+        }
+
+        // =====================================
+        // Packet Building
+        // =====================================
+
+        private void SendPacket(DataType type, int channel, byte[] payload)
+        {
+            byte[] packet;
+
+            if (config.debugMode)
+            {
+                // JSON mode (always plain, ignore SecurityLevel)
+                packet = BuildJSONPacket(type, channel, payload);
+            }
+            else
+            {
+                // Binary mode (respects SecurityLevel)
+                packet = BuildBinaryPacket(type, channel, payload);
+            }
+
+            SendDataToDevice(packet);
+        }
+
+        private byte[] BuildBinaryPacket(DataType type, int channel, byte[] payload)
+        {
+            List<byte> packet = new List<byte>();
+
+            if (config.securityLevel == SecurityLevel.Encrypted)
+            {
+                // Encrypted format: [0xAA][IV:4][Encrypted(Type|Ch|Payload):N][HMAC:8]
+
+                // Build plaintext
+                List<byte> plaintext = new List<byte>();
+                plaintext.Add((byte)type);
+                plaintext.Add((byte)channel);
+                plaintext.AddRange(payload);
+
+                // Generate random IV
+                uint iv = GenerateRandomIV();
+
+                // Encrypt
+                byte[] ciphertext = EncryptAES128(plaintext.ToArray(), iv);
+
+                // Build packet
+                packet.Add(PACKET_START_MARKER);
+                packet.Add((byte)(iv & 0xFF));
+                packet.Add((byte)((iv >> 8) & 0xFF));
+                packet.Add((byte)((iv >> 16) & 0xFF));
+                packet.Add((byte)((iv >> 24) & 0xFF));
+                packet.AddRange(ciphertext);
+
+                // Calculate and append HMAC
+                byte[] hmac = CalculateHMAC(packet.ToArray());
+                packet.AddRange(hmac);
+            }
+            else if (config.securityLevel == SecurityLevel.HMAC)
+            {
+                // HMAC-only format: [0xAA][Type][Ch][Payload][HMAC:8]
+
+                packet.Add(PACKET_START_MARKER);
+                packet.Add((byte)type);
+                packet.Add((byte)channel);
+                packet.AddRange(payload);
+
+                // Calculate and append HMAC
+                byte[] hmac = CalculateHMAC(packet.ToArray());
+                packet.AddRange(hmac);
+            }
+            else
+            {
+                // No security: [0xAA][Type][Ch][Payload][CRC:1]
+
+                packet.Add(PACKET_START_MARKER);
+                packet.Add((byte)type);
+                packet.Add((byte)channel);
+                packet.AddRange(payload);
+
+                // Calculate and append CRC
+                byte crc = CalculateCRC(packet.ToArray());
+                packet.Add(crc);
+            }
+
+            return packet.ToArray();
+        }
+
+        private byte[] BuildJSONPacket(DataType type, int channel, byte[] payload)
+        {
+            string typeStr = type.ToString().ToLower();
+            string valueStr = "";
+
+            switch (type)
+            {
+                case DataType.Bool:
+                    valueStr = (payload[0] != 0) ? "true" : "false";
+                    break;
+                case DataType.Int32:
+                    int intVal = BitConverter.ToInt32(payload, 0);
+                    valueStr = intVal.ToString();
+                    break;
+                case DataType.Float:
+                    float floatVal = BitConverter.ToSingle(payload, 0);
+                    valueStr = floatVal.ToString("F3");
+                    break;
+                case DataType.String:
+                    string strVal = Encoding.UTF8.GetString(payload, 1, payload[0]);
+                    valueStr = $"\"{strVal.Replace("\"", "\\\"")}\"";
+                    break;
+                case DataType.Bytes:
+                    string hexStr = BitConverter.ToString(payload, 1, payload[0]).Replace("-", "");
+                    valueStr = $"\"{hexStr}\"";
+                    break;
+            }
+
+            string json = $"{{\"ch\":{channel},\"type\":\"{typeStr}\",\"val\":{valueStr}}}";
+            return Encoding.UTF8.GetBytes(json);
+        }
+
+        private void SendDataToDevice(byte[] data)
+        {
+            if (!isConnected || udpClient == null || data.Length == 0)
+                return;
+
+            try
+            {
+                udpClient.Send(data, data.Length, remoteEndPoint);
             }
             catch (Exception e)
             {
-                Debug.LogError($"[LBEAST] Error reading from device: {e.Message}");
+                Debug.LogWarning($"Failed to send data: {e.Message}");
             }
         }
 
-        private void SendOutgoingMessages()
+        // =====================================
+        // Packet Parsing
+        // =====================================
+
+        private void ProcessIncomingData()
         {
-            if (serialPort == null || !serialPort.IsOpen)
+            if (udpClient == null || udpClient.Available == 0)
+                return;
+
+            try
             {
+                IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
+                byte[] data = udpClient.Receive(ref sender);
+
+                if (config.debugMode)
+                {
+                    ParseJSONPacket(data);
+                }
+                else
+                {
+                    ParseBinaryPacket(data);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Error receiving data: {e.Message}");
+            }
+        }
+
+        private void ParseBinaryPacket(byte[] data)
+        {
+            if (data.Length < 1 || data[0] != PACKET_START_MARKER)
+            {
+                Debug.LogWarning("Invalid start marker");
                 return;
             }
 
-            while (outgoingMessages.Count > 0)
+            DataType type;
+            int channel;
+            byte[] payloadData;
+
+            if (config.securityLevel == SecurityLevel.Encrypted)
             {
-                try
+                // Encrypted format: [0xAA][IV:4][Encrypted(Type|Ch|Payload):N][HMAC:8]
+                if (data.Length < 15)
                 {
-                    string message = outgoingMessages.Dequeue();
-                    serialPort.WriteLine(message);
+                    Debug.LogWarning($"Encrypted packet too small ({data.Length} bytes)");
+                    return;
                 }
-                catch (Exception e)
+
+                // Extract and validate HMAC
+                byte[] receivedHMAC = new byte[8];
+                Array.Copy(data, data.Length - 8, receivedHMAC, 0, 8);
+
+                byte[] dataForHMAC = new byte[data.Length - 8];
+                Array.Copy(data, dataForHMAC, data.Length - 8);
+
+                if (!ValidateHMAC(dataForHMAC, receivedHMAC))
                 {
-                    Debug.LogError($"[LBEAST] Error sending to device: {e.Message}");
+                    Debug.LogWarning("HMAC validation failed");
+                    return;
                 }
+
+                // Extract IV
+                uint iv = (uint)(data[1] | (data[2] << 8) | (data[3] << 16) | (data[4] << 24));
+
+                // Extract and decrypt ciphertext
+                int ciphertextLen = data.Length - 13;
+                byte[] ciphertext = new byte[ciphertextLen];
+                Array.Copy(data, 5, ciphertext, 0, ciphertextLen);
+
+                byte[] plaintext = DecryptAES128(ciphertext, iv);
+
+                if (plaintext.Length < 2)
+                {
+                    Debug.LogWarning("Decrypted payload too small");
+                    return;
+                }
+
+                type = (DataType)plaintext[0];
+                channel = plaintext[1];
+                payloadData = new byte[plaintext.Length - 2];
+                Array.Copy(plaintext, 2, payloadData, 0, payloadData.Length);
+            }
+            else if (config.securityLevel == SecurityLevel.HMAC)
+            {
+                // HMAC-only format: [0xAA][Type][Ch][Payload][HMAC:8]
+                if (data.Length < 12)
+                {
+                    Debug.LogWarning($"HMAC packet too small ({data.Length} bytes)");
+                    return;
+                }
+
+                // Extract and validate HMAC
+                byte[] receivedHMAC = new byte[8];
+                Array.Copy(data, data.Length - 8, receivedHMAC, 0, 8);
+
+                byte[] dataForHMAC = new byte[data.Length - 8];
+                Array.Copy(data, dataForHMAC, data.Length - 8);
+
+                if (!ValidateHMAC(dataForHMAC, receivedHMAC))
+                {
+                    Debug.LogWarning("HMAC validation failed");
+                    return;
+                }
+
+                type = (DataType)data[1];
+                channel = data[2];
+                payloadData = new byte[data.Length - 11];
+                Array.Copy(data, 3, payloadData, 0, payloadData.Length);
+            }
+            else
+            {
+                // No security: [0xAA][Type][Ch][Payload][CRC:1]
+                if (data.Length < 5)
+                {
+                    Debug.LogWarning($"Packet too small ({data.Length} bytes)");
+                    return;
+                }
+
+                // Validate CRC
+                byte receivedCRC = data[data.Length - 1];
+                byte[] dataForCRC = new byte[data.Length - 1];
+                Array.Copy(data, dataForCRC, data.Length - 1);
+
+                if (!ValidateCRC(dataForCRC, receivedCRC))
+                {
+                    Debug.LogWarning("CRC validation failed");
+                    return;
+                }
+
+                type = (DataType)data[1];
+                channel = data[2];
+                payloadData = new byte[data.Length - 4];
+                Array.Copy(data, 3, payloadData, 0, payloadData.Length);
+            }
+
+            // Dispatch based on type
+            HandleReceivedData(type, channel, payloadData);
+        }
+
+        private void ParseJSONPacket(byte[] data)
+        {
+            try
+            {
+                string json = Encoding.UTF8.GetString(data);
+                var dict = MiniJSON.Json.Deserialize(json) as Dictionary<string, object>;
+
+                if (dict == null) return;
+
+                int channel = Convert.ToInt32(dict["ch"]);
+                string typeStr = dict["type"] as string;
+
+                DataType type = DataType.Bool;
+                byte[] payloadData = null;
+
+                switch (typeStr)
+                {
+                    case "bool":
+                        type = DataType.Bool;
+                        bool boolVal = Convert.ToBoolean(dict["val"]);
+                        payloadData = new byte[] { (byte)(boolVal ? 1 : 0) };
+                        break;
+
+                    case "int":
+                    case "int32":
+                        type = DataType.Int32;
+                        int intVal = Convert.ToInt32(dict["val"]);
+                        payloadData = BitConverter.GetBytes(intVal);
+                        break;
+
+                    case "float":
+                        type = DataType.Float;
+                        float floatVal = Convert.ToSingle(dict["val"]);
+                        payloadData = BitConverter.GetBytes(floatVal);
+                        break;
+
+                    case "string":
+                        type = DataType.String;
+                        string strVal = dict["val"] as string;
+                        byte[] strBytes = Encoding.UTF8.GetBytes(strVal);
+                        payloadData = new byte[strBytes.Length + 1];
+                        payloadData[0] = (byte)strBytes.Length;
+                        Array.Copy(strBytes, 0, payloadData, 1, strBytes.Length);
+                        break;
+                }
+
+                HandleReceivedData(type, channel, payloadData);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to parse JSON: {e.Message}");
             }
         }
 
-        private void ProcessIncomingMessages()
+        private void HandleReceivedData(DataType type, int channel, byte[] payload)
         {
-            while (incomingMessages.Count > 0)
+            switch (type)
             {
-                string message = incomingMessages.Dequeue();
-                ParseMessage(message);
-            }
-        }
-
-        #endregion
-
-        #region Message Parsing
-
-        private void ParseMessage(string message)
-        {
-            // Expected format: "CMD:VALUE" or "BTN:ID:STATE"
-            string[] parts = message.Split(':');
-
-            if (parts.Length < 2)
-            {
-                return;
-            }
-
-            string command = parts[0];
-
-            switch (command)
-            {
-                case "BTN":
-                    if (parts.Length >= 3)
+                case DataType.Bool:
+                    if (payload.Length >= 1)
                     {
-                        if (int.TryParse(parts[1], out int buttonID) && int.TryParse(parts[2], out int state))
+                        bool value = payload[0] != 0;
+                        inputValueCache[channel] = value ? 1f : 0f;
+                        onBoolReceived?.Invoke(channel, value);
+                    }
+                    break;
+
+                case DataType.Int32:
+                    if (payload.Length >= 4)
+                    {
+                        int value = BitConverter.ToInt32(payload, 0);
+                        inputValueCache[channel] = value;
+                        onInt32Received?.Invoke(channel, value);
+                    }
+                    break;
+
+                case DataType.Float:
+                    if (payload.Length >= 4)
+                    {
+                        float value = BitConverter.ToSingle(payload, 0);
+                        inputValueCache[channel] = value;
+                        onFloatReceived?.Invoke(channel, value);
+                    }
+                    break;
+
+                case DataType.String:
+                    if (payload.Length >= 1)
+                    {
+                        int length = payload[0];
+                        if (payload.Length >= 1 + length)
                         {
-                            UpdateButtonState(buttonID, state == 1);
+                            string value = Encoding.UTF8.GetString(payload, 1, length);
+                            onStringReceived?.Invoke(channel, value);
                         }
                     }
                     break;
 
-                case "STATUS":
-                    Debug.Log($"[LBEAST] Device status: {parts[1]}");
+                case DataType.Bytes:
+                    if (payload.Length >= 1)
+                    {
+                        int length = payload[0];
+                        if (payload.Length >= 1 + length)
+                        {
+                            byte[] bytes = new byte[length];
+                            Array.Copy(payload, 1, bytes, 0, length);
+                            onBytesReceived?.Invoke(channel, bytes);
+                        }
+                    }
                     break;
-
-                default:
-                    Debug.Log($"[LBEAST] Unknown command: {message}");
-                    break;
             }
         }
 
-        #endregion
+        // =====================================
+        // Utility
+        // =====================================
 
-        #region Button Control
-
-        private void UpdateButtonState(int buttonID, bool pressed)
+        private byte CalculateCRC(byte[] data)
         {
-            if (!buttonStates.ContainsKey(buttonID))
+            byte crc = 0;
+            foreach (byte b in data)
             {
-                buttonStates[buttonID] = new ButtonState(buttonID);
+                crc ^= b;
             }
-
-            ButtonState state = buttonStates[buttonID];
-            bool wasPressed = state.isPressed;
-            state.isPressed = pressed;
-
-            if (pressed && !wasPressed)
-            {
-                // Button just pressed
-                state.lastPressTime = DateTime.Now;
-                state.pressDuration = 0f;
-            }
-            else if (pressed && wasPressed)
-            {
-                // Button held
-                state.pressDuration = (float)(DateTime.Now - state.lastPressTime).TotalSeconds;
-            }
+            return crc;
         }
 
-        /// <summary>
-        /// Check if a button is currently pressed
-        /// </summary>
-        public bool IsButtonPressed(int buttonID)
+        private bool ValidateCRC(byte[] data, byte expectedCRC)
         {
-            if (buttonStates.TryGetValue(buttonID, out ButtonState state))
-            {
-                return state.isPressed;
-            }
-            return false;
+            return CalculateCRC(data) == expectedCRC;
         }
 
-        /// <summary>
-        /// Get how long a button has been pressed (in seconds)
-        /// </summary>
-        public float GetButtonPressDuration(int buttonID)
+        private byte[] CombineBytes(byte[] a, byte[] b)
         {
-            if (buttonStates.TryGetValue(buttonID, out ButtonState state))
-            {
-                return state.pressDuration;
-            }
-            return 0f;
+            byte[] result = new byte[a.Length + b.Length];
+            Array.Copy(a, result, a.Length);
+            Array.Copy(b, 0, result, a.Length, b.Length);
+            return result;
         }
-
-        /// <summary>
-        /// Check if a button was just pressed this frame
-        /// </summary>
-        public bool GetButtonDown(int buttonID)
-        {
-            if (buttonStates.TryGetValue(buttonID, out ButtonState state))
-            {
-                return state.isPressed && state.pressDuration < Time.deltaTime;
-            }
-            return false;
-        }
-
-        #endregion
-
-        #region Haptic Output
-
-        /// <summary>
-        /// Send haptic pulse to device
-        /// </summary>
-        /// <param name="intensity">Pulse intensity (0-255)</param>
-        /// <param name="duration">Duration in milliseconds</param>
-        public void SendHapticPulse(byte intensity, int duration)
-        {
-            if (!isConnected)
-            {
-                return;
-            }
-
-            string message = $"HAPTIC:{intensity}:{duration}";
-            outgoingMessages.Enqueue(message);
-        }
-
-        /// <summary>
-        /// Activate a specific haptic motor
-        /// </summary>
-        /// <param name="motorID">Motor ID</param>
-        /// <param name="intensity">Intensity (0-255)</param>
-        /// <param name="duration">Duration in milliseconds</param>
-        public void ActivateMotor(int motorID, byte intensity, int duration)
-        {
-            if (!isConnected)
-            {
-                return;
-            }
-
-            string message = $"MOTOR:{motorID}:{intensity}:{duration}";
-            outgoingMessages.Enqueue(message);
-        }
-
-        #endregion
-
-        #region LED Control
-
-        /// <summary>
-        /// Set LED color (RGB)
-        /// </summary>
-        /// <param name="ledID">LED ID</param>
-        /// <param name="r">Red (0-255)</param>
-        /// <param name="g">Green (0-255)</param>
-        /// <param name="b">Blue (0-255)</param>
-        public void SetLEDColor(int ledID, byte r, byte g, byte b)
-        {
-            if (!isConnected)
-            {
-                return;
-            }
-
-            string message = $"LED:{ledID}:{r}:{g}:{b}";
-            outgoingMessages.Enqueue(message);
-        }
-
-        /// <summary>
-        /// Turn LED on/off
-        /// </summary>
-        public void SetLEDState(int ledID, bool on)
-        {
-            if (!isConnected)
-            {
-                return;
-            }
-
-            string message = $"LED:{ledID}:{(on ? "ON" : "OFF")}";
-            outgoingMessages.Enqueue(message);
-        }
-
-        #endregion
-
-        #region Custom Commands
-
-        /// <summary>
-        /// Send a custom command to the device
-        /// </summary>
-        public void SendCustomCommand(string command)
-        {
-            if (!isConnected)
-            {
-                return;
-            }
-
-            outgoingMessages.Enqueue(command);
-        }
-
-        #endregion
-
-        #region Accessors
-
-        /// <summary>
-        /// Check if device is connected
-        /// </summary>
-        public bool IsConnected()
-        {
-            return isConnected && serialPort != null && serialPort.IsOpen;
-        }
-
-        /// <summary>
-        /// Get device type
-        /// </summary>
-        public MicrocontrollerType GetDeviceType()
-        {
-            return deviceType;
-        }
-
-        /// <summary>
-        /// Get list of available COM ports
-        /// </summary>
-        public static string[] GetAvailablePorts()
-        {
-            return SerialPort.GetPortNames();
-        }
-
-        #endregion
     }
 }
-
