@@ -116,12 +116,25 @@ namespace LBEAST.ExperienceTemplates
                 }
             }
 
-            // Initialize costume controller (wrist-mounted buttons + haptics)
+            // Initialize costume controller (wrist-mounted buttons)
             if (costumeController != null)
             {
-                if (!costumeController.ConnectToDevice())
+                EmbeddedDeviceConfig deviceConfig = new EmbeddedDeviceConfig
                 {
-                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: Failed to connect to embedded device");
+                    deviceType = MicrocontrollerType.ESP32,
+                    protocol = CommProtocol.WiFi,
+                    deviceAddress = "192.168.1.50",
+                    port = 8888,
+                    inputChannelCount = 4,  // 4 wrist buttons (2 left, 2 right)
+                    outputChannelCount = 8, // 8 haptic vibrators (general support, not used by this template)
+                    debugMode = false,
+                    securityLevel = SecurityLevel.Encrypted,
+                    sharedSecret = "CHANGE_ME_IN_PRODUCTION_2025"
+                };
+
+                if (!costumeController.InitializeDevice(deviceConfig))
+                {
+                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: Failed to initialize embedded device, continuing without wrist controls");
                 }
                 else
                 {
@@ -170,7 +183,7 @@ namespace LBEAST.ExperienceTemplates
             // Disconnect embedded systems
             if (costumeController != null)
             {
-                costumeController.DisconnectFromDevice();
+                costumeController.DisconnectDevice();
             }
 
             // Clean up spawned avatar
@@ -191,7 +204,7 @@ namespace LBEAST.ExperienceTemplates
 
         private void ProcessButtonInput()
         {
-            if (costumeController == null || !costumeController.IsConnected() || experienceLoop == null)
+            if (costumeController == null || !costumeController.IsDeviceConnected() || experienceLoop == null)
             {
                 return;
             }
@@ -200,7 +213,7 @@ namespace LBEAST.ExperienceTemplates
             bool[] currentButtonStates = new bool[4];
             for (int i = 0; i < 4; i++)
             {
-                currentButtonStates[i] = costumeController.IsButtonPressed(i);
+                currentButtonStates[i] = costumeController.GetDigitalInput(i);
             }
 
             // Button 0 (Left Wrist Forward) or Button 2 (Right Wrist Forward)

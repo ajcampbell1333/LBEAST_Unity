@@ -107,10 +107,8 @@ namespace LBEAST.ExperienceTemplates
             }
         }
 
-        protected override void Update()
+        protected void Update()
         {
-            base.Update();
-
             if (!isRunning)
             {
                 return;

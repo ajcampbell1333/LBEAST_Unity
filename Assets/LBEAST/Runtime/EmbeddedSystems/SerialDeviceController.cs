@@ -264,6 +264,35 @@ namespace LBEAST.EmbeddedSystems
             return isConnected;
         }
 
+        /// <summary>
+        /// Get digital input state (button press)
+        /// </summary>
+        /// <param name="channel">Channel/pin number</param>
+        /// <returns>True if button is pressed, false otherwise</returns>
+        public bool GetDigitalInput(int channel)
+        {
+            if (inputValueCache.TryGetValue(channel, out float value))
+            {
+                // Digital input: > 0.5 = pressed
+                return value > 0.5f;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get analog input value (0.0 to 1.0)
+        /// </summary>
+        /// <param name="channel">Channel/pin number</param>
+        /// <returns>Analog value from 0.0 to 1.0</returns>
+        public float GetAnalogInput(int channel)
+        {
+            if (inputValueCache.TryGetValue(channel, out float value))
+            {
+                return value;
+            }
+            return 0.0f;
+        }
+
         // =====================================
         // Cryptography - Key Derivation
         // =====================================

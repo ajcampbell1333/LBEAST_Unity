@@ -28,6 +28,7 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 
 ## 📚 Table of Contents
 
+- [Prerequisites & Package Dependencies](#-prerequisites--package-dependencies)
 - [Three-Tier Architecture](#-three-tier-architecture)
 - [Hardware-Agnostic Input System](#-hardware-agnostic-input-system)
 - [Features](#-features)
@@ -35,8 +36,138 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 - [Low-Level APIs](#low-level-apis-technical-modules)
 - [Installation](#-installation)
 - [Examples](#-examples)
+- [Dedicated Server & Server Manager](#-dedicated-server--server-manager)
 - [Roadmap](#-roadmap)
 - [License](#-license)
+
+---
+
+## 📦 Prerequisites & Package Dependencies
+
+### **Unity Version Requirements**
+
+- **Unity 6 LTS (Recommended)** or Unity 2022.3 LTS (Minimum)
+- **Windows 10/11** (Primary platform)
+- **Linux** (Experimental support)
+
+### **Required Unity Packages**
+
+LBEAST requires several Unity packages to be installed via **Window > Package Manager**:
+
+#### **Core Dependencies (Required)**
+
+| Package | Version | Purpose | Installation |
+|---------|---------|---------|--------------|
+| **XR Plugin Management** | 4.4.0+ | VR/AR runtime management | `com.unity.xr.management` |
+| **OpenXR Plugin** | 1.9.0+ | Cross-platform VR support | `com.unity.xr.openxr` |
+| **Input System** | 1.7.0+ | Modern input handling | `com.unity.inputsystem` |
+| **TextMeshPro** | 3.0.6+ | UI text rendering | `com.unity.textmeshpro` |
+
+#### **Multiplayer Dependencies (Required for AIFacemask)**
+
+| Package | Version | Purpose | Installation |
+|---------|---------|---------|--------------|
+| **NetCode for GameObjects** | 1.8.0+ | Multiplayer networking | `com.unity.netcode.gameobjects` |
+| **Unity Transport** | 2.2.0+ | Network transport layer | `com.unity.transport` |
+
+#### **Optional Packages (Platform-Specific)**
+
+| Package | Version | Purpose | When Needed |
+|---------|---------|---------|-------------|
+| **SteamVR Plugin** | 2.7.3+ | SteamVR integration | If using Valve Index, HTC Vive |
+| **Oculus Integration** | Latest | Meta Quest integration | If targeting Quest 2/3/Pro |
+| **XR Interaction Toolkit** | 2.5.0+ | VR interaction helpers | For advanced VR interactions |
+
+### **Installation Methods**
+
+#### **✅ Automatic Install (If You Cloned This Repo)**
+
+All required packages are already configured in `Packages/manifest.json` which is tracked in git:
+
+```json
+{
+  "dependencies": {
+    "com.unity.xr.management": "4.4.0",
+    "com.unity.xr.openxr": "1.13.1",
+    "com.unity.inputsystem": "1.14.2",
+    "com.unity.textmeshpro": "3.0.6",
+    "com.unity.netcode.gameobjects": "2.6.0",
+    "com.unity.transport": "2.5.0"
+  }
+}
+```
+
+**Simply clone the repository and open in Unity - all packages will auto-install!**
+
+> **💡 Note:** If you cloned the repo, you already have everything. Unity will automatically install all packages when you first open the project.
+
+#### **📦 Manual Install (If NOT Using Git Clone)**
+
+If you're NOT cloning the repo, or if packages are missing, install manually:
+
+1. **Open Unity Editor**
+2. **Window > Package Manager**
+3. **Click "+" button (top-left)**
+4. **Select "Add package by name..."**
+5. **Enter package name** (e.g., `com.unity.xr.openxr`)
+6. **Click "Add"**
+7. **Repeat for each required package**
+
+### **Project Settings Configuration**
+
+After installing packages, configure:
+
+1. **XR Plugin Management**
+   - **Edit > Project Settings > XR Plug-in Management**
+   - Enable **OpenXR** for your target platform
+   - Configure **OpenXR Feature Sets** (hand tracking, controllers, etc.)
+
+2. **Input System**
+   - **Edit > Project Settings > Player > Active Input Handling**
+   - Select **"Both"** (supports old and new input systems)
+
+3. **Physics**
+   - **Edit > Project Settings > Physics**
+   - Verify collision layers for VR interactions
+
+### **Verification**
+
+To verify all dependencies are installed:
+
+1. Open **Window > Package Manager**
+2. Switch to **"In Project"** view
+3. Confirm all required packages are listed
+
+If you see compilation errors about missing namespaces:
+- `Unity.Netcode` → Install NetCode for GameObjects
+- `Unity.XR.OpenXR` → Install OpenXR Plugin
+- `UnityEngine.InputSystem` → Install Input System
+
+### **Common Issues & Troubleshooting**
+
+#### **"The type or namespace name 'NetworkBehaviour' could not be found"**
+**Solution:** Install `com.unity.netcode.gameobjects` via Package Manager.
+
+#### **"The type or namespace name 'InputSystem' could not be found"**
+**Solution:** 
+1. Install `com.unity.inputsystem`
+2. Go to **Edit > Project Settings > Player**
+3. Change **Active Input Handling** to **"Both"** or **"Input System Package (New)"**
+
+#### **"Assembly has reference to non-existent assembly 'Unity.XR.OpenXR'"**
+**Solution:** Install `com.unity.xr.openxr` and enable OpenXR in **Edit > Project Settings > XR Plug-in Management**.
+
+#### **Package installation fails or gets stuck**
+**Solution:**
+1. Close Unity Editor
+2. Delete `Library/` folder in project root
+3. Delete `Packages/packages-lock.json`
+4. Reopen Unity Editor (will reimport all packages)
+
+#### **"Could not load file or assembly 'Unity.Netcode.Runtime'"**
+**Solution:** 
+1. Restart Unity Editor
+2. If that fails, reimport NetCode package: **Package Manager > NetCode for GameObjects > Right-click > Reimport**
 
 ---
 
@@ -555,12 +686,148 @@ public class GunshipGameController : MonoBehaviour
 
 ---
 
+## 🖥️ Dedicated Server & Server Manager
+
+The AIFacemask experience (and optionally other multiplayer experiences) uses a **dedicated server architecture** to offload AI processing and enable robust multi-player experiences.
+
+### **Architecture Overview**
+
+```
+┌─────────────────────────────────────────────────┐
+│  LBEAST Server Manager PC (with monitor)       │
+│  ─────────────────────────────────────────────  │
+│  • Runs Server Manager GUI (UI Toolkit)        │
+│  • Launches dedicated server process           │
+│  • Processes AI workflow (Speech → NLU →       │
+│    Emotion → Audio2Face)                        │
+│  • Streams facial animation to HMDs            │
+└─────────────────────────────────────────────────┘
+                    │
+                    ├─ UDP Broadcast ──→ LAN (auto-discovery)
+                    │
+        ┌───────────┴───────────┐
+        │                       │
+        ▼                       ▼
+   ┌─────────┐            ┌─────────┐
+   │  HMD 1  │            │  HMD 2  │
+   │ (Client)│            │ (Client)│
+   └─────────┘            └─────────┘
+```
+
+### **Building the Dedicated Server**
+
+1. **Open Unity Hub** and load the LBEAST_Unity project
+2. **File > Build Settings**
+3. **Select "Dedicated Server" platform** (added in Unity 2021.2+)
+4. **Click "Build"** and save to `Builds/Server/`
+
+### **Option 1: Command-Line Launch (Quick)**
+
+Use the provided launch scripts:
+
+**Windows:**
+```batch
+LaunchDedicatedServer.bat -experience AIFacemask -port 7777 -maxplayers 4
+```
+
+**Linux:**
+```bash
+./LaunchDedicatedServer.sh -experience AIFacemask -port 7777 -maxplayers 4
+```
+
+### **Option 2: Server Manager GUI (Recommended)**
+
+The **LBEAST Server Manager** is a UI Toolkit-based application for managing dedicated servers with a graphical interface.
+
+#### **Setting Up the Server Manager**
+
+1. **Create a new scene** called `ServerManager`
+2. **Create an empty GameObject** named `ServerManager`
+3. **Add components:**
+   - `ServerManagerController`
+   - `ServerManagerUI`
+   - `UIDocument` (assign the ServerManager UXML file)
+4. **Configure UIDocument:**
+   - Create a UXML file with the UI layout (see example below)
+   - Assign to UIDocument component
+5. **Play** the scene
+
+#### **Server Manager Interface**
+
+The Unity version mirrors the Unreal UMG interface:
+
+```
+┌────────────────────────────────────────┐
+│  LBEAST Server Manager                 │
+├────────────────────────────────────────┤
+│  Configuration:                        │
+│  Experience: [AIFacemask     ▼]        │
+│  Server Name: [LBEAST Server]          │
+│  Max Players: [4]                      │
+│  Port: [7777]                          │
+│  Scene: [LBEASTScene]                  │
+│                                         │
+│  [Start Server]  [Stop Server]         │
+├────────────────────────────────────────┤
+│  Status:                               │
+│  ● Running                             │
+│  Players: 2/4                          │
+│  State: Act1                           │
+│  Uptime: 00:15:32                      │
+│  PID: 12345                            │
+├────────────────────────────────────────┤
+│  Omniverse Audio2Face:                 │
+│  Status: ○ Not Connected               │
+│  Streams: 0 active                     │
+│  [Configure Omniverse]                 │
+├────────────────────────────────────────┤
+│  Server Logs:                          │
+│  [12:30:15] Server started...          │
+│  [12:30:22] State changed to: Lobby    │
+└────────────────────────────────────────┘
+```
+
+#### **Key Features**
+
+- **Start/Stop Servers** - Launch and manage dedicated server processes
+- **Real-Time Monitoring** - Player count, experience state, uptime
+- **Omniverse Integration** - Configure Audio2Face streaming (coming soon)
+- **Live Logs** - View server output in real-time
+- **Multi-Experience Support** - Switch between different experience types
+- **Process Management** - Automatic detection of crashed servers
+
+### **Automatic Server Discovery**
+
+Clients automatically discover and connect to dedicated servers on the LAN using UDP broadcast:
+
+- **Server** broadcasts presence every 2 seconds on port `7778`
+- **Clients** listen for broadcasts and auto-connect
+- **No manual IP entry required** for venue deployments
+
+See the Unreal documentation for details on the server beacon protocol.
+
+### **Omniverse Audio2Face Integration**
+
+The dedicated server PC should also run NVIDIA Omniverse with Audio2Face for real-time facial animation:
+
+1. **Install** [NVIDIA Omniverse](https://www.nvidia.com/en-us/omniverse/)
+2. **Install** Audio2Face from Omniverse Launcher
+3. **Configure** Audio2Face to stream to your HMDs
+4. **Connect** via the Server Manager Omniverse panel
+
+> **Note:** Omniverse integration is in development. Current implementation provides the architecture and UI hooks.
+
+---
+
 ## 🗺️ Roadmap
 
 ### ✅ Completed (v1.0)
 - [x] Core VR tracking abstraction
 - [x] 5DOF hydraulic platform support (4 & 6 actuators)
 - [x] 2DOF gyroscope support
+- [x] **Dedicated Server** architecture
+- [x] **Server Manager GUI** (UI Toolkit-based)
+- [x] **Automatic Server Discovery** (UDP broadcast)
 - [x] Normalized input system (-1 to +1)
 - [x] HOTAS integration framework
 - [x] AI facial animation control

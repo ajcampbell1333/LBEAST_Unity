@@ -25,7 +25,7 @@ namespace LBEAST.EmbeddedSystems
                 return Serializer.Serialize(obj);
             }
 
-            sealed class Parser
+            sealed class Parser : System.IDisposable
             {
                 const string WORD_BREAK = "{}[],:\"";
 
@@ -60,7 +60,7 @@ namespace LBEAST.EmbeddedSystems
                     }
                 }
 
-                void Dispose()
+                public void Dispose()
                 {
                     json.Dispose();
                     json = null;
