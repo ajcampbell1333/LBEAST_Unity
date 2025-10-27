@@ -10,7 +10,11 @@ echo.
 
 REM Find Unity executable
 set UNITY_PATH=""
-if exist "C:\Program Files\Unity\Hub\Editor\6.0.27f1\Editor\Unity.exe" (
+if exist "C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Unity.exe" (
+    set UNITY_PATH="C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Unity.exe"
+) else if exist "C:\Program Files\Unity\Hub\Editor\2022.3.19f1\Editor\Unity.exe" (
+    set UNITY_PATH="C:\Program Files\Unity\Hub\Editor\2022.3.19f1\Editor\Unity.exe"
+) else if exist "C:\Program Files\Unity\Hub\Editor\6.0.27f1\Editor\Unity.exe" (
     set UNITY_PATH="C:\Program Files\Unity\Hub\Editor\6.0.27f1\Editor\Unity.exe"
 ) else if exist "C:\Program Files\Unity\Hub\Editor\2022.3.54f1\Editor\Unity.exe" (
     set UNITY_PATH="C:\Program Files\Unity\Hub\Editor\2022.3.54f1\Editor\Unity.exe"
@@ -39,9 +43,43 @@ echo Starting Unity compilation (this may take 1-2 minutes)...
 echo Please wait...
 echo.
 
-%UNITY_PATH% -quit -batchmode -nographics -projectPath "%PROJECT_PATH%" -executeMethod LBEAST.Editor.CompilationReporterCLI.CompileAndExit -logFile "%PROJECT_PATH%\Temp\UnityBatchCompile.log"
+REM Start Unity without -quit flag so reporter can write before exit
+start "LBEAST Unity Compiler" /B %UNITY_PATH% -batchmode -nographics -projectPath "%PROJECT_PATH%" -executeMethod LBEAST.Editor.CompilationReporterCLI.CompileAndExit -logFile "%PROJECT_PATH%\Temp\UnityBatchCompile.log"
 
-set UNITY_EXIT_CODE=%errorlevel%
+echo Waiting for Unity to finish compilation and generate report...
+echo (This will take 30-60 seconds on first run)
+echo.
+
+REM Wait for compilation report to be generated (with timeout)
+set TIMEOUT_COUNTER=0
+set MAX_TIMEOUT=120
+
+:WAIT_FOR_REPORT
+if exist "%PROJECT_PATH%\Temp\CompilationErrors.log" goto REPORT_FOUND
+timeout /t 1 /nobreak >nul
+set /a TIMEOUT_COUNTER+=1
+if %TIMEOUT_COUNTER% GEQ %MAX_TIMEOUT% goto TIMEOUT_REACHED
+goto WAIT_FOR_REPORT
+
+:TIMEOUT_REACHED
+echo WARNING: Compilation report not generated within 2 minutes
+echo Unity may still be compiling - check Unity log
+goto KILL_UNITY
+
+:REPORT_FOUND
+echo Report generated successfully!
+echo.
+
+:KILL_UNITY
+REM Give Unity a moment to finish writing
+timeout /t 2 /nobreak >nul
+
+REM Kill Unity process
+echo Shutting down Unity...
+taskkill /FI "WINDOWTITLE eq LBEAST Unity Compiler*" /F >nul 2>&1
+taskkill /IM Unity.exe /F >nul 2>&1
+
+set UNITY_EXIT_CODE=0
 
 echo.
 echo ========================================

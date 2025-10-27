@@ -30,7 +30,7 @@ namespace LBEAST.Editor
             CompilationPipeline.compilationFinished += OnCompilationFinished;
             CompilationPipeline.assemblyCompilationFinished += OnAssemblyCompilationFinished;
 
-            Debug.Log("[LBEAST] Compilation Reporter initialized");
+            Debug.Log("🤖 [LBEAST AUTO-COMPILE] Reporter initialized - automated compilation monitoring active");
 
             // If running in batch mode, force a compilation report on initialization
             if (Application.isBatchMode)
@@ -143,7 +143,7 @@ namespace LBEAST.Editor
                 }
 
                 File.WriteAllText(outputPath, errorLog.ToString());
-                Debug.Log($"[LBEAST] Compilation report written to: {outputPath}");
+                Debug.Log($"✅ [LBEAST AUTO-COMPILE] Report generated successfully → {outputPath}");
             }
             catch (System.Exception ex)
             {
@@ -257,7 +257,7 @@ namespace LBEAST.Editor
                 }
 
                 File.WriteAllText(outputPath, report.ToString());
-                Debug.Log($"[LBEAST] Batch mode report written to: {outputPath}");
+                Debug.Log($"✅ [LBEAST AUTO-COMPILE] Batch mode report generated → {outputPath}");
             }
             catch (System.Exception ex)
             {

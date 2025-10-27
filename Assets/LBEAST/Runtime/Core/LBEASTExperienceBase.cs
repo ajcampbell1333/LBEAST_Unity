@@ -1,6 +1,7 @@
 // Copyright (c) 2025 AJ Campbell. Licensed under the MIT License.
 
 using UnityEngine;
+using LBEAST.Core.Input;
 
 namespace LBEAST.Core
 {
@@ -15,6 +16,10 @@ namespace LBEAST.Core
         [SerializeField] protected bool enableMultiplayer = false;
         [SerializeField] protected int maxPlayers = 1;
 
+        [Header("Components")]
+        [Tooltip("Input adapter for handling all input sources (embedded systems, VR, keyboard, etc.)")]
+        public LBEASTInputAdapter inputAdapter;
+
         [Header("Core Systems")]
         [SerializeField] protected LBEASTTrackingSystem trackingSystem;
         [SerializeField] protected LBEASTNetworkManager networkManager;
@@ -26,6 +31,17 @@ namespace LBEAST.Core
 
         protected virtual void Awake()
         {
+            // Create input adapter component if not already present
+            if (inputAdapter == null)
+            {
+                inputAdapter = GetComponent<LBEASTInputAdapter>();
+                if (inputAdapter == null)
+                {
+                    inputAdapter = gameObject.AddComponent<LBEASTInputAdapter>();
+                    Debug.Log("[LBEAST] InputAdapter component auto-created.");
+                }
+            }
+
             // Find or create core systems
             if (trackingSystem == null)
             {
