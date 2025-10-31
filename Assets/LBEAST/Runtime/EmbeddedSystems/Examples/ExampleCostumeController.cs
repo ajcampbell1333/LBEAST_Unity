@@ -117,25 +117,25 @@ namespace LBEAST.Examples
         void OnButton1Pressed()
         {
             Debug.Log("🎭 Actor: Dialogue Option 1");
-            // TODO: Trigger dialogue tree branch 1
+            // NOOP: TODO - Trigger dialogue tree branch 1
         }
 
         void OnButton2Pressed()
         {
             Debug.Log("🎭 Actor: Dialogue Option 2");
-            // TODO: Trigger dialogue tree branch 2
+            // NOOP: TODO - Trigger dialogue tree branch 2
         }
 
         void OnButton3Pressed()
         {
             Debug.Log("⚠️ Actor: Emergency Stop Requested!");
-            // TODO: Pause game, call game master
+            // NOOP: TODO - Pause game, call game master
         }
 
         void OnButton4Pressed()
         {
             Debug.Log("❓ Actor: Hint Requested");
-            // TODO: Provide hint to actor via HMD
+            // NOOP: TODO - Provide hint to actor via HMD
         }
 
         // =====================================
@@ -230,4 +230,6 @@ namespace LBEAST.Examples
         }
     }
 }
+
+
 

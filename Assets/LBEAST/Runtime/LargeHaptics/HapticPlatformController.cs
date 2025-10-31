@@ -402,7 +402,7 @@ namespace LBEAST.LargeHaptics
 
         private bool InitializeHOTAS()
         {
-            // TODO: Integrate with Unity Input System for HOTAS devices
+            // NOOP: TODO - Integrate with Unity Input System for HOTAS devices
             // Map device-specific inputs for Logitech X56, Thrustmaster T.Flight, etc.
             
             Debug.Log($"[LBEAST] Initializing HOTAS: {config.gyroscopeConfig.hotasType}");
@@ -412,7 +412,7 @@ namespace LBEAST.LargeHaptics
 
         private void UpdateHOTASInput()
         {
-            // TODO: Poll HOTAS device for current input values
+            // NOOP: TODO - Poll HOTAS device for current input values
             // Apply sensitivity multipliers
             // hotasJoystickInput = ...
             // hotasThrottleInput = ...
@@ -425,7 +425,7 @@ namespace LBEAST.LargeHaptics
 
         private void SendCommandToHardware(PlatformMotionCommand command)
         {
-            // TODO: Implement actual hardware communication
+            // NOOP: TODO - Implement actual hardware communication
             // - Perform inverse kinematics to calculate actuator extensions
             // - Send commands via TCP/UDP to hydraulic controller
             // - Handle safety checks and emergency stop conditions
@@ -456,4 +456,6 @@ namespace LBEAST.LargeHaptics
         #endregion
     }
 }
+
+
 

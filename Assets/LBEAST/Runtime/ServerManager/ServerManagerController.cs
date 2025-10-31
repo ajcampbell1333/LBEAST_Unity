@@ -23,6 +23,15 @@ namespace LBEAST.ServerManager
     }
 
     /// <summary>
+    /// Connection mode for Server Manager
+    /// </summary>
+    public enum ConnectionMode
+    {
+        Local,   // Launch server locally
+        Remote   // Connect to remote server
+    }
+
+    /// <summary>
     /// Server runtime status
     /// </summary>
     [System.Serializable]
@@ -55,7 +64,22 @@ namespace LBEAST.ServerManager
     public class ServerManagerController : MonoBehaviour
     {
         [Header("Configuration")]
+        public ConnectionMode connectionMode = ConnectionMode.Local;
         public ServerConfiguration ServerConfig = new ServerConfiguration();
+
+        [Header("Remote Server Configuration")]
+        [Tooltip("Only used in Remote mode")]
+        public string RemoteServerIP = "127.0.0.1";
+        [Tooltip("Only used in Remote mode")]
+        public int RemoteServerPort = 7777;
+        [Tooltip("Only used in Remote mode")]
+        public int RemoteCommandPort = 7779;
+
+        [Header("Security")]
+        [Tooltip("Enable authentication for remote connections (not needed for local same-desk setups)")]
+        public bool EnableAuthentication = false;
+        [Tooltip("Shared secret for authentication (must match server configuration)")]
+        public string SharedSecret = "CHANGE_ME_IN_PRODUCTION";
 
         [Header("Status (Read-Only)")]
         public ServerStatus ServerStatus = new ServerStatus();
@@ -71,16 +95,35 @@ namespace LBEAST.ServerManager
         // Private members
         private Process serverProcess;
         private LBEASTServerBeacon serverBeacon;
+        private LBEASTServerCommandProtocol commandProtocol;
         private float statusPollTimer = 0.0f;
+        private string expectedServerIP = "";
+        private int expectedServerPort = 0;
 
         private void Awake()
         {
             // Initialize server beacon for real-time status updates
             serverBeacon = gameObject.AddComponent<LBEASTServerBeacon>();
             serverBeacon.OnServerDiscovered += OnServerStatusReceived;
+            serverBeacon.OnServerDiscovered += OnServerDiscoveredForConnection;
             serverBeacon.StartClientDiscovery();
 
-            AddLogMessage("Server Manager initialized");
+            // Initialize command protocol for remote server control
+            commandProtocol = gameObject.AddComponent<LBEASTServerCommandProtocol>();
+            if (commandProtocol != null)
+            {
+                // Configure authentication settings (only applies in Remote mode)
+                commandProtocol.EnableAuthentication = EnableAuthentication;
+                commandProtocol.SharedSecret = SharedSecret;
+                commandProtocol.CommandPort = RemoteCommandPort;
+
+                if (EnableAuthentication)
+                    AddLogMessage("Command protocol initialized with authentication enabled (port 7779)");
+                else
+                    AddLogMessage("Command protocol initialized (port 7779, authentication disabled)");
+            }
+
+            AddLogMessage($"Server Manager initialized (Mode: {connectionMode})");
             AddLogMessage("Server status beacon initialized (listening on port 7778)");
         }
 
@@ -93,6 +136,10 @@ namespace LBEAST.ServerManager
                 statusPollTimer = 0.0f;
                 PollServerStatus();
             }
+
+            // Tick command protocol in Remote mode
+            if (connectionMode == ConnectionMode.Remote && commandProtocol != null)
+                commandProtocol.TickClient();
 
             // Update uptime if server is running
             if (ServerStatus.IsRunning)
@@ -113,6 +160,14 @@ namespace LBEAST.ServerManager
                 return false;
             }
 
+            if (connectionMode == ConnectionMode.Local)
+                return StartServerLocal();
+            else
+                return StartServerRemote();
+        }
+
+        private bool StartServerLocal()
+        {
             string serverPath = GetServerExecutablePath();
             if (!System.IO.File.Exists(serverPath))
             {
@@ -163,6 +218,33 @@ namespace LBEAST.ServerManager
             }
         }
 
+        private bool StartServerRemote()
+        {
+            // Connect to remote server if not already connected
+            if (!ConnectToRemoteServer())
+                return false;
+
+            // Send StartServer command
+            if (commandProtocol != null)
+            {
+                ServerResponseMessage response = commandProtocol.SendCommand(ServerCommand.StartServer, "");
+                if (response.Success)
+                {
+                    AddLogMessage($"Start server command sent to {RemoteServerIP}:{RemoteServerPort}");
+                    ServerStatus.IsRunning = true;
+                    ServerStatus.ExperienceState = "Starting...";
+                    OnServerStatusChanged?.Invoke(ServerStatus);
+                    return true;
+                }
+                else
+                {
+                    AddLogMessage($"ERROR: Failed to send start command: {response.Message}");
+                    return false;
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Stop the running dedicated server
         /// </summary>
@@ -174,6 +256,14 @@ namespace LBEAST.ServerManager
                 return false;
             }
 
+            if (connectionMode == ConnectionMode.Local)
+                return StopServerLocal();
+            else
+                return StopServerRemote();
+        }
+
+        private bool StopServerLocal()
+        {
             if (serverProcess == null || serverProcess.HasExited)
             {
                 AddLogMessage("ERROR: Server process not found or already exited");
@@ -204,6 +294,112 @@ namespace LBEAST.ServerManager
             {
                 AddLogMessage($"ERROR: Exception stopping server: {ex.Message}");
                 return false;
+            }
+        }
+
+        private bool StopServerRemote()
+        {
+            // Send StopServer command
+            if (commandProtocol != null && commandProtocol.IsActive())
+            {
+                ServerResponseMessage response = commandProtocol.SendCommand(ServerCommand.StopServer, "");
+                if (response.Success)
+                {
+                    AddLogMessage($"Stop server command sent to {RemoteServerIP}:{RemoteServerPort}");
+                    ServerStatus.IsRunning = false;
+                    ServerStatus.CurrentPlayers = 0;
+                    ServerStatus.ExperienceState = "Stopped";
+                    OnServerStatusChanged?.Invoke(ServerStatus);
+                    return true;
+                }
+                else
+                {
+                    AddLogMessage($"ERROR: Failed to send stop command: {response.Message}");
+                    return false;
+                }
+            }
+            AddLogMessage("ERROR: Not connected to remote server");
+            return false;
+        }
+
+        /// <summary>
+        /// Connect to remote server
+        /// </summary>
+        public bool ConnectToRemoteServer()
+        {
+            if (connectionMode != ConnectionMode.Remote)
+            {
+                AddLogMessage("ERROR: Connection mode is not set to Remote");
+                return false;
+            }
+
+            if (commandProtocol != null && commandProtocol.IsActive())
+            {
+                AddLogMessage("Already connected to remote server");
+                return true;
+            }
+
+            if (commandProtocol == null)
+            {
+                commandProtocol = gameObject.AddComponent<LBEASTServerCommandProtocol>();
+                if (commandProtocol == null)
+                {
+                    AddLogMessage("ERROR: Failed to create command protocol");
+                    return false;
+                }
+            }
+
+            // Sync authentication settings before connecting
+            commandProtocol.EnableAuthentication = EnableAuthentication;
+            commandProtocol.SharedSecret = SharedSecret;
+            commandProtocol.CommandPort = RemoteCommandPort;
+
+            // Initialize client connection
+            if (commandProtocol.InitializeClient(RemoteServerIP, RemoteCommandPort))
+            {
+                expectedServerIP = RemoteServerIP;
+                expectedServerPort = RemoteServerPort;
+                AddLogMessage($"Connected to remote server at {RemoteServerIP}:{RemoteServerPort} (command port: {RemoteCommandPort})");
+                return true;
+            }
+            else
+            {
+                AddLogMessage($"ERROR: Failed to connect to remote server at {RemoteServerIP}:{RemoteCommandPort}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Disconnect from remote server
+        /// </summary>
+        public void DisconnectFromRemoteServer()
+        {
+            if (connectionMode != ConnectionMode.Remote)
+                return;
+
+            if (commandProtocol != null && commandProtocol.IsActive())
+            {
+                commandProtocol.ShutdownClient();
+                AddLogMessage("Disconnected from remote server");
+            }
+        }
+
+        /// <summary>
+        /// Check if connected to remote server
+        /// </summary>
+        public bool IsRemoteConnected() =>
+            connectionMode == ConnectionMode.Remote &&
+            commandProtocol != null &&
+            commandProtocol.IsActive();
+
+        private void OnServerDiscoveredForConnection(ServerInfo serverInfo)
+        {
+            // Auto-fill remote server info if not set
+            if (connectionMode == ConnectionMode.Remote && string.IsNullOrEmpty(RemoteServerIP))
+            {
+                RemoteServerIP = serverInfo.ServerIP;
+                RemoteServerPort = serverInfo.ServerPort;
+                AddLogMessage($"Auto-filled remote server info from discovery: {RemoteServerIP}:{RemoteServerPort}");
             }
         }
 
@@ -239,15 +435,13 @@ namespace LBEAST.ServerManager
         public void OpenOmniverseConfig()
         {
             AddLogMessage("Omniverse configuration not yet implemented");
-            // TODO: Open Omniverse configuration dialog
+            // NOOP: TODO - Open Omniverse configuration dialog
         }
 
         private void PollServerStatus()
         {
             if (!ServerStatus.IsRunning)
-            {
                 return;
-            }
 
             // Check if process is still running
             if (serverProcess != null && serverProcess.HasExited)
@@ -258,7 +452,6 @@ namespace LBEAST.ServerManager
                 ServerStatus.ExperienceState = "Crashed";
                 OnServerStatusChanged?.Invoke(ServerStatus);
             }
-
             // Real-time status updates come via OnServerStatusReceived callback
             // from the network beacon. This function just verifies process is alive.
         }
@@ -268,15 +461,11 @@ namespace LBEAST.ServerManager
             // Only process status for our managed server
             // (Match by port since IP might be reported differently for localhost)
             if (serverInfo.ServerPort != ServerConfig.Port)
-            {
                 return; // This is a different server on the network
-            }
 
             // Only process if our server is marked as running
             if (!ServerStatus.IsRunning)
-            {
                 return;
-            }
 
             // Update real-time status from server broadcast
             bool stateChanged = false;
@@ -296,9 +485,7 @@ namespace LBEAST.ServerManager
             }
 
             if (stateChanged)
-            {
                 OnServerStatusChanged?.Invoke(ServerStatus);
-            }
         }
 
         private string GetServerExecutablePath()
@@ -343,10 +530,10 @@ namespace LBEAST.ServerManager
             }
 
             if (serverBeacon != null)
-            {
                 serverBeacon.Stop();
-            }
+
+            if (commandProtocol != null)
+                commandProtocol.Shutdown();
         }
     }
 }
-

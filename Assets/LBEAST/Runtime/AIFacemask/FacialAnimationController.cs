@@ -207,20 +207,20 @@ namespace LBEAST.AIFacemask
 
         private void StartLiveMode()
         {
-            // TODO: Connect to actor stream via TCP/UDP
+            // NOOP: TODO - Connect to actor stream via TCP/UDP
             // Receive blend shape data from actor's facial capture system
             Debug.Log($"[LBEAST] Connecting to actor stream at {actorStreamIP}:{actorStreamPort}");
         }
 
         private void StopLiveMode()
         {
-            // TODO: Disconnect from actor stream
+            // NOOP: TODO - Disconnect from actor stream
             Debug.Log("[LBEAST] Disconnected from actor stream");
         }
 
         private void UpdateLiveMode()
         {
-            // TODO: Process incoming facial data from actor
+            // NOOP: TODO - Process incoming facial data from actor
             // Apply blend shapes in real-time
         }
 

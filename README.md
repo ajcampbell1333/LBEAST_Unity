@@ -210,6 +210,19 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 
 **Rule of thumb:** Start with templates, drop to APIs only when you need customization beyond what templates offer.
 
+### When to Use What Configuration?
+
+| Scenario | Recommended Configuration | Why |
+|----------|---------------------------|-----|
+| Basic single-player experience | **Local Command Console** (same PC as server) | Simple setup, no need for separate machines. Command Console launches and manages server locally. |
+| Basic multiplayer with RPCs but no heavy data transferring wirelessly | **Local Command Console** (same PC as server) | Network traffic is lightweight (player positions, events). Local Command Console can manage server on same machine efficiently. |
+| Lots of heavy graphics processing you want to offload from VR HMD(s) | **Dedicated Server + Remote Command Console** (separate PCs) | Offload GPU-intensive rendering and AI processing to dedicated server PC. Remote Command Console monitors and controls from separate machine. Better performance isolation and HMD battery life. |
+| Need to monitor the experience in real-time from off-site? | **Dedicated Server + Remote Command Console** (separate PCs) ⚠️ | Remote Command Console can connect over network to monitor server status, player count, experience state, and logs from a separate location. **⚠️ Recommended for debugging/testing only. For general public operation, full internet isolation is recommended for security.** Requires authentication enabled in Command Protocol settings. |
+
+**Configuration Options:**
+- **Local Command Console:** Command Console (UI Panel) and Server Manager (dedicated server) run on the same PC. Simple setup, one machine.
+- **Remote Command Console:** Command Console runs on separate PC from Server Manager. Networked via UDP (port 7779). Better for heavy processing workloads.
+
 ---
 
 ## 🎮 Hardware-Agnostic Input System
@@ -688,18 +701,25 @@ public class GunshipGameController : MonoBehaviour
 
 ## 🖥️ Dedicated Server & Server Manager
 
+> **Terminology Note:** 
+> - **"Command Console"** (operations terminology) = The UI Panel (admin interface) used by Operations Technicians to monitor and control the experience
+> - **"Server Manager"** (developer terminology) = The dedicated server backend that handles network traffic, decision-making, graphics processing offloaded from VR harnesses, and other computational tasks
+>
+> These are **separate components** that **may** run on the same CPU/PC, or may be networked on separate machines in close proximity.
+
 The AIFacemask experience (and optionally other multiplayer experiences) uses a **dedicated server architecture** to offload AI processing and enable robust multi-player experiences.
 
 ### **Architecture Overview**
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  LBEAST Server Manager PC (with monitor)       │
+│  LBEAST Server Manager PC (Dedicated Server)   │
 │  ─────────────────────────────────────────────  │
-│  • Runs Server Manager GUI (UI Toolkit)        │
-│  • Launches dedicated server process           │
-│  • Processes AI workflow (Speech → NLU →       │
-│    Emotion → Audio2Face)                        │
+│  • Handles all network traffic                 │
+│  • Decision-making & game state logic          │
+│  • Graphics processing offloaded from VR        │
+│  • AI workflow (Speech → NLU → Emotion →       │
+│    Audio2Face)                                  │
 │  • Streams facial animation to HMDs            │
 └─────────────────────────────────────────────────┘
                     │
@@ -712,6 +732,16 @@ The AIFacemask experience (and optionally other multiplayer experiences) uses a 
    │  HMD 1  │            │  HMD 2  │
    │ (Client)│            │ (Client)│
    └─────────┘            └─────────┘
+
+┌─────────────────────────────────────────────────┐
+│  Command Console PC (Optional - May be same)   │
+│  ─────────────────────────────────────────────  │
+│  • Server Manager GUI (UI Toolkit)             │
+│  • Admin Panel for Ops Tech monitoring        │
+│  • Experience control interface                │
+└─────────────────────────────────────────────────┘
+         │ (May share same CPU/PC as Server Manager)
+         │ OR networked separately
 ```
 
 ### **Building the Dedicated Server**
@@ -737,7 +767,7 @@ LaunchDedicatedServer.bat -experience AIFacemask -port 7777 -maxplayers 4
 
 ### **Option 2: Server Manager GUI (Recommended)**
 
-The **LBEAST Server Manager** is a UI Toolkit-based application for managing dedicated servers with a graphical interface.
+The **Command Console** (the admin UI Panel) is a UI Toolkit-based application for managing dedicated servers with a graphical interface. This provides the operations interface to monitor and control the **Server Manager** (dedicated server backend) which handles network traffic, decision-making, and graphics processing.
 
 #### **Setting Up the Server Manager**
 
