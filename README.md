@@ -562,6 +562,106 @@ device.SetLEDColor(0, 255, 0, 0);  // Red LED
 device.SendCustomCommand("PLAY:SOUND:1");
 ```
 
+### Pro Audio Module (`LBEAST.ProAudio`)
+
+**Classes:**
+- `ProAudioController` - Hardware-agnostic professional audio console control via OSC
+- `LBEASTOSCClient` - Lightweight OSC client for sending commands
+- `LBEASTOSCServer` - Lightweight OSC server for receiving updates (bidirectional sync)
+- `ProAudioConsole` - Supported console types (Behringer, Yamaha, Allen & Heath, Other, Custom)
+- `ProAudioConfig` - Configuration (console type, IP, ports, channel offset, custom patterns)
+
+**Basic Example:**
+```csharp
+using LBEAST.ProAudio;
+
+var audioController = gameObject.AddComponent<ProAudioController>();
+
+// Configure for Behringer X32
+audioController.Config.ConsoleType = ProAudioConsole.BehringerX32;
+audioController.Config.BoardIPAddress = "192.168.1.100";
+audioController.Config.OSCPort = 10023;  // X32 default OSC port
+audioController.Config.EnableReceive = true;  // Enable bidirectional sync
+audioController.Config.ReceivePort = 8000;
+
+// Initialize connection
+audioController.InitializeConsole(audioController.Config);
+
+// Control channel fader (0.0 = -inf, 1.0 = 0dB)
+audioController.SetChannelFader(1, 0.75f);  // Virtual channel 1 to 75%
+
+// Mute/unmute channel
+audioController.SetChannelMute(2, true);   // Mute virtual channel 2
+audioController.SetChannelMute(2, false);  // Unmute virtual channel 2
+
+// Set bus send (e.g., reverb send)
+audioController.SetChannelBusSend(1, 1, 0.5f);  // Virtual channel 1 → Bus 1 at 50%
+
+// Control master fader
+audioController.SetMasterFader(0.9f);  // Master to 90%
+```
+
+**Virtual-to-Physical Channel Mapping (For UI Toolkit Widgets):**
+```csharp
+// Register virtual channel 1 to map to physical hardware channel 5
+bool success = audioController.RegisterChannelForSync(
+    virtualChannel: 1,      // UI Toolkit widget channel number
+    physicalChannel: 5     // Physical hardware channel number
+);
+
+// Now SetChannelFader(1, level) will send OSC to physical channel 5
+
+// Unregister when removing channel from UI
+audioController.UnregisterChannelForSync(1);
+
+// Get max channels for current console type
+int maxChannels = audioController.GetMaxChannelsForConsole();  // 32 for X32, 64 for Other, etc.
+```
+
+**Bidirectional Sync with Actions (For UI Toolkit Window):**
+```csharp
+// Subscribe to physical board updates
+audioController.OnChannelFaderChanged += (virtualChannel, level) =>
+{
+    Debug.Log($"Physical board changed channel {virtualChannel} to {level}");
+    // Update UI Toolkit slider for this channel
+};
+
+audioController.OnChannelMuteChanged += (virtualChannel, mute) =>
+{
+    Debug.Log($"Physical board muted channel {virtualChannel}: {mute}");
+    // Update UI Toolkit toggle for this channel
+};
+
+audioController.OnMasterFaderChanged += (level) =>
+{
+    Debug.Log($"Physical board changed master to {level}");
+    // Update UI Toolkit master slider
+};
+```
+
+**Supported Consoles:**
+- ✅ Behringer X32, M32, Wing
+- ✅ Yamaha QL, CL, TF, DM7
+- ✅ Allen & Heath SQ, dLive
+- ✅ Soundcraft Si
+- ✅ PreSonus StudioLive
+- ✅ Other (generic 64-channel support)
+- ✅ Custom (user-defined OSC path patterns with XX/YY placeholders)
+
+**Features:**
+- ✅ **Virtual-to-Physical Mapping** - Map UI channels to any hardware channel
+- ✅ **Bidirectional Sync** - Physical board changes update UI, UI changes update board
+- ✅ **Channel Validation** - Validates channel numbers against console-specific limits
+- ✅ **Channel Offset** - Support for 0-based vs 1-based channel indexing
+- ✅ **Custom OSC Patterns** - Define custom OSC paths for unsupported hardware
+- ✅ **No Max for Live** - Direct OSC to console (no intermediate software)
+- ✅ **Cross-Manufacturer** - Same API works with all supported boards
+- ✅ **Lightweight** - Custom OSC implementation (no Asset Store dependencies)
+- ✅ **UDP-Based** - Consistent with LBEAST architecture (uses existing UDP infrastructure)
+
+**Next Steps:** See `ProAudioNextSteps.md` for UI Toolkit template implementation guide.
+
 ---
 
 ## 📦 Installation
@@ -796,7 +896,7 @@ The Unity version mirrors the Unreal UMG interface:
 │  Max Players: [4]                      │
 │  Port: [7777]                          │
 │  Scene: [LBEASTScene]                  │
-│                                         │
+│                                        │
 │  [Start Server]  [Stop Server]         │
 ├────────────────────────────────────────┤
 │  Status:                               │

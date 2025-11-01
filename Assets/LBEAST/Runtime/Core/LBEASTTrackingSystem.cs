@@ -12,8 +12,12 @@ namespace LBEAST.Core
     public class LBEASTTrackingSystem : MonoBehaviour
     {
         [Header("Tracking Configuration")]
+        // NOOP: TODO - Implement hand tracking enable/disable logic
+#pragma warning disable CS0414 // Field is assigned but never used (intentionally unused - future feature)
         [SerializeField] private bool enableHandTracking = true;
+        // NOOP: TODO - Implement eye tracking enable/disable logic
         [SerializeField] private bool enableEyeTracking = false;
+#pragma warning restore CS0414
         
         private bool isInitialized = false;
         private InputDevice headDevice;

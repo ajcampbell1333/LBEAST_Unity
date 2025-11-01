@@ -95,7 +95,7 @@ namespace LBEAST.Core.Input
             // Auto-find experience if not already assigned
             if (autoFindExperience && currentExperience == null)
             {
-                currentExperience = FindObjectOfType<LBEASTExperienceBase>();
+                currentExperience = FindFirstObjectByType<LBEASTExperienceBase>();
                 if (currentExperience != null)
                 {
                     Debug.Log($"[LBEASTPlayerController] Auto-assigned currentExperience: {currentExperience.name}");

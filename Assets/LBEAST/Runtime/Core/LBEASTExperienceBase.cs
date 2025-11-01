@@ -49,7 +49,7 @@ namespace LBEAST.Core
             // Find or create core systems
             if (trackingSystem == null)
             {
-                trackingSystem = FindObjectOfType<LBEASTTrackingSystem>();
+                trackingSystem = FindFirstObjectByType<LBEASTTrackingSystem>();
                 if (trackingSystem == null)
                 {
                     GameObject trackingObj = new GameObject("LBEAST_TrackingSystem");
@@ -59,7 +59,7 @@ namespace LBEAST.Core
 
             if (enableMultiplayer && networkManager == null)
             {
-                networkManager = FindObjectOfType<LBEASTNetworkManager>();
+                networkManager = FindFirstObjectByType<LBEASTNetworkManager>();
                 if (networkManager == null)
                 {
                     GameObject networkObj = new GameObject("LBEAST_NetworkManager");

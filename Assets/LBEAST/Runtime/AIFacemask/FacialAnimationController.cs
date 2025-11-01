@@ -66,8 +66,12 @@ namespace LBEAST.AIFacemask
         [Header("Configuration")]
         [SerializeField] private FacialAnimationMode animationMode = FacialAnimationMode.Live;
         [SerializeField] private SkinnedMeshRenderer faceMeshRenderer;
+        // NOOP: TODO - Implement lip sync enable/disable logic
+#pragma warning disable CS0414 // Field is assigned but never used (intentionally unused - future feature)
         [SerializeField] private bool enableLipSync = true;
+        // NOOP: TODO - Implement eye tracking enable/disable logic
         [SerializeField] private bool enableEyeTracking = false;
+#pragma warning restore CS0414
 
         [Header("Network Settings")]
         [SerializeField] private string actorStreamIP = "192.168.1.50";
