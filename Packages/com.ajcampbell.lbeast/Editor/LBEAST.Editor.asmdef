@@ -1,0 +1,19 @@
+{
+    "name": "LBEAST.Editor",
+    "rootNamespace": "LBEAST.Editor",
+    "references": [
+        "LBEAST.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+

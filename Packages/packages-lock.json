@@ -1,5 +1,17 @@
 {
   "dependencies": {
+    "com.ajcampbell.lbeast": {
+      "version": "file:com.ajcampbell.lbeast",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.inputsystem": "1.14.2",
+        "com.unity.netcode.gameobjects": "2.6.0",
+        "com.unity.xr.management": "4.4.0",
+        "com.unity.xr.openxr": "1.13.1",
+        "com.unity.modules.uielements": "1.0.0"
+      }
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

@@ -44,15 +44,17 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 
 ## 📦 Prerequisites & Package Dependencies
 
+> **📦 LBEAST is a Unity Package** - See the [Installation](#-installation) section below for detailed setup instructions.
+
 ### **Unity Version Requirements**
 
 - **Unity 6 LTS (Recommended)** or Unity 2022.3 LTS (Minimum)
 - **Windows 10/11** (Primary platform)
 - **Linux** (Experimental support)
 
-### **Required Unity Packages**
+### **LBEAST Package Dependencies**
 
-LBEAST requires several Unity packages to be installed via **Window > Package Manager**:
+LBEAST requires several Unity packages. These are **automatically installed** when you install LBEAST via Package Manager or Git URL. If installing manually, install these via **Window > Package Manager**:
 
 #### **Core Dependencies (Required)**
 
@@ -78,40 +80,18 @@ LBEAST requires several Unity packages to be installed via **Window > Package Ma
 | **Oculus Integration** | Latest | Meta Quest integration | If targeting Quest 2/3/Pro |
 | **XR Interaction Toolkit** | 2.5.0+ | VR interaction helpers | For advanced VR interactions |
 
-### **Installation Methods**
+### **Quick Setup (If You Cloned This Repo)**
 
-#### **✅ Automatic Install (If You Cloned This Repo)**
+If you've cloned the `LBEAST_Unity` repository, everything is already configured:
 
-All required packages are already configured in `Packages/manifest.json` which is tracked in git:
+1. **Open the project in Unity**
+2. **LBEAST package** is already in `Packages/com.ajcampbell.lbeast/`
+3. **Dependencies** will auto-install from `Packages/manifest.json`
+4. **That's it!** See the [Installation](#-installation) section for more details.
 
-```json
-{
-  "dependencies": {
-    "com.unity.xr.management": "4.4.0",
-    "com.unity.xr.openxr": "1.13.1",
-    "com.unity.inputsystem": "1.14.2",
-    "com.unity.textmeshpro": "3.0.6",
-    "com.unity.netcode.gameobjects": "2.6.0",
-    "com.unity.transport": "2.5.0"
-  }
-}
-```
+> **💡 Note:** If you cloned the repo, LBEAST is already set up as a local package. All dependencies will automatically install when you first open the project.
 
-**Simply clone the repository and open in Unity - all packages will auto-install!**
-
-> **💡 Note:** If you cloned the repo, you already have everything. Unity will automatically install all packages when you first open the project.
-
-#### **📦 Manual Install (If NOT Using Git Clone)**
-
-If you're NOT cloning the repo, or if packages are missing, install manually:
-
-1. **Open Unity Editor**
-2. **Window > Package Manager**
-3. **Click "+" button (top-left)**
-4. **Select "Add package by name..."**
-5. **Enter package name** (e.g., `com.unity.xr.openxr`)
-6. **Click "Add"**
-7. **Repeat for each required package**
+For installation in other projects, see the [Installation](#-installation) section below.
 
 ### **Project Settings Configuration**
 
@@ -666,35 +646,142 @@ audioController.OnMasterFaderChanged += (level) =>
 
 ## 📦 Installation
 
-### Option 1: Manual Installation
+LBEAST is distributed as a Unity Package, making it easy to integrate into your projects. Choose the installation method that best fits your workflow.
 
-1. Clone or download this repository
-2. Copy the `Assets/LBEAST` folder into your Unity project's `Assets` directory
-3. Install dependencies via Package Manager:
-   - **Unity NetCode for GameObjects** (for multiplayer)
-   - **Input System** (for HOTAS and VR controllers)
-   - **XR Plugin Management** (for VR support)
+### **Installation Methods**
 
-### Option 2: Unity Package Manager (Git URL)
+#### **Option 1: Local Package (If You Cloned This Repo)**
 
-1. Open Unity Package Manager
-2. Click **+ → Add package from git URL**
-3. Enter: `https://github.com/ajcampbell1333/LBEAST_Unity.git`
+If you've cloned the `LBEAST_Unity` repository, the package is already set up:
 
-### Dependencies
+1. **Open your Unity project**
+2. The package will automatically appear in **Package Manager**
+3. **Window > Package Manager**
+4. Switch to **"In Project"** tab
+5. Look for **"LBEAST - Location-Based Entertainment Activation Standard"**
 
-Add these packages via **Window → Package Manager**:
+> **✅ Already Done!** If you cloned the repo, LBEAST is already configured as a local package in `Packages/com.ajcampbell.lbeast/`
 
+#### **Option 2: Git URL Installation (Recommended for Distribution)**
+
+Install LBEAST directly from a Git repository:
+
+1. **Open Unity Editor**
+2. **Window > Package Manager**
+3. Click **"+"** button (top-left)
+4. Select **"Add package from git URL..."**
+5. Enter the Git URL:
+   ```
+   https://github.com/ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast
+   ```
+6. Click **"Add"**
+7. Unity will download and install the package
+
+> **📌 Note:** LBEAST is currently in **early alpha (version 0.1.0)**. Version tags are not yet available, so the Git URL above will pull the latest commit from the `main` branch. Once version tags are added, you can pin to specific versions using `#v0.1.0` syntax. LBEAST uses **Semantic Versioning** (SemVer): MAJOR.MINOR.PATCH (e.g., 0.1.0 = minor changes, 1.0.0 = major/breaking changes).
+
+**For a specific branch:**
 ```
-com.unity.netcode.gameobjects (Latest)
-com.unity.inputsystem (Latest)
-com.unity.xr.management (Latest)
+https://github.com/ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast#main
 ```
 
-For OpenXR support:
+**For a specific version tag (when available):**
 ```
-com.unity.xr.openxr (Latest)
+https://github.com/ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast#v0.1.0
 ```
+
+**Using SSH:**
+```
+git@github.com:ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast
+```
+
+#### **Option 3: Manual Package Installation**
+
+If you have the package folder locally (e.g., downloaded ZIP or different location):
+
+1. **Open Unity Editor**
+2. **Window > Package Manager**
+3. Click **"+"** button (top-left)
+4. Select **"Add package from disk..."**
+5. Navigate to the `package.json` file in the LBEAST package folder:
+   ```
+   Packages/com.ajcampbell.lbeast/package.json
+   ```
+6. Select `package.json`
+7. Click **"Open"**
+
+#### **Option 4: Copy Package to Your Project**
+
+If you want to embed LBEAST directly in your project:
+
+1. **Copy the package folder** to your project:
+   ```
+   Copy: Packages/com.ajcampbell.lbeast/
+   To: YourProject/Packages/com.ajcampbell.lbeast/
+   ```
+2. **Open Unity Editor**
+3. Unity will automatically detect and import the package
+4. Verify in **Window > Package Manager > "In Project"**
+
+### **Verifying Installation**
+
+After installation, verify LBEAST is properly installed:
+
+1. **Window > Package Manager**
+2. Switch to **"In Project"** tab
+3. Look for **"LBEAST - Location-Based Entertainment Activation Standard"** (version 0.1.0)
+4. **Create a test script** to verify namespaces:
+   ```csharp
+   using LBEAST.Core;
+   using LBEAST.ExperienceTemplates;
+   
+   // This should compile without errors
+   public class LBEASTTest : MonoBehaviour
+   {
+       void Start()
+       {
+           Debug.Log("LBEAST package loaded successfully!");
+       }
+   }
+   ```
+
+### **Package Dependencies**
+
+LBEAST requires several Unity packages. These will be **automatically installed** when you install LBEAST via Git URL or Package Manager. If installing manually, ensure these are installed:
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `com.unity.inputsystem` | 1.14.2+ | Modern input handling |
+| `com.unity.netcode.gameobjects` | 2.6.0+ | Multiplayer networking |
+| `com.unity.xr.management` | 4.4.0+ | VR/AR runtime management |
+| `com.unity.xr.openxr` | 1.13.1+ | Cross-platform VR support |
+| `com.unity.modules.uielements` | 1.0.0 | UI Toolkit for Command Console |
+
+**To install dependencies manually:**
+1. **Window > Package Manager**
+2. Click **"+"** → **"Add package by name..."**
+3. Enter package name (e.g., `com.unity.inputsystem`)
+4. Click **"Add"**
+
+### **Troubleshooting Installation**
+
+#### **Package doesn't appear in Package Manager**
+- **Solution:** Close and reopen Unity Editor
+- **Solution:** Check that `package.json` exists in `Packages/com.ajcampbell.lbeast/`
+- **Solution:** Verify `Packages/manifest.json` includes the package (if using Git URL)
+
+#### **"Could not resolve package" (Git URL installation)**
+- **Solution:** Verify the Git repository URL is correct and publicly accessible
+- **Solution:** Check your internet connection
+- **Solution:** Try using HTTPS instead of SSH or vice versa
+
+#### **"Assembly 'LBEAST.Runtime' could not be found"**
+- **Solution:** Ensure `Runtime/LBEAST.Runtime.asmdef` exists in the package
+- **Solution:** Close and reopen Unity Editor to force reimport
+- **Solution:** Check for compilation errors in the Console
+
+#### **Dependencies not installing automatically**
+- **Solution:** Install dependencies manually (see table above)
+- **Solution:** Check `package.json` in the LBEAST package for the `dependencies` section
 
 ---
 
