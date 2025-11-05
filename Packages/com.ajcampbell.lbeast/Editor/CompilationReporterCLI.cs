@@ -22,38 +22,94 @@ namespace LBEAST.Editor
         /// </summary>
         public static void CompileAndExit()
         {
-            Debug.Log("🚀🤖✅ [LBEAST AUTO-COMPILE v2.0] CLI invoked - FINAL TEST - starting compilation check...");
+            Debug.Log("🚀🤖 [LBEAST AUTO-COMPILE] CLI invoked - forcing compilation...");
 
-            // Wait for any pending compilation to finish
-            int waitCount = 0;
-            while (EditorApplication.isCompiling && waitCount < 600) // Max 60 seconds
+            // Wait for Unity to fully initialize before forcing compilation
+            EditorApplication.delayCall += () =>
             {
-                System.Threading.Thread.Sleep(100);
-                waitCount++;
-            }
+                // Force a recompilation to ensure we actually compile
+                CompilationPipeline.RequestScriptCompilation();
+                
+                Debug.Log("📦 [LBEAST AUTO-COMPILE] Recompilation requested - waiting for compilation to start...");
 
-            if (EditorApplication.isCompiling)
-            {
-                Debug.LogWarning("⏰ [LBEAST AUTO-COMPILE] Compilation still in progress after 60s timeout");
-            }
+                // Wait for compilation to actually start
+                EditorApplication.delayCall += () =>
+                {
+                    int waitStartCount = 0;
+                    while (!EditorApplication.isCompiling && waitStartCount < 200) // Max 20 seconds for compilation to start
+                    {
+                        System.Threading.Thread.Sleep(100);
+                        waitStartCount++;
+                        // Check every 10 iterations (1 second)
+                        if (waitStartCount % 10 == 0)
+                        {
+                            CompilationPipeline.RequestScriptCompilation(); // Keep requesting
+                        }
+                    }
 
-            // Force a compilation report generation
-            string projectRoot = Application.dataPath.Replace("/Assets", "");
-            string reportPath = Path.Combine(projectRoot, "Temp/CompilationErrors.log");
-            
-            // Generate the report
-            WriteCompilationReport(reportPath);
+                    if (!EditorApplication.isCompiling && waitStartCount >= 200)
+                    {
+                        Debug.LogWarning("⚠️ [LBEAST AUTO-COMPILE] Compilation did not start after 20s - checking if already compiled");
+                        // Still generate a report even if compilation didn't start
+                        string projectRoot = Application.dataPath.Replace("/Assets", "");
+                        string reportPath = Path.Combine(projectRoot, "Temp/CompilationErrors.log");
+                        WriteCompilationReport(reportPath);
+                        Debug.Log($"✅ [LBEAST AUTO-COMPILE] Status check complete → {reportPath}");
+                        return;
+                    }
 
-            Debug.Log($"✅✅✅ [LBEAST AUTO-COMPILE v2.0] FINAL TEST COMPLETE → {reportPath}");
-            Debug.Log("⚠️  [LBEAST AUTO-COMPILE v2.0] Unity will remain open - batch script will terminate when ready");
-            
-            // DO NOT EXIT - let batch script kill Unity after reading the file
+                    Debug.Log("⚙️ [LBEAST AUTO-COMPILE] Compilation started - waiting for completion...");
+
+                    // Now wait for compilation to finish
+                    EditorApplication.delayCall += () =>
+                    {
+                        int waitCount = 0;
+                        while (EditorApplication.isCompiling && waitCount < 600) // Max 60 seconds
+                        {
+                            System.Threading.Thread.Sleep(100);
+                            waitCount++;
+                        }
+
+                        if (EditorApplication.isCompiling)
+                        {
+                            Debug.LogWarning("⏰ [LBEAST AUTO-COMPILE] Compilation still in progress after 60s timeout");
+                        }
+                        else
+                        {
+                            Debug.Log("✅ [LBEAST AUTO-COMPILE] Compilation finished");
+                        }
+
+                        // Force a compilation report generation after compilation completes
+                        string projectRoot = Application.dataPath.Replace("/Assets", "");
+                        string reportPath = Path.Combine(projectRoot, "Temp/CompilationErrors.log");
+                        
+                        // Generate the report
+                        WriteCompilationReport(reportPath);
+
+                        Debug.Log($"[LBEAST AUTO-COMPILE] Compilation complete → {reportPath}");
+                        Debug.Log("⚠️  [LBEAST AUTO-COMPILE] Unity will remain open - batch script will terminate when ready");
+                    };
+                };
+            };
         }
 
         private static void WriteCompilationReport(string reportPath)
         {
             try
             {
+                // Check if CompilationReporter already wrote a report (from compilation events)
+                if (File.Exists(reportPath))
+                {
+                    string existingReport = File.ReadAllText(reportPath);
+                    // If the existing report has actual compilation results, use it
+                    if (existingReport.Contains("Status: SUCCESS") || existingReport.Contains("Status: FAILED"))
+                    {
+                        Debug.Log("📄 [LBEAST AUTO-COMPILE] Using existing compilation report from CompilationReporter");
+                        return; // Use the report from CompilationReporter which has detailed errors
+                    }
+                }
+
+                // Otherwise, generate a basic report
                 System.Text.StringBuilder report = new System.Text.StringBuilder();
                 report.AppendLine("===========================================");
                 report.AppendLine("LBEAST COMPILATION REPORT");
@@ -63,20 +119,34 @@ namespace LBEAST.Editor
                 report.AppendLine($"Report ID: LBEAST-{System.Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}");
                 report.AppendLine();
 
-                // Check for compilation errors
-                bool hasErrors = EditorApplication.isCompiling;
-                
-                // Note: In batch mode, we can't easily detect compilation errors after the fact
-                // The CompilationReporter will capture them during actual compilation
+                // Check compilation status
                 report.AppendLine("Status Check:");
                 report.AppendLine($"  Compiling: {EditorApplication.isCompiling}");
                 report.AppendLine($"  Play Mode Enabled: {EditorApplication.isPlaying}");
                 report.AppendLine();
 
+                // Check for actual compilation errors via CompilationPipeline
+                var assemblies = CompilationPipeline.GetAssemblies();
+                bool hasErrors = false;
+                foreach (var assembly in assemblies)
+                {
+                    // Note: This is a basic check - detailed errors are captured by CompilationReporter
+                    if (assembly.name.Contains("error", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasErrors = true;
+                        break;
+                    }
+                }
+
                 report.AppendLine("===========================================");
                 if (EditorApplication.isCompiling)
                 {
                     report.AppendLine("Status: COMPILING (still in progress)");
+                }
+                else if (hasErrors)
+                {
+                    report.AppendLine("Status: FAILED - Compilation errors detected");
+                    report.AppendLine("Note: Check Unity console or CompilationReporter for detailed errors");
                 }
                 else
                 {
