@@ -73,7 +73,7 @@ public class CostumeController : MonoBehaviour
 
 ### **ESP32 Side (Arduino)**
 
-**Upload firmware from:** `Assets/LBEAST/Resources/ESP32_Example_Firmware_Secured.ino`
+**Upload firmware from:** `FirmwareExamples/Base/Examples/ButtonMotor_Example.ino` (or use secured version if available)
 
 ```cpp
 // Configuration (edit in Arduino IDE)
@@ -85,9 +85,9 @@ const char* sharedSecret = "MyVenueSecret_2025";  // MUST match Unity
 const int securityLevel = 2;  // 2 = AES-128 + HMAC
 ```
 
-**Two firmware versions available:**
-- `ESP32_Example_Firmware.ino` - Unsecured (development only)
-- `ESP32_Example_Firmware_Secured.ino` - **AES-128 + HMAC (use this for production!)**
+**Firmware examples available in `FirmwareExamples/`:**
+- `Base/Examples/ButtonMotor_Example.ino` - Generic button & motor example (all platforms)
+- `EscapeRoom/DoorLock/DoorLock_Example.ino` - Door lock control example with confirmation callbacks
 
 ---
 
@@ -440,8 +440,8 @@ Socket->SendTo(Data.GetData(), Data.Num(), BytesSent, *RemoteAddr);
 
 ## 📚 Additional Resources
 
-- **ESP32 Firmware (Unsecured):** `Assets/LBEAST/Resources/ESP32_Example_Firmware.ino` ⚠️ Development only
-- **ESP32 Firmware (Secured):** `Assets/LBEAST/Resources/ESP32_Example_Firmware_Secured.ino` ✅ **Production**
+- **Firmware Examples:** `FirmwareExamples/Base/Examples/` - Platform-agnostic examples
+- **Escape Room Examples:** `FirmwareExamples/EscapeRoom/` - Door lock and prop control examples
 - **Example Usage:** `Assets/LBEAST/Runtime/EmbeddedSystems/Examples/ExampleCostumeController.cs`
 - **Unreal Implementation:** `LBEAST_Unreal/Plugins/LBEAST/Source/EmbeddedSystems/`
 - **Protocol Spec:** Same as Unreal (byte-for-byte compatible)

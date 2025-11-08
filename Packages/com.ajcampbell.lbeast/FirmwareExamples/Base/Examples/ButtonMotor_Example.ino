@@ -1,20 +1,32 @@
 /*
- * LBEAST ESP32 Example Firmware (Unsecured)
+ * LBEAST Button & Motor Example Firmware
  * 
  * This example demonstrates bidirectional communication between
- * Unity/Unreal Engine (LBEAST SDK) and an ESP32 over WiFi (UDP).
+ * Unreal Engine (LBEAST SDK) and a microcontroller over WiFi (UDP).
  * 
- * ⚠️ DEVELOPMENT ONLY - No encryption! Use ESP32_Example_Firmware_Secured.ino for production.
+ * Functionality:
+ * - Reads 4 tactile buttons and sends state changes to Unreal
+ * - Receives motor control commands from Unreal and drives 6 vibration motors
+ * - Demonstrates basic input/output integration with LBEAST EmbeddedSystems API
+ * 
+ * Supported Platforms:
+ * - ESP32 (built-in WiFi) - GPIO pins: 2, 4, 5, 12, 13, 14, 18, 25, 26, 27
+ * - ESP8266 (built-in WiFi) - GPIO pins: 2, 4, 5, 12, 13, 14, 16
+ * - Arduino + WiFi Shield (ESP8266-based) - Standard Arduino GPIO pins
+ * - STM32 + WiFi Module (ESP8266/ESP32-based) - STM32 GPIO pins
+ * - Raspberry Pi (built-in WiFi) - GPIO via WiringPi or pigpio
+ * - Jetson Nano (built-in WiFi) - GPIO via Jetson GPIO library
  * 
  * Hardware Requirements:
- * - ESP32 DevKit (any variant with WiFi)
- * - 4 tactile buttons connected to GPIO 2, 4, 5, 18 (with pull-up resistors)
- * - 6 vibration motors connected to GPIO 12, 13, 14, 25, 26, 27 (with driver transistors)
+ * - Microcontroller with WiFi capability (see supported platforms above)
+ * - 4 tactile buttons connected to GPIO pins (with pull-up resistors)
+ * - 6 vibration motors connected to GPIO pins (with driver transistors)
  * 
  * Protocol: Binary (matches LBEAST EmbeddedDeviceController)
  * Packet Format: [0xAA][Type][Channel][Payload...][CRC]
  * 
- * ✅ COMPATIBLE WITH BOTH UNITY AND UNREAL - Same firmware works for both engines!
+ * Note: GPIO pin assignments vary by platform. Adjust pin numbers in the
+ * Configuration section below to match your hardware.
  * 
  * Copyright (c) 2025 AJ Campbell. Licensed under the MIT License.
  */
@@ -30,18 +42,21 @@
 const char* ssid = "VR_Arcade_LAN";
 const char* password = "your_password_here";
 
-// Unity/Unreal PC IP and port
-IPAddress gameEngineIP(192, 168, 1, 100);  // Change to your PC's IP
-uint16_t gameEnginePort = 8888;
+// Unreal PC IP and port
+IPAddress unrealIP(192, 168, 1, 100);  // Change to your Unreal PC's IP
+uint16_t unrealPort = 8888;
 uint16_t localPort = 8888;
 
 // Button pins (INPUT_PULLUP)
-const int buttonPins[4] = {2, 4, 5, 18};
+// Note: GPIO pin assignments vary by platform. For ESP8266, use pins: {2, 4, 5, 16}
+// ESP8266 has fewer GPIO pins - avoid GPIO 0, 15, 16 for some functions
+const int buttonPins[4] = {2, 4, 5, 18};  // ESP32 example
 bool buttonStates[4] = {false, false, false, false};
 bool lastButtonStates[4] = {false, false, false, false};
 
 // Vibration motor pins (PWM)
-const int motorPins[6] = {12, 13, 14, 25, 26, 27};
+// Note: For ESP8266, use pins: {12, 13, 14, 15, 0, 1}
+const int motorPins[6] = {12, 13, 14, 25, 26, 27};  // ESP32 example
 
 // UDP
 WiFiUDP udp;
@@ -63,8 +78,7 @@ enum DataType {
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n\nLBEAST ESP32 Firmware Starting...");
-  Serial.println("⚠️  UNSECURED MODE - Development only!");
+  Serial.println("\n\nLBEAST Button & Motor Example Starting...");
 
   // Configure button pins
   for (int i = 0; i < 4; i++) {
@@ -88,14 +102,13 @@ void setup() {
 
   Serial.println("\nWiFi connected!");
   Serial.printf("ESP32 IP: %s\n", WiFi.localIP().toString().c_str());
-  Serial.printf("Game Engine IP: %s:%d\n", gameEngineIP.toString().c_str(), gameEnginePort);
+  Serial.printf("Unreal IP: %s:%d\n", unrealIP.toString().c_str(), unrealPort);
 
   // Start UDP
   udp.begin(localPort);
   Serial.printf("UDP listening on port %d\n", localPort);
 
-  Serial.println("ESP32 ready!");
-  Serial.println("Works with Unity AND Unreal!");
+  Serial.println("Button & Motor Example ready!");
 }
 
 // =====================================
@@ -103,10 +116,10 @@ void setup() {
 // =====================================
 
 void loop() {
-  // Read button states and send to game engine
+  // Read button states and send to Unreal
   readButtons();
 
-  // Receive commands from game engine
+  // Receive commands from Unreal
   receiveCommands();
 
   delay(10); // ~100Hz polling
@@ -226,7 +239,7 @@ void handleString(uint8_t channel, uint8_t* data, uint8_t length) {
 }
 
 // =====================================
-// Sending to Game Engine
+// Sending to Unreal
 // =====================================
 
 void sendBool(uint8_t channel, bool value) {
@@ -237,7 +250,7 @@ void sendBool(uint8_t channel, bool value) {
   packet[3] = value ? 1 : 0;
   packet[4] = calculateCRC(packet, 4);
 
-  udp.beginPacket(gameEngineIP, gameEnginePort);
+  udp.beginPacket(unrealIP, unrealPort);
   udp.write(packet, 5);
   udp.endPacket();
 }
@@ -253,7 +266,7 @@ void sendInt32(uint8_t channel, int32_t value) {
   packet[6] = (value >> 24) & 0xFF;
   packet[7] = calculateCRC(packet, 7);
 
-  udp.beginPacket(gameEngineIP, gameEnginePort);
+  udp.beginPacket(unrealIP, unrealPort);
   udp.write(packet, 8);
   udp.endPacket();
 }
@@ -272,7 +285,7 @@ void sendFloat(uint8_t channel, float value) {
   packet[6] = (intValue >> 24) & 0xFF;
   packet[7] = calculateCRC(packet, 7);
 
-  udp.beginPacket(gameEngineIP, gameEnginePort);
+  udp.beginPacket(unrealIP, unrealPort);
   udp.write(packet, 8);
   udp.endPacket();
 }
@@ -289,7 +302,7 @@ void sendString(uint8_t channel, const char* str) {
   memcpy(&packet[4], str, len);
   packet[4 + len] = calculateCRC(packet, 4 + len);
 
-  udp.beginPacket(gameEngineIP, gameEnginePort);
+  udp.beginPacket(unrealIP, unrealPort);
   udp.write(packet, 5 + len);
   udp.endPacket();
 }
@@ -305,6 +318,4 @@ uint8_t calculateCRC(uint8_t* data, int length) {
   }
   return crc;
 }
-
-
 

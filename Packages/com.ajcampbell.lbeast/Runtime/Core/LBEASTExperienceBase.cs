@@ -28,6 +28,12 @@ namespace LBEAST.Core
         [SerializeField] protected LBEASTTrackingSystem trackingSystem;
         [SerializeField] protected LBEASTNetworkManager networkManager;
 
+        [Header("Narrative State Machine")]
+        [Tooltip("Optional narrative state machine for story progression. Enable to use state-based experience flow.")]
+        [SerializeField] protected bool useNarrativeStateMachine = false;
+        [Tooltip("Narrative state machine component (auto-created if useNarrativeStateMachine is true)")]
+        [SerializeField] protected ExperienceStateMachine narrativeStateMachine;
+
         protected bool isInitialized = false;
         protected bool isRunning = false;
 
@@ -117,6 +123,12 @@ namespace LBEAST.Core
 
             // Initialize command protocol if running as dedicated server
             InitializeCommandProtocol();
+
+            // Initialize narrative state machine if enabled
+            if (useNarrativeStateMachine)
+            {
+                InitializeNarrativeStateMachine();
+            }
 
             // Call derived class initialization
             if (!InitializeExperienceImpl())
@@ -245,6 +257,106 @@ namespace LBEAST.Core
         /// Check if multiplayer is enabled for this experience
         /// </summary>
         public bool IsMultiplayerEnabled() => enableMultiplayer;
+
+        #endregion
+
+        #region Narrative State Machine
+
+        /// <summary>
+        /// Initialize the narrative state machine component
+        /// </summary>
+        protected virtual void InitializeNarrativeStateMachine()
+        {
+            if (narrativeStateMachine == null)
+            {
+                narrativeStateMachine = GetComponent<ExperienceStateMachine>();
+                if (narrativeStateMachine == null)
+                {
+                    narrativeStateMachine = gameObject.AddComponent<ExperienceStateMachine>();
+                    Debug.Log("[LBEAST] NarrativeStateMachine component auto-created.");
+                }
+            }
+
+            // Bind to state change events
+            if (narrativeStateMachine != null)
+            {
+                narrativeStateMachine.onStateChanged.AddListener(HandleNarrativeStateChanged);
+            }
+        }
+
+        /// <summary>
+        /// Get the narrative state machine component
+        /// </summary>
+        public ExperienceStateMachine GetNarrativeStateMachine()
+        {
+            return narrativeStateMachine;
+        }
+
+        /// <summary>
+        /// Get the current narrative state name
+        /// </summary>
+        public string GetCurrentNarrativeState()
+        {
+            if (narrativeStateMachine != null)
+            {
+                return narrativeStateMachine.GetCurrentStateName();
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Advance to the next narrative state
+        /// </summary>
+        public bool AdvanceNarrativeState()
+        {
+            if (narrativeStateMachine != null)
+            {
+                return narrativeStateMachine.AdvanceState();
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Retreat to the previous narrative state
+        /// </summary>
+        public bool RetreatNarrativeState()
+        {
+            if (narrativeStateMachine != null)
+            {
+                return narrativeStateMachine.RetreatState();
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Jump to a specific narrative state by name
+        /// </summary>
+        public bool JumpToNarrativeState(string stateName)
+        {
+            if (narrativeStateMachine != null)
+            {
+                return narrativeStateMachine.JumpToState(stateName);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Internal handler for narrative state changes (binds to state machine delegate)
+        /// </summary>
+        protected virtual void HandleNarrativeStateChanged(string oldState, string newState, int newStateIndex)
+        {
+            // Call virtual method that derived classes can override
+            OnNarrativeStateChanged(oldState, newState, newStateIndex);
+        }
+
+        /// <summary>
+        /// Event fired when narrative state changes
+        /// Override in derived classes to handle state transitions
+        /// </summary>
+        protected virtual void OnNarrativeStateChanged(string oldState, string newState, int newStateIndex)
+        {
+            // Default implementation - derived classes can override
+        }
 
         #endregion
 
