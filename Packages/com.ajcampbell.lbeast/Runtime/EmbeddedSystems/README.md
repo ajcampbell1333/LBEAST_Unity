@@ -442,6 +442,7 @@ Socket->SendTo(Data.GetData(), Data.Num(), BytesSent, *RemoteAddr);
 
 - **Firmware Examples:** `FirmwareExamples/Base/Examples/` - Platform-agnostic examples
 - **Escape Room Examples:** `FirmwareExamples/EscapeRoom/` - Door lock and prop control examples
+- **Gunship Experience Examples:** `FirmwareExamples/GunshipExperience/` - Motion platform ECU examples
 - **Example Usage:** `Assets/LBEAST/Runtime/EmbeddedSystems/Examples/ExampleCostumeController.cs`
 - **Unreal Implementation:** `LBEAST_Unreal/Plugins/LBEAST/Source/EmbeddedSystems/`
 - **Protocol Spec:** Same as Unreal (byte-for-byte compatible)

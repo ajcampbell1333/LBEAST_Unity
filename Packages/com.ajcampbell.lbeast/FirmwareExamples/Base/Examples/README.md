@@ -11,6 +11,8 @@ These examples are **platform-agnostic** in functionality but **platform-specifi
 | File | Description | Supported Platforms |
 |------|-------------|---------------------|
 | **`ButtonMotor_Example.ino`** | Button & motor controller (platform-agnostic) | ESP32, ESP8266, Arduino+WiFi, STM32+WiFi, Raspberry Pi, Jetson Nano |
+| **`ScissorLift_Controller.ino`** | Scissor lift control (CAN bus or GPIO mode) | ESP32, ESP8266, Arduino, STM32, Raspberry Pi, Jetson Nano |
+| **`ActuatorSystem_Controller.ino`** | 4-actuator hydraulic system control | ESP32, ESP8266, Arduino, STM32, Raspberry Pi, Jetson Nano |
 
 **Supported Platforms:**
 - ✅ **ESP32** - Full GPIO support, built-in WiFi (recommended)
@@ -26,13 +28,28 @@ These examples are **platform-agnostic** in functionality but **platform-specifi
 
 ## 🎯 Features Demonstrated
 
-All examples include:
-
+### **ButtonMotor_Example.ino**
 - ✅ **4 buttons** - Digital input reading and transmission
 - ✅ **6 vibration motors** - PWM output control via commands
 - ✅ **Bidirectional communication** - Send button states, receive motor commands
 - ✅ **Binary protocol** - Low-latency LBEAST protocol
 - ✅ **CRC validation** - Packet integrity checking
+
+### **ScissorLift_Controller.ino**
+- ✅ **CAN Bus Mode** - Communicate with manufacturer ECUs (Genie/Skyjack)
+- ✅ **Direct GPIO Mode** - Direct motor control for custom builds
+- ✅ **Vertical Translation** - Lift up/down control
+- ✅ **Forward/Reverse Drive** - Optional lateral movement (can be disabled)
+- ✅ **Position Feedback** - GPIO analog input or CAN bus feedback
+- ✅ **Calibration** - Automatic zero-point calibration
+- ✅ **Safety Limits** - Hardware and software limits
+
+### **ActuatorSystem_Controller.ino**
+- ✅ **4-Actuator Control** - Independent control of 4 hydraulic actuators
+- ✅ **Pitch/Roll Control** - Platform tilt control
+- ✅ **Closed-Loop Control** - PID control with position sensors
+- ✅ **Calibration** - Automatic calibration with limit switches
+- ✅ **Safety Limits** - Hardware and software limits
 
 ---
 
@@ -84,9 +101,9 @@ All examples include:
    const char* ssid = "VR_Arcade_LAN";
    const char* password = "your_password_here";
    ```
-3. **Set Unreal PC IP address**:
+3. **Set Unity PC IP address**:
    ```cpp
-   IPAddress unrealIP(192, 168, 1, 100);
+   IPAddress unityIP(192, 168, 1, 100);
    ```
 4. **Adjust GPIO pins** if needed (check your hardware - see comments for ESP8266 pin recommendations)
 5. **Upload to microcontroller**
@@ -115,7 +132,7 @@ All examples include:
 - Check signal strength
 
 ### **No packets received**
-- Verify Unreal PC IP address
+- Verify Unity PC IP address
 - Check firewall allows UDP port 8888
 - Ensure both devices on same network
 - Use Wireshark to monitor network traffic
@@ -131,11 +148,10 @@ All examples include:
 
 - **[Templates/README.md](../Templates/README.md)** - Using header templates
 - **[EscapeRoom/README.md](../../EscapeRoom/README.md)** - Experience-specific examples
-- **[EmbeddedSystems Module README](../../../Source/EmbeddedSystems/README.md)** - Full API documentation
+- **[EmbeddedSystems Module README](../../../Runtime/EmbeddedSystems/README.md)** - Full API documentation
 
 ---
 
 ## 📄 License
 
 MIT License - Copyright (c) 2025 AJ Campbell
-

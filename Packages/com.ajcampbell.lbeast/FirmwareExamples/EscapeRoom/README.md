@@ -36,7 +36,7 @@ Located in `DoorLock/` directory:
 - ✅ **Solenoid/Servo control** - Works with both lock types
 - ✅ **Door sensors** - Magnetic reed switches for state detection
 - ✅ **Status LEDs** - Visual feedback for lock state
-- ✅ **Wireless commands** - Receive unlock/lock commands from Unreal
+- ✅ **Wireless commands** - Receive unlock/lock commands from Unity
 - ✅ **State reporting** - Report door open/closed state
 
 ---
@@ -67,20 +67,20 @@ ESP32 GPIO 14 ──[220Ω Resistor]── LED ── GND
 
 ---
 
-## 💻 Usage in Unreal Engine
+## 💻 Usage in Unity
 
-```cpp
+```csharp
 // In EscapeRoomExperience
-AEscapeRoomExperience* EscapeRoom = GetWorld()->SpawnActor<AEscapeRoomExperience>();
+EscapeRoomExperience escapeRoom = FindObjectOfType<EscapeRoomExperience>();
 
 // Unlock door 0
-EscapeRoom->UnlockDoor(0);
+escapeRoom.UnlockDoor(0);
 
 // Check if door is unlocked
-bool isUnlocked = EscapeRoom->IsDoorUnlocked(0);
+bool isUnlocked = escapeRoom.IsDoorUnlocked(0);
 
 // Lock door 0
-EscapeRoom->LockDoor(0);
+escapeRoom.LockDoor(0);
 ```
 
 ---
@@ -139,13 +139,20 @@ All platforms use the same core functionality. Differences are primarily in:
 
 The `EscapeRoomExperience` automatically unlocks doors based on narrative state progression:
 
-```cpp
-// In EscapeRoomExperience::OnNarrativeStateChanged()
-if (NewState == FName("Puzzle1")) {
-    UnlockDoor(0);  // Unlock first door when entering Puzzle1
-}
-else if (NewState == FName("Puzzle2")) {
-    UnlockDoor(1);  // Unlock second door when entering Puzzle2
+```csharp
+// In EscapeRoomExperience.OnNarrativeStateChanged()
+protected override void OnNarrativeStateChanged(string oldState, string newState, int newStateIndex)
+{
+    base.OnNarrativeStateChanged(oldState, newState, newStateIndex);
+    
+    if (newState == "Puzzle1")
+    {
+        UnlockDoor(0);  // Unlock first door when entering Puzzle1
+    }
+    else if (newState == "Puzzle2")
+    {
+        UnlockDoor(1);  // Unlock second door when entering Puzzle2
+    }
 }
 ```
 
@@ -155,7 +162,7 @@ else if (NewState == FName("Puzzle2")) {
 
 - **[Base/Templates/README.md](../../Base/Templates/README.md)** - Using header templates
 - **[Base/Examples/README.md](../../Base/Examples/README.md)** - Base example documentation
-- **[EscapeRoomExperience.h](../../../Source/LBEASTExperiences/Public/EscapeRoomExperience.h)** - Unreal API
+- **[EscapeRoomExperience.cs](../../../Runtime/ExperienceTemplates/EscapeRoomExperience.cs)** - Unity API
 
 ---
 
