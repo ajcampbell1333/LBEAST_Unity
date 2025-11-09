@@ -1,5 +1,7 @@
 // Copyright (c) 2025 AJ Campbell. Licensed under the MIT License.
 
+using UnityEngine;
+
 namespace LBEAST.ProLighting
 {
     /// <summary>Validates fixture registration to prevent overlaps and invalid configurations</summary>

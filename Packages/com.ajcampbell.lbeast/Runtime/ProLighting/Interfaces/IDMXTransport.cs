@@ -63,7 +63,9 @@ namespace LBEAST.ProLighting
                         UnityEngine.Debug.LogError("DMXTransportFactory: Art-Net manager configuration failed");
                         return result;
                     }
-                    if (!artNetManager.Initialize())
+                    // Initialize via interface (explicit interface implementation)
+                    IDMXTransport transport = artNetManager;
+                    if (!transport.Initialize())
                     {
                         UnityEngine.Debug.LogError("DMXTransportFactory: Art-Net transport initialization failed");
                         return result;

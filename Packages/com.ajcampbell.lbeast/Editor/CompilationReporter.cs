@@ -223,13 +223,8 @@ namespace LBEAST.Editor
 
             // Check if project has compilation errors
             var assemblies = CompilationPipeline.GetAssemblies();
-            bool hasErrors = false;
-
-            foreach (var assembly in assemblies)
-            {
-                // This will only show if errors exist in Unity's internal state
-                // The detailed errors are captured during compilation events
-            }
+            // Note: Detailed errors are captured during compilation events above
+            // This section is for additional status checks if needed
 
             report.AppendLine("===========================================");
             if (EditorApplication.isCompiling)

@@ -99,10 +99,7 @@ namespace LBEAST.ExperienceTemplates
 
         protected override bool InitializeExperienceImpl()
         {
-            if (!base.InitializeExperienceImpl())
-            {
-                return false;
-            }
+            // Note: InitializeExperienceImpl is abstract in base class, no base call needed
 
             Debug.Log("[LBEAST] EscapeRoomExperience: Initializing escape room experience...");
 
@@ -143,7 +140,7 @@ namespace LBEAST.ExperienceTemplates
                 propController.DisconnectDevice();
             }
 
-            base.ShutdownExperienceImpl();
+            // Note: ShutdownExperienceImpl is abstract in base class, no base call needed
         }
 
         /// <summary>

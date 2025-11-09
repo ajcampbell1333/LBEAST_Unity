@@ -3,6 +3,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Compilation;
 using System.IO;
 
 namespace LBEAST.Editor
