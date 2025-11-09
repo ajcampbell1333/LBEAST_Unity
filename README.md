@@ -11,6 +11,8 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://microsoft.com/windows)
 
+> **🔗 Unreal Version:** Also available at [github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
+
 ---
 
 ## 🎯 Quick Start
@@ -828,7 +830,7 @@ Install LBEAST directly from a Git repository:
 4. Select **"Add package from git URL..."**
 5. Enter the Git URL:
    ```
-   https://github.com/ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast
+   https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
    ```
 6. Click **"Add"**
 7. Unity will download and install the package
@@ -837,17 +839,17 @@ Install LBEAST directly from a Git repository:
 
 **For a specific branch:**
 ```
-https://github.com/ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast#main
+https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast#main
 ```
 
 **For a specific version tag (when available):**
 ```
-https://github.com/ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast#v0.1.0
+https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast#v0.1.0
 ```
 
 **Using SSH:**
 ```
-git@github.com:ajcampbell1333/LBEAST_Unity.git?path=Packages/com.ajcampbell.lbeast
+git@github.com:ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
 ```
 
 #### **Option 3: Manual Package Installation**
@@ -1284,8 +1286,9 @@ This project is licensed under the **MIT License** - see the [LICENSE](../LICENS
 
 ## 📞 Support
 
-- **GitHub Issues:** [https://github.com/ajcampbell1333/LBEAST_Unity/issues](https://github.com/ajcampbell1333/LBEAST_Unity/issues)
-- **Documentation:** [https://github.com/ajcampbell1333/LBEAST_Unity/wiki](https://github.com/ajcampbell1333/LBEAST_Unity/wiki)
+- **GitHub Issues:** [https://github.com/ajcampbell1333/lbeast_unity/issues](https://github.com/ajcampbell1333/lbeast_unity/issues)
+- **Documentation:** [https://github.com/ajcampbell1333/lbeast_unity/wiki](https://github.com/ajcampbell1333/lbeast_unity/wiki)
+- **Unreal Version:** [https://github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
 
 ---
 
