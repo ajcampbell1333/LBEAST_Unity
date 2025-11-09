@@ -1,5 +1,7 @@
 # LBEAST for Unity
 
+<img src="Packages/com.ajcampbell.lbeast/Runtime/images/lbeast-logo.png" alt="LBEAST Logo" width="100%">
+
 **Location-Based Entertainment Activation Standard Toolkit (LBEAST)** - A comprehensive SDK for developing VR/AR Location-Based Entertainment experiences in Unity with support for AI facial animation, large hydraulic haptics, and embedded systems integration.
 
 **Author Disclaimer**
@@ -161,6 +163,9 @@ Foundation modules providing core functionality:
 - `AIFacemask` - Facial animation control
 - `LargeHaptics` - Platform/gyroscope control
 - `EmbeddedSystems` - Microcontroller integration
+- `ProAudio` - Professional audio console control via OSC
+- `ProLighting` - DMX lighting control (Art-Net, USB DMX)
+- `VOIP` - Low-latency voice communication with 3D HRTF spatialization
 
 **Use these when:** Building custom experiences from scratch with full control.
 
@@ -171,6 +176,7 @@ Ready-to-use complete experiences combining multiple APIs:
 - `GunshipExperience` - 4-player seated platform
 - `CarSimExperience` - Racing/driving simulator
 - `FlightSimExperience` - Flight sim with HOTAS
+- `EscapeRoomExperience` - Puzzle-based escape room with embedded door locks and prop sensors
 
 **Use these when:** Rapid deployment of standard LBE configurations.
 
@@ -186,6 +192,7 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 | Building a space combat game | `FlightSimExperience` | HOTAS integration ready, continuous rotation supported |
 | Custom 3-player standing platform | Low-Level APIs | Need custom configuration not covered by templates |
 | Live actor-driven escape room | `AIFacemaskExperience` | Live actor support, multiplayer, and embedded systems ready |
+| Puzzle-based escape room | `EscapeRoomExperience` | Narrative state machine, door locks, prop sensors, embedded systems |
 | Unique hardware configuration | Low-Level APIs | Full control over all actuators and systems |
 
 **Rule of thumb:** Start with templates, drop to APIs only when you need customization beyond what templates offer.
@@ -415,6 +422,57 @@ float throttle = flightSim.GetThrottleInput();
 float pedals = flightSim.GetPedalInput();
 ```
 
+#### 🚪 Escape Room Experience
+
+**Class:** `EscapeRoomExperience`
+
+Puzzle-based escape room experience with narrative state machine, embedded door locks, and prop sensors. Perfect for interactive puzzle experiences with physical hardware integration.
+
+**Includes:**
+- Pre-configured narrative state machine (puzzle progression)
+- Embedded door lock control (unlock/lock doors via microcontroller)
+- Prop sensor integration (read sensor values from embedded devices)
+- Automatic door unlocking based on puzzle state
+- Door state callbacks (confirm when doors actually unlock)
+
+**Quick Start:**
+```csharp
+var escapeRoom = gameObject.AddComponent<EscapeRoomExperience>();
+escapeRoom.InitializeExperience();
+
+// Unlock a specific door (by index)
+escapeRoom.UnlockDoor(0);  // Unlock door 0
+
+// Lock a door
+escapeRoom.LockDoor(0);
+
+// Check if door is unlocked
+bool isUnlocked = escapeRoom.IsDoorUnlocked(0);
+
+// Trigger a prop action (e.g., activate a sensor)
+escapeRoom.TriggerPropAction(0, 1.0f);  // Prop 0, value 1.0
+
+// Read prop sensor value
+float sensorValue = escapeRoom.ReadPropSensor(0);
+
+// Get current puzzle state
+string currentState = escapeRoom.GetCurrentPuzzleState();
+```
+
+**Handle State Changes:**
+Override `OnExperienceStateChanged` in your derived class:
+```csharp
+protected override void OnExperienceStateChanged(string oldState, string newState, int newStateIndex)
+{
+    base.OnExperienceStateChanged(oldState, newState, newStateIndex);
+    
+    if (newState == "Puzzle1_Complete")
+    {
+        // Unlock next door, play sound, etc.
+    }
+}
+```
+
 ---
 
 ## 🔧 Low-Level APIs (Technical Modules)
@@ -641,6 +699,104 @@ audioController.OnMasterFaderChanged += (level) =>
 - ✅ **UDP-Based** - Consistent with LBEAST architecture (uses existing UDP infrastructure)
 
 **Next Steps:** See `ProAudioNextSteps.md` for UI Toolkit template implementation guide.
+
+### Pro Lighting Module (`LBEAST.ProLighting`)
+
+**Classes:**
+- `ProLightingController` - DMX lighting control via Art-Net or USB DMX
+- `ProLightingConfig` - Configuration (transport type, IP, port, universe)
+- `DMXFixture` - Virtual fixture definition
+- `ArtNetNode` - Discovered Art-Net node metadata
+
+**Example:**
+```csharp
+using LBEAST.ProLighting;
+
+var lightingController = gameObject.AddComponent<ProLightingController>();
+
+// Configure for Art-Net
+lightingController.Config.TransportType = DMXTransportType.ArtNet;
+lightingController.Config.ArtNetIPAddress = "192.168.1.200";
+lightingController.Config.ArtNetPort = 6454;  // Art-Net default port
+lightingController.Config.ArtNetUniverse = 0;
+
+lightingController.InitializeLighting(lightingController.Config);
+
+// Register a fixture
+DMXFixture fixture = new DMXFixture
+{
+    fixtureType = DMXFixtureType.RGBW,
+    dmxAddress = 1,
+    universe = 0
+};
+int fixtureId = lightingController.RegisterFixture(fixture);
+
+// Control fixture intensity (0.0 to 1.0)
+lightingController.SetFixtureIntensity(fixtureId, 0.75f);
+
+// Set RGBW color
+lightingController.SetFixtureColorRGBW(fixtureId, 1.0f, 0.5f, 0.0f, 0.0f);  // Orange
+
+// Start a fade
+lightingController.StartFixtureFade(fixtureId, 0.0f, 1.0f, 2.0f);  // Fade from 0 to 1 over 2 seconds
+```
+
+**Supported Transports:**
+- ✅ Art-Net (UDP) - Full support with auto-discovery
+- ✅ USB DMX - Stubbed (coming soon)
+
+**Features:**
+- ✅ **Fixture Registry** - Virtual fixture management by ID
+- ✅ **Fade Engine** - Time-based intensity fades
+- ✅ **RDM Discovery** - Automatic fixture discovery (stubbed)
+- ✅ **Art-Net Discovery** - Auto-detect Art-Net nodes on network
+- ✅ **Multiple Fixture Types** - Dimmable, RGB, RGBW, Moving Head, Custom
+
+### VOIP Module (`LBEAST.VOIP`)
+
+**Classes:**
+- `VOIPManager` - Main component for managing VOIP connections
+- `MumbleClient` - Mumble protocol wrapper
+- `SteamAudioSourceComponent` - Per-user spatial audio source
+- `VOIPConnectionState` - Connection state enumeration
+
+**Example:**
+```csharp
+using LBEAST.VOIP;
+
+var voipManager = gameObject.AddComponent<VOIPManager>();
+voipManager.serverIP = "192.168.1.100";
+voipManager.serverPort = 64738;  // Mumble default port
+voipManager.autoConnect = true;
+voipManager.playerName = "Player_1";
+
+// Connect to Mumble server
+voipManager.Connect();
+
+// Mute/unmute microphone
+voipManager.SetMicrophoneMuted(false);
+
+// Set output volume (0.0 to 1.0)
+voipManager.SetOutputVolume(0.8f);
+
+// Listen to connection events
+voipManager.OnConnectionStateChanged.AddListener((state) =>
+{
+    Debug.Log($"VOIP connection state: {state}");
+});
+```
+
+**Features:**
+- ✅ **Mumble Protocol** - Low-latency VOIP (< 50ms on LAN)
+- ✅ **Steam Audio** - 3D HRTF spatialization for positional audio
+- ✅ **Per-User Audio Sources** - Automatic spatialization for each remote player
+- ✅ **HMD-Agnostic** - Works with any HMD's microphone and headphones
+- ✅ **Unity-Friendly** - Easy integration via MonoBehaviour component
+
+**Prerequisites:**
+- Murmur server running on LAN
+- Steam Audio plugin (git submodule)
+- MumbleLink plugin (git submodule)
 
 ---
 
@@ -900,14 +1056,14 @@ The AIFacemask experience (and optionally other multiplayer experiences) uses a 
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  LBEAST Server Manager PC (Dedicated Server)   │
+│  LBEAST Server Manager PC (Dedicated Server)    │
 │  ─────────────────────────────────────────────  │
-│  • Handles all network traffic                 │
-│  • Decision-making & game state logic          │
+│  • Handles all network traffic                  │
+│  • Decision-making & game state logic           │
 │  • Graphics processing offloaded from VR        │
-│  • AI workflow (Speech → NLU → Emotion →       │
+│  • AI workflow (Speech → NLU → Emotion →        │
 │    Audio2Face)                                  │
-│  • Streams facial animation to HMDs            │
+│  • Streams facial animation to HMDs             │
 └─────────────────────────────────────────────────┘
                     │
                     ├─ UDP Broadcast ──→ LAN (auto-discovery)
@@ -921,11 +1077,11 @@ The AIFacemask experience (and optionally other multiplayer experiences) uses a 
    └─────────┘            └─────────┘
 
 ┌─────────────────────────────────────────────────┐
-│  Command Console PC (Optional - May be same)   │
+│  Command Console PC (Optional - May be same)    │
 │  ─────────────────────────────────────────────  │
-│  • Server Manager GUI (UI Toolkit)             │
-│  • Admin Panel for Ops Tech monitoring        │
-│  • Experience control interface                │
+│  • Server Manager GUI (UI Toolkit)              │
+│  • Admin Panel for Ops Tech monitoring          │
+│  • Experience control interface                 │
 └─────────────────────────────────────────────────┘
          │ (May share same CPU/PC as Server Manager)
          │ OR networked separately
