@@ -4,6 +4,7 @@ using UnityEngine;
 using LBEAST.Core;
 using LBEAST.AIFacemask;
 using LBEAST.EmbeddedSystems;
+using LBEAST.VOIP;
 
 namespace LBEAST.ExperienceTemplates
 {
@@ -12,27 +13,45 @@ namespace LBEAST.ExperienceTemplates
     /// 
     /// Pre-configured experience for LAN multiplayer VR with immersive theater live actors.
     /// 
-    /// Architecture:
-    /// - AI facial animation operates AUTONOMOUSLY (driven by NVIDIA Audio2Face)
+    /// NETWORK ARCHITECTURE (REQUIRED):
+    /// This experience REQUIRES a dedicated server setup:
+    /// - Separate local PC running headless dedicated server
+    /// - Same PC runs NVIDIA ACE pipeline: Audio → NLU → Emotion → Facial Animation
+    /// - NVIDIA ACE streams facial textures and blend shapes to HMDs over network
+    /// - Offloads AI processing from HMDs for optimal performance
+    /// - Supports parallelization for multiple live actors
+    /// 
+    /// AI FACIAL ANIMATION:
+    /// - Fully automated by NVIDIA ACE - NO manual control, keyframe animation, or rigging
+    /// - Live actor wears HMD with AIFace mesh tracked on top of their face (like a mask)
+    /// - NVIDIA ACE determines facial expressions based on:
+    ///   - Audio track (speech recognition)
+    ///   - NLU (natural language understanding)
+    ///   - Emotion detection
+    ///   - State machine context
+    /// - AIFaceController receives NVIDIA ACE output and applies it to mesh in real-time
+    /// 
+    /// LIVE ACTOR CONTROLS:
     /// - Live actors wear wrist-mounted button controls (4 buttons: 2 left, 2 right)
-    /// - Buttons control the Experience Loop state machine (not the AI face)
+    /// - Buttons control the narrative state machine (NOT facial animation)
+    /// - Live actor directs experience flow, AI face handles expressions autonomously
     /// 
     /// Button Layout:
     /// - Left Wrist:  Button 0 (Forward), Button 1 (Backward)
     /// - Right Wrist: Button 2 (Forward), Button 3 (Backward)
     /// 
-    /// The live actor directs the experience flow, while the AI face handles
-    /// natural conversation and emotional responses autonomously.
-    /// 
-    /// Perfect for escape rooms, interactive theater, live actor-driven VR experiences,
-    /// and any LBE installation requiring live human performance.
+    /// Perfect for interactive theater, escape rooms, and narrative-driven LBE experiences
+    /// requiring professional performers to guide players through story beats.
     /// </summary>
     public class AIFacemaskExperience : LBEASTExperienceBase
     {
         [Header("Components")]
-        [SerializeField] private FacialAnimationController facialController;
+        [SerializeField] private AIFaceController faceController;
         [SerializeField] private SerialDeviceController costumeController;
-        [SerializeField] private ExperienceStateMachine experienceLoop;
+        [SerializeField] private AIFacemaskACEScriptManager aceScriptManager;
+        [SerializeField] private AIFacemaskACEImprovManager aceImprovManager;
+        [SerializeField] private AIFacemaskASRManager aceASRManager;
+        [SerializeField] private VOIPManager voipManager;
 
         [Header("Live Actor Configuration")]
         [SerializeField] private GameObject avatarPrefab;
@@ -55,10 +74,14 @@ namespace LBEAST.ExperienceTemplates
             enableMultiplayer = true;
             maxPlayers = numberOfLiveActors + numberOfPlayers;
 
-            // Find or create facial controller
-            if (facialController == null)
+            // Enable narrative state machine (uses base class NarrativeStateMachine component)
+            // This provides the narrative state progression that triggers automated AI facemask performances
+            useNarrativeStateMachine = true;
+
+            // Find or create AI face controller
+            if (faceController == null)
             {
-                facialController = GetComponentInChildren<FacialAnimationController>();
+                faceController = GetComponentInChildren<AIFaceController>();
             }
 
             // Find or create serial device controller
@@ -71,13 +94,43 @@ namespace LBEAST.ExperienceTemplates
                 }
             }
 
-            // Find or create experience loop
-            if (experienceLoop == null)
+            // Find or create ACE Script Manager
+            if (aceScriptManager == null)
             {
-                experienceLoop = GetComponent<ExperienceStateMachine>();
-                if (experienceLoop == null)
+                aceScriptManager = GetComponent<AIFacemaskACEScriptManager>();
+                if (aceScriptManager == null)
                 {
-                    experienceLoop = gameObject.AddComponent<ExperienceStateMachine>();
+                    aceScriptManager = gameObject.AddComponent<AIFacemaskACEScriptManager>();
+                }
+            }
+
+            // Find or create ACE Improv Manager
+            if (aceImprovManager == null)
+            {
+                aceImprovManager = GetComponent<AIFacemaskACEImprovManager>();
+                if (aceImprovManager == null)
+                {
+                    aceImprovManager = gameObject.AddComponent<AIFacemaskACEImprovManager>();
+                }
+            }
+
+            // Find or create ACE ASR Manager
+            if (aceASRManager == null)
+            {
+                aceASRManager = GetComponent<AIFacemaskASRManager>();
+                if (aceASRManager == null)
+                {
+                    aceASRManager = gameObject.AddComponent<AIFacemaskASRManager>();
+                }
+            }
+
+            // Find or create VOIP Manager
+            if (voipManager == null)
+            {
+                voipManager = GetComponent<VOIPManager>();
+                if (voipManager == null)
+                {
+                    voipManager = gameObject.AddComponent<VOIPManager>();
                 }
             }
         }
@@ -89,10 +142,10 @@ namespace LBEAST.ExperienceTemplates
             {
                 spawnedAvatar = Instantiate(avatarPrefab, transform);
                 
-                // Find facial controller and mesh on spawned avatar
-                if (facialController == null)
+                // Find AI face controller and mesh on spawned avatar
+                if (faceController == null)
                 {
-                    facialController = spawnedAvatar.GetComponentInChildren<FacialAnimationController>();
+                    faceController = spawnedAvatar.GetComponentInChildren<AIFaceController>();
                 }
                 
                 if (liveActorMesh == null)
@@ -101,19 +154,23 @@ namespace LBEAST.ExperienceTemplates
                 }
             }
 
-            // Initialize facial animation (autonomous)
-            if (facialController != null)
+            // Initialize AI Face Controller (receives NVIDIA ACE output)
+            if (faceController != null && liveActorMesh != null)
             {
-                if (!facialController.Initialize())
+                AIFaceConfig faceConfig = new AIFaceConfig
                 {
-                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: Failed to initialize facial animation");
-                }
-                else
+                    targetMesh = liveActorMesh,
+                    nvidiaACEEndpointURL = "",  // NOOP: TODO - Configure NVIDIA ACE endpoint URL
+                    updateRate = 30.0f
+                };
+
+                if (!faceController.InitializeAIFace(faceConfig))
                 {
-                    facialController.SetAnimationMode(FacialAnimationMode.Live);  // Autonomous AI-driven
-                    facialController.StartAnimation();
-                    Debug.Log("[LBEAST] AIFacemaskExperience: AI Face initialized (autonomous mode)");
+                    Debug.LogError("[LBEAST] AIFacemaskExperience: Failed to initialize face controller");
+                    return false;
                 }
+
+                Debug.Log("[LBEAST] AIFacemaskExperience: AI Face initialized (NVIDIA ACE receiver mode)");
             }
 
             // Initialize costume controller (wrist-mounted buttons)
@@ -142,8 +199,9 @@ namespace LBEAST.ExperienceTemplates
                 }
             }
 
-            // Initialize Experience Loop with default states
-            if (experienceLoop != null)
+            // Initialize narrative state machine with default states (uses base class NarrativeStateMachine)
+            // Base class creates NarrativeStateMachine automatically when useNarrativeStateMachine is true
+            if (narrativeStateMachine != null && useNarrativeStateMachine)
             {
                 var defaultStates = new System.Collections.Generic.List<ExperienceState>
                 {
@@ -155,11 +213,66 @@ namespace LBEAST.ExperienceTemplates
                     new ExperienceState("Credits", "End credits")
                 };
 
-                experienceLoop.Initialize(defaultStates);
-                experienceLoop.onStateChanged.AddListener(OnExperienceStateChanged);
-                experienceLoop.StartExperience();
+                narrativeStateMachine.Initialize(defaultStates);
+                narrativeStateMachine.StartExperience();
 
-                Debug.Log($"[LBEAST] AIFacemaskExperience: Experience Loop initialized with {defaultStates.Count} states");
+                Debug.Log($"[LBEAST] AIFacemaskExperience: Narrative state machine initialized with {defaultStates.Count} states");
+            }
+
+            // Initialize ACE Script Manager (pre-baked script collections for NVIDIA ACE)
+            if (aceScriptManager != null)
+            {
+                // NOOP: TODO - Configure NVIDIA ACE server base URL from project settings or config
+                string aceServerBaseURL = "http://localhost:8000";  // Default to localhost
+
+                if (aceScriptManager.InitializeScriptManager(aceServerBaseURL))
+                {
+                    Debug.Log("[LBEAST] AIFacemaskExperience: ACE Script Manager initialized");
+                }
+                else
+                {
+                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: ACE Script Manager initialization failed, continuing without script automation");
+                }
+            }
+
+            // Initialize ACE Improv Manager (real-time improvised responses using local LLM + TTS + Audio2Face)
+            if (aceImprovManager != null)
+            {
+                // Set reference to AIFaceController for streaming facial animation
+                aceImprovManager.aiFaceController = faceController;
+
+                if (aceImprovManager.InitializeImprovManager())
+                {
+                    Debug.Log("[LBEAST] AIFacemaskExperience: ACE Improv Manager initialized (local LLM + TTS + Audio2Face)");
+                }
+                else
+                {
+                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: ACE Improv Manager initialization failed, continuing without improv responses");
+                }
+            }
+
+            // Initialize ACE ASR Manager (converts player voice to text for improv responses)
+            if (aceASRManager != null)
+            {
+                // Set reference to ACE Improv Manager for triggering improv after transcription
+                aceASRManager.aceImprovManager = aceImprovManager;
+
+                if (aceASRManager.InitializeASRManager())
+                {
+                    Debug.Log("[LBEAST] AIFacemaskExperience: ACE ASR Manager initialized (player voice → text for improv)");
+
+                    // Register ASR Manager as visitor with VOIPManager
+                    // This keeps AIFacemask module decoupled from VOIP module
+                    if (voipManager != null)
+                    {
+                        voipManager.RegisterAudioVisitor(aceASRManager);
+                        Debug.Log("[LBEAST] AIFacemaskExperience: ASR Manager registered with VOIPManager");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: ACE ASR Manager initialization failed, continuing without voice input");
+                }
             }
 
             Debug.Log($"[LBEAST] AIFacemaskExperience: Initialized with {numberOfLiveActors} live actors and {numberOfPlayers} players");
@@ -168,16 +281,16 @@ namespace LBEAST.ExperienceTemplates
 
         protected override void ShutdownExperienceImpl()
         {
-            // Stop experience loop
-            if (experienceLoop != null)
+            // Stop narrative state machine (uses base class NarrativeStateMachine)
+            if (narrativeStateMachine != null)
             {
-                experienceLoop.StopExperience();
+                narrativeStateMachine.StopExperience();
             }
 
-            // Stop facial animation
-            if (facialController != null)
+            // Unregister ASR Manager from VOIPManager
+            if (voipManager != null && aceASRManager != null)
             {
-                facialController.StopAnimation();
+                voipManager.UnregisterAudioVisitor(aceASRManager);
             }
 
             // Disconnect embedded systems
@@ -204,7 +317,7 @@ namespace LBEAST.ExperienceTemplates
 
         private void ProcessButtonInput()
         {
-            if (costumeController == null || !costumeController.IsDeviceConnected() || experienceLoop == null)
+            if (costumeController == null || !costumeController.IsDeviceConnected() || narrativeStateMachine == null)
             {
                 return;
             }
@@ -237,53 +350,53 @@ namespace LBEAST.ExperienceTemplates
             }
         }
 
-        #region Experience Loop Control
+        #region Narrative State Control
 
         /// <summary>
-        /// Get the current experience state
+        /// Get the current narrative state (from base class narrative state machine)
+        /// This is the same as GetCurrentNarrativeState() from the base class
         /// </summary>
         public string GetCurrentExperienceState()
         {
-            if (experienceLoop != null)
-            {
-                return experienceLoop.GetCurrentStateName();
-            }
-            return "";
+            return GetCurrentNarrativeState();
         }
 
         /// <summary>
         /// Manually advance the experience to the next state (usually triggered by buttons)
+        /// Uses base class AdvanceNarrativeState() method
         /// </summary>
         public bool AdvanceExperience()
         {
-            if (experienceLoop != null)
-            {
-                return experienceLoop.AdvanceState();
-            }
-            return false;
+            return AdvanceNarrativeState();
         }
 
         /// <summary>
         /// Manually retreat the experience to the previous state (usually triggered by buttons)
+        /// Uses base class RetreatNarrativeState() method
         /// </summary>
         public bool RetreatExperience()
         {
-            if (experienceLoop != null)
-            {
-                return experienceLoop.RetreatState();
-            }
-            return false;
+            return RetreatNarrativeState();
         }
 
         /// <summary>
-        /// Handle state change events
-        /// Override this in your derived class to trigger game events
+        /// Handle narrative state changes (overrides base class method)
+        /// Called when live actor advances/retreats narrative state via wireless trigger buttons
+        /// Each state change triggers automated AI facemask performances
         /// </summary>
-        protected virtual void OnExperienceStateChanged(string oldState, string newState, int newStateIndex)
+        protected override void OnNarrativeStateChanged(string oldState, string newState, int newStateIndex)
         {
-            Debug.Log($"[LBEAST] AIFacemaskExperience: State changed from '{oldState}' to '{newState}' (Index: {newStateIndex})");
+            Debug.Log($"[LBEAST] AIFacemaskExperience: Narrative state changed from '{oldState}' to '{newState}' (Index: {newStateIndex})");
 
-            // Override this method to trigger game events based on state changes
+            // State changes are triggered by live actor's wireless trigger buttons
+            // Each state change triggers automated AI facemask performances via NVIDIA ACE
+            // Trigger ACE script for the new state (if script manager is available and auto-trigger is enabled)
+            if (aceScriptManager != null && aceScriptManager.autoTriggerOnStateChange)
+            {
+                aceScriptManager.HandleNarrativeStateChanged(oldState, newState, newStateIndex);
+            }
+
+            // Override this method in derived classes to trigger additional game events based on state changes
         }
 
         #endregion

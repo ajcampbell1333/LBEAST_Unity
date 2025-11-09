@@ -13,6 +13,48 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 
 > **🔗 Unreal Version:** Also available at [github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
 
+## Philosophy
+
+<details>
+<summary><strong>Who is LBEAST for?</strong></summary>
+
+<div style="margin-left: 20px;">
+
+LBEAST is for professional teams building commercial Location-Based Entertainment installations. It's a professional-grade toolchain designed for teams of programmers and technical artists.
+
+**Target audiences:**
+- **Theme park attraction designers/engineers/production staff** - Building immersive attractions with motion platforms, embedded systems, and live actor integration
+- **VR Arcade venue designers/engineers/production staff** - Deploying multiplayer VR experiences with synchronized motion and professional audio/lighting
+- **Brands at trade shows** interested in wowing audiences with VR
+- **3rd-party VR developers** who want to deploy new content rapidly to theme parks and VR Arcades
+- **VR educators** who want to expose students to professional toolchains used in commercial LBE production
+
+The SDK provides:
+- ✅ **C# programmers** with robust APIs and extensible architecture
+- ✅ **Unity developers** with drag-and-drop components and visual scripting
+- ✅ **Content teams** with rapid deployment capabilities
+- ✅ **Commercial projects** with free-to-use, MIT-licensed code
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>Who is LBEAST not for?</strong></summary>
+
+<div style="margin-left: 20px;">
+
+Developers with little or no experience with C# may struggle to put LBEAST to its fullest use. It is meant for a scale of production that would be challenging for lone developers. However, it can be a great learning tool for educators to prepare students to work on professional team projects.
+
+**Important notes:**
+- LBEAST is **not** a no-code solution. It requires programming knowledge (C# or Unity scripting) to customize experiences beyond the provided templates.
+- LBEAST is designed for **team-based production** with multiple developers, technical artists, and production staff.
+- LBEAST provides prefabs, but it assumes tech art team members have access to C# programmers on the team to back them up for customization.
+
+</div>
+
+</details>
+
 ---
 
 ## 🎯 Quick Start
@@ -36,7 +78,7 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 - [Three-Tier Architecture](#-three-tier-architecture)
 - [Hardware-Agnostic Input System](#-hardware-agnostic-input-system)
 - [Features](#-features)
-- [Experience Templates](#experience-templates-pre-configured-solutions)
+- [Experience Genre Templates](#experience-genre-templates-pre-configured-solutions)
 - [Low-Level APIs](#low-level-apis-technical-modules)
 - [Installation](#-installation)
 - [Examples](#-examples)
@@ -157,9 +199,15 @@ If you see compilation errors about missing namespaces:
 
 ## 🏗️ Three-Tier Architecture
 
-LBEAST is structured in three layers, allowing developers to choose their level of control:
+LBEAST uses a modular three-tier architecture for code organization and server/client deployment.
 
-### Tier 1: Low-Level APIs (Technical Modules)
+### Code and Class Structure
+
+<details>
+<summary><strong>Tier 1: Low-Level APIs (Technical Modules)</strong></summary>
+
+<div style="margin-left: 20px;">
+
 Foundation modules providing core functionality:
 - `LBEASTCore` - VR/XR tracking abstraction, networking
 - `AIFacemask` - Facial animation control
@@ -171,9 +219,17 @@ Foundation modules providing core functionality:
 
 **Use these when:** Building custom experiences from scratch with full control.
 
-### Tier 2: Experience Templates (Pre-Configured MonoBehaviours)
+</div>
+
+</details>
+
+<details>
+<summary><strong>Tier 2: Experience Genre Templates (Pre-Configured MonoBehaviours)</strong></summary>
+
+<div style="margin-left: 20px;">
+
 Ready-to-use complete experiences combining multiple APIs:
-- `AIFacemaskExperience` - Live actor-driven multiplayer VR
+- `AIFacemaskExperience` - Live actor-driven multiplayer VR with wireless trigger buttons controlling automated AI facemask performances
 - `MovingPlatformExperience` - Standing hydraulic platform
 - `GunshipExperience` - 4-player seated platform
 - `CarSimExperience` - Racing/driving simulator
@@ -182,10 +238,25 @@ Ready-to-use complete experiences combining multiple APIs:
 
 **Use these when:** Rapid deployment of standard LBE configurations.
 
-### Tier 3: Your Custom Game Logic
+</div>
+
+</details>
+
+<details>
+<summary><strong>Tier 3: Your Custom Game Logic</strong></summary>
+
+<div style="margin-left: 20px;">
+
 Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Tier 1).
 
-### When to Use What?
+</div>
+
+</details>
+
+<details>
+<summary><strong>When to Use What?</strong></summary>
+
+<div style="margin-left: 20px;">
 
 | Scenario | Use This | Why |
 |----------|----------|-----|
@@ -193,205 +264,574 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 | Building a racing game | `CarSimExperience` | Simplified driving API, optimized motion profiles |
 | Building a space combat game | `FlightSimExperience` | HOTAS integration ready, continuous rotation supported |
 | Custom 3-player standing platform | Low-Level APIs | Need custom configuration not covered by templates |
-| Live actor-driven escape room | `AIFacemaskExperience` | Live actor support, multiplayer, and embedded systems ready |
+| Live actor-driven escape room | `AIFacemaskExperience` | Wireless trigger buttons in costume control narrative state machine, automated AI facemask performances |
 | Puzzle-based escape room | `EscapeRoomExperience` | Narrative state machine, door locks, prop sensors, embedded systems |
 | Unique hardware configuration | Low-Level APIs | Full control over all actuators and systems |
 
 **Rule of thumb:** Start with templates, drop to APIs only when you need customization beyond what templates offer.
 
-### When to Use What Configuration?
+</div>
+
+</details>
+
+### LAN Server/Client Configuration
+
+<details>
+<summary><strong>Local Command Console</strong></summary>
+
+<div style="margin-left: 20px;">
+
+```
+┌─────────────────────────────────────────────┐
+│  Single PC (Command Console + Server)       │
+│  ────────────────────────────────────────   │
+│  • Command Console UI (monitoring)          │
+│  • Server Manager (dedicated server)        │
+│  • NVIDIA ACE Pipeline (if AIFacemask)       │
+└───────────────────┬─────────────────────────┘
+                    │
+                    │ UDP Broadcast (port 7778)
+                    │
+        ┌───────────┴───────────┐
+        │                       │
+        ▼                       ▼
+   ┌─────────┐            ┌─────────┐
+   │  HMD 1  │            │  HMD 2  │
+   │(Client) │            │(Client) │
+   └─────────┘            └─────────┘
+   ... (Player 1...N, Live Actor 1...N)
+```
+
+**Use when:** Simple setup, single machine, lightweight network traffic.
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>Dedicated Server + Separate Local Command Console</strong></summary>
+
+<div style="margin-left: 20px;">
+
+```
+┌─────────────────────────────────────────────┐
+│  Server PC (Dedicated Server)               │
+│  ────────────────────────────────────────   │
+│  • Server Manager (dedicated server)        │
+│  • NVIDIA ACE Pipeline (if AIFacemask)      │
+└───────────────────┬─────────────────────────┘
+                    │
+                    │ UDP Broadcast (port 7778)
+                    │
+        ┌───────────┴───────────┐
+        │                       │
+        ▼                       ▼
+   ┌─────────┐            ┌─────────┐
+   │  HMD 1  │            │  HMD 2  │
+   │(Client) │            │(Client) │
+   └─────────┘            └─────────┘
+   ... (Player 1...N, Live Actor 1...N)
+
+┌─────────────────────────────────────────────┐
+│  Console PC (Command Console)               │
+│  ────────────────────────────────────────   │
+│  • Command Console UI (monitoring)           │
+│  • Connected via UDP (port 7779)             │
+└─────────────────────────────────────────────┘
+```
+
+**Use when:** Heavy processing workloads, better performance isolation, HMD battery life optimization.
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>Dedicated Server + Remote Command Console</strong></summary>
+
+<div style="margin-left: 20px;">
+
+```
+┌─────────────────────────────────────────────┐
+│  Server PC (Dedicated Server)               │
+│  ────────────────────────────────────────   │
+│  • Server Manager (dedicated server)        │
+│  • NVIDIA ACE Pipeline (if AIFacemask)    │
+└───────────────────┬─────────────────────────┘
+                    │
+                    │ UDP Broadcast (port 7778)
+                    │
+        ┌───────────┴───────────┐
+        │                       │
+        ▼                       ▼
+   ┌─────────┐            ┌─────────┐
+   │  HMD 1  │            │  HMD 2  │
+   │(Client) │            │(Client) │
+   └─────────┘            └─────────┘
+   ... (Player 1...N, Live Actor 1...N)
+
+                    │
+                    │ Internet Node
+                    │
+                    ▼
+┌─────────────────────────────────────────────┐
+│  Remote Console PC (Command Console)       │
+│  ────────────────────────────────────────   │
+│  • Command Console UI (monitoring)          │
+│  • Connected via UDP (port 7779) over       │
+│    internet (VPN recommended)               │
+└─────────────────────────────────────────────┘
+```
+
+**Use when:** Off-site monitoring (debugging/testing only - use VPN and authentication for security).
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>When to Use What Configuration?</strong></summary>
+
+<div style="margin-left: 20px;">
 
 | Scenario | Recommended Configuration | Why |
 |----------|---------------------------|-----|
 | Basic single-player experience | **Local Command Console** (same PC as server) | Simple setup, no need for separate machines. Command Console launches and manages server locally. |
 | Basic multiplayer with RPCs but no heavy data transferring wirelessly | **Local Command Console** (same PC as server) | Network traffic is lightweight (player positions, events). Local Command Console can manage server on same machine efficiently. |
-| Lots of heavy graphics processing you want to offload from VR HMD(s) | **Dedicated Server + Remote Command Console** (separate PCs) | Offload GPU-intensive rendering and AI processing to dedicated server PC. Remote Command Console monitors and controls from separate machine. Better performance isolation and HMD battery life. |
-| Need to monitor the experience in real-time from off-site? | **Dedicated Server + Remote Command Console** (separate PCs) ⚠️ | Remote Command Console can connect over network to monitor server status, player count, experience state, and logs from a separate location. **⚠️ Recommended for debugging/testing only. For general public operation, full internet isolation is recommended for security.** Requires authentication enabled in Command Protocol settings. |
+| Lots of heavy graphics processing you want to offload from VR HMD(s) | **Dedicated + Separate Local** or **Dedicated + Remote** | Offload GPU-intensive rendering and AI processing to dedicated server PC. Better performance isolation and HMD battery life. |
+| Need to monitor the experience in real-time from off-site? | **Dedicated + Remote** ⚠️ | Remote Command Console can connect over network to monitor server status, player count, experience state, and logs from a separate location. **⚠️ Recommended for debugging/testing only. For general public operation, full internet isolation is recommended for security.** Requires authentication enabled in Command Protocol settings. |
 
 **Configuration Options:**
 - **Local Command Console:** Command Console (UI Panel) and Server Manager (dedicated server) run on the same PC. Simple setup, one machine.
-- **Remote Command Console:** Command Console runs on separate PC from Server Manager. Networked via UDP (port 7779). Better for heavy processing workloads.
+- **Dedicated + Separate Local:** Server Manager runs on dedicated PC, Command Console runs on separate local PC (same LAN). Networked via UDP (port 7779). Better for heavy processing workloads.
+- **Dedicated + Remote:** Server Manager runs on dedicated PC, Command Console runs on remote PC (over internet). Networked via UDP (port 7779). VPN and authentication recommended.
+
+</div>
+
+</details>
 
 ---
 
-## 🎮 Hardware-Agnostic Input System
+## Unity Terminology
 
-### Normalized Tilt Control (-1 to +1)
+<details>
+<summary><strong>Unity MonoBehaviour vs. Live Actor</strong></summary>
 
-LBEAST uses a **joystick-style normalized input system** for all 5DOF hydraulic platforms. This means you write your game code once, and it works on any hardware configuration:
+<div style="margin-left: 20px;">
 
-**Why Normalized Inputs?**
-- ✅ **Hardware Independence:** Same game code works on platforms with 5° tilt or 15° tilt
-- ✅ **Venue Flexibility:** Operators can upgrade/downgrade hardware without code changes
-- ✅ **Intuitive API:** Think like a joystick: -1.0 (full left/back), 0.0 (center), +1.0 (full right/forward)
-- ✅ **Automatic Scaling:** SDK maps your inputs to actual hardware capabilities
+### Unity MonoBehaviour (Game Object Component)
 
-**Example:**
+A **Unity MonoBehaviour** refers to a C# class that inherits from `MonoBehaviour` and exists as a component on a GameObject in the Unity scene.
+
 ```csharp
-// Your game sends: "tilt 50% right, 80% forward"
-platform.SendPlatformTilt(0.5f, 0.8f, 0f, 1f);
-
-// On 5° max platform: Translates to Roll=2.5°, Pitch=4.0°
-// On 15° max platform: Translates to Roll=7.5°, Pitch=12.0°
-// Same code, automatically scaled!
+// This is a Unity MonoBehaviour
+public class AIFacemaskExperience : LBEASTExperienceBase
+{
+    // Component code...
+}
 ```
 
-**Axis Mapping:**
-- **TiltX:** Left/Right roll (-1.0 = full left, +1.0 = full right)
-- **TiltY:** Forward/Backward pitch (-1.0 = full backward, +1.0 = full forward)
-- **VerticalOffset:** Up/Down translation (-1.0 = full down, +1.0 = full up)
+### Live Actor (Physical Performer)
 
-**Advanced Users:** If you need precise control and know your hardware specs, angle-based APIs are available.
+A **Live Actor** refers to a **physical human performer** wearing VR equipment and/or costumes in the LBE installation. They drive in-game avatars with real-time facial animation and interact with players.
+
+```csharp
+// This configures support for 2 physical performers
+experience.numberOfLiveActors = 2;  // Human performers wearing facemasks
+experience.numberOfPlayers = 4;     // VR players
+```
+
+### Quick Reference
+- **"Unity MonoBehaviour"** = C# class that exists as a component on a GameObject
+- **"Live Actor"** = Physical person performing in the experience
+- **"Avatar"** = The in-game character controlled by a live actor
+- **"Player"** = VR participant (not performing, just experiencing)
+
+**In this documentation:**
+- When we say "MonoBehaviour" or "Component" in code context, we mean the Unity class
+- When we say "Live Actor" or "live actors", we mean physical human performers
+- Context should make it clear, but this distinction is important for the AI Facemask system
+
+</div>
+
+</details>
+
+---
+
 
 ---
 
 ## ✨ Features
 
-### Experience Templates (Drag-and-Drop Solutions)
+### Experience Genre Templates (Drag-and-Drop Solutions)
 
-Experience Templates are complete, pre-configured MonoBehaviours that you can add to your scene and use immediately. Each combines multiple low-level APIs into a cohesive, tested solution.
+Experience Genre Templates are complete, pre-configured MonoBehaviours that you can add to your scene and use immediately. Each combines multiple low-level APIs into a cohesive, tested solution.
 
-#### 🎭 AI Facemask Experience
+<details>
+<summary><strong>🎭 AI Facemask Experience</strong></summary>
+
+<div style="margin-left: 20px;">
 
 **Class:** `AIFacemaskExperience`
 
-Deploy LAN multiplayer VR experiences where immersive theater live actors drive avatars with **autonomous AI-generated facial expressions**. The AI face operates independently using NVIDIA Audio2Face (Neural Face via Omniverse server), while live actors control the experience flow through wrist-mounted buttons.
+Deploy LAN multiplayer VR experiences where immersive theater live actors drive avatars with **fully automated AI-generated facial expressions**. The AI face is controlled entirely by NVIDIA ACE pipeline - no manual animation, rigging, or blend shape tools required.
+
+**⚠️ DEDICATED SERVER REQUIRED ⚠️**
+
+This template **enforces** dedicated server mode. You **must** run a separate local PC as a headless dedicated server. This is **not optional** - the experience will fail to initialize if ServerMode is changed to Listen Server.
+
+**Network Architecture:**
+```
+┌─────────────────────────────────────┐
+│   Dedicated Server PC (Headless)    │
+│                                     │
+│  ┌───────────────────────────────┐  │
+│  │  Unity Dedicated Server       │  │ ← Multiplayer networking
+│  │  (No HMD, no rendering)       │  │
+│  └───────────────────────────────┘  │
+│                                     │
+│  ┌───────────────────────────────┐  │
+│  │  NVIDIA ACE Pipeline           │  │ ← AI Workflow:
+│  │  - Speech Recognition         │  │   Audio → NLU → Emotion
+│  │  - NLU (Natural Language)     │  │              ↓
+│  │  - Emotion Detection          │  │   Facial Animation
+│  │  - Facial Animation Gen       │  │   (Textures + Blend Shapes)
+│  └───────────────────────────────┘  │              ↓
+└─────────────────────────────────────┘   Stream to HMDs
+               │
+        LAN Network (UDP/TCP)
+               │
+        ┌──────┴────────┐
+        │               │
+   VR HMD #1      VR HMD #2      (Live Actors)
+   VR HMD #3      VR HMD #4      (Players)
+```
+
+**AI Facial Animation (Fully Automated):**
+- **NVIDIA ACE Pipeline**: Generates facial textures and blend shapes automatically
+- **No Manual Control**: Live actors never manually animate facial expressions
+- **No Rigging Required**: NVIDIA ACE handles all facial animation generation
+- **Real-Time Application**: AIFaceController receives NVIDIA ACE output and applies to mesh
+- **Mask-Like Tracking**: AIFace mesh is tracked on top of live actor's face in HMD
+- **Context-Aware**: Facial expressions determined by audio, NLU, emotion, and narrative state machine
+- **Automated Performances**: Each narrative state triggers fully automated AI facemask performances
+
+**Live Actor Control (High-Level Flow Only):**
+- **Wireless Trigger Buttons**: Embedded in live actor's costume/clothes (ESP32, WiFi-connected)
+- **Narrative State Control**: Buttons advance/retreat the narrative state machine (Intro → Act1 → Act2 → Finale)
+- **Automated Performance Triggers**: State changes trigger automated AI facemask performances - live actor controls when, not how
+- **Experience Direction**: Live actor guides players through story beats by controlling narrative flow
+
+**Why Dedicated Server?**
+- **Performance**: Offloads heavy AI processing from VR HMDs
+- **Parallelization**: Supports multiple live actors simultaneously
+- **Reliability**: Isolated AI workflow prevents HMD performance degradation
+- **Scalability**: Easy to add more live actors or players
+
+**Automatic Server Discovery:**
+
+LBEAST includes a **zero-configuration UDP broadcast system** for automatic server discovery:
+- **Server**: Broadcasts presence every 2 seconds on port `7778`
+- **Clients**: Automatically discover and connect to available servers
+- **No Manual IP Entry**: Perfect for LBE installations where tech setup should be invisible
+- **Multi-Experience Support**: Discover multiple concurrent experiences on the same LAN
+- **Server Metadata**: Includes experience type, player count, version, current state
+
+When a client HMD boots up, it automatically finds the dedicated server and connects - zero configuration required!
+
+**Complete System Flow:**
+
+The AI Facemask system supports two workflows: **pre-baked scripts** (narrative-driven) and **real-time improv** (player interaction-driven).
+
+**Pre-Baked Script Flow (Narrative-Driven):**
+```
+Live Actor presses wireless trigger button (embedded in costume)
+    ↓
+Narrative State Machine advances/retreats (Intro → Act1 → Act2 → Finale)
+    ↓
+ACE Script Manager triggers pre-baked script for new state
+    ↓
+NVIDIA ACE Server streams pre-baked facial animation (from cached TTS + Audio2Face)
+    ↓
+AIFaceController receives facial animation data (blend shapes + textures)
+    ↓
+Facial animation displayed on live actor's HMD-mounted mesh
+```
+
+**Real-Time Improv Flow (Player Interaction-Driven):**
+```
+Player speaks into HMD microphone
+    ↓
+VOIPManager captures audio → Sends to Mumble server
+    ↓
+Dedicated Server receives audio via Mumble
+    ↓
+ACE ASR Manager (visitor pattern) receives audio → Converts speech to text (NVIDIA Riva ASR)
+    ↓
+ACE Improv Manager receives text → Local LLM (with LoRA) generates improvised response
+    ↓
+Local TTS (NVIDIA Riva) converts text → audio
+    ↓
+Local Audio2Face (NVIDIA NIM) converts audio → facial animation
+    ↓
+Facial animation streamed to AIFaceController
+    ↓
+Facial animation displayed on live actor's HMD-mounted mesh
+```
+
+**Component Architecture:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  PLAYER HMD (Client)                                            │
+│  ────────────────────────────────────────────────────────────   │
+│  1. Player speaks into HMD microphone                           │
+│  2. VOIPManager captures audio                                  │
+│  3. Audio sent to Mumble server (Opus encoded)                  │
+└───────────────────────┬─────────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  MUMBLE SERVER (LAN)                                            │
+│  ────────────────────────────────────────────────────────────   │
+│  Routes audio to dedicated server                               │
+└───────────────────────┬─────────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  DEDICATED SERVER PC (Unity Server)                             │
+│  ────────────────────────────────────────────────────────────   │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  ACE ASR Manager (VOIP-to-AIFacemask Visitor Pattern)    │   │
+│  │  - Receives audio from Mumble                            │   │
+│  │  - Buffers audio (voice activity detection)              │   │
+│  │  - Converts speech → text (NVIDIA Riva ASR)              │   │
+│  │  - Triggers Improv Manager with text                     │   │
+│  └───────────────────────┬──────────────────────────────────┘   │
+│                          │                                      │
+│                          ▼                                      │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  ACE Improv Manager                                      │   │
+│  │  - Receives text from ASR Manager                        │   │
+│  │  - Local LLM (Ollama/vLLM/NIM + LoRA) → Improvised text  │   │
+│  │  - Local TTS (NVIDIA Riva) → Audio file                  │   │
+│  │  - Local Audio2Face (NVIDIA NIM) → Facial animation      │   │
+│  └───────────────────────┬──────────────────────────────────┘   │
+│                          │                                      │
+│                          ▼                                      │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  ACE Script Manager                                      │   │
+│  │  - Manages pre-baked scripts                             │   │
+│  │  - Triggers scripts on narrative state changes           │   │
+│  │  - Pre-bakes scripts (TTS + Audio2Face) on ACE server    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└───────────────────────┬─────────────────────────────────────────┘
+                        │
+                        │ Facial Animation Data (Blend Shapes + Textures)
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LIVE ACTOR HMD (Client)                                        │
+│  ────────────────────────────────────────────────────────────   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  AIFaceController                                        │   │
+│  │  - Receives facial animation data from server            │   │
+│  │  - Applies blend shapes/textures to mesh                 │   │
+│  │  - Real-time facial animation display                    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 **Architecture:**
-- **AI Face**: Fully autonomous, driven by NVIDIA Audio2Face for natural conversation
-- **Live Actor Role**: Experience director, NOT puppeteer
-- **Wrist Controls**: 4 buttons (2 left, 2 right) to advance/retreat through experience states
-- **Experience Loop**: Built-in state machine (Intro → Tutorial → Act1 → Act2 → Finale → Credits)
+- **AI Face**: Fully autonomous, driven by NVIDIA ACE pipeline (Audio → NLU → Emotion → Facial Animation)
+- **Live Actor Role**: High-level experience director via wireless trigger buttons, NOT facial puppeteer
+- **Wireless Controls**: Embedded trigger buttons in live actor's costume/clothes (4 buttons total)
+- **Narrative State Machine**: Live actor advances/retreats through story beats (Intro → Tutorial → Act1 → Act2 → Finale → Credits)
+- **Automated Performances**: AI facemask performances are fully automated - live actor controls flow, not expressions
+- **Server Mode**: **ENFORCED** to Dedicated Server (attempting to change will fail initialization)
+
+**Live Actor Control System:**
+- **Wireless Trigger Buttons**: Embedded in live actor's costume/clothes (ESP32-based, WiFi-connected)
+- **High-Level Flow Control**: Buttons advance/retreat the narrative state machine, which triggers automated AI facemask performances
+- **No Facial Control**: Live actor never manually controls facial expressions - NVIDIA ACE handles all facial animation
+- **Experience Direction**: Live actor guides players through story beats by advancing/retreating narrative states
 
 **Includes:**
-- Pre-configured `FacialAnimationController` (autonomous facial animation bridge)
-- Pre-configured `SerialDeviceController` (wrist buttons)
-- Pre-configured `ExperienceStateMachine` (story progression)
+- Pre-configured `AIFaceController` (receives NVIDIA ACE output, applies to mesh)
+- Pre-configured `SerialDeviceController` (wireless trigger buttons embedded in costume)
+- Pre-configured `ExperienceStateMachine` (narrative story progression)
+- Pre-configured `AIFacemaskACEScriptManager` (pre-baked script collections)
+- Pre-configured `AIFacemaskACEImprovManager` (real-time improvised responses)
+- Pre-configured `AIFacemaskASRManager` (speech-to-text for player voice)
 - LAN multiplayer support (configurable live actor/player counts)
+- Passthrough mode for live actors to help players
 
-**Button Layout:**
-- **Left Wrist**: Button 0 (Forward), Button 1 (Backward)
-- **Right Wrist**: Button 2 (Forward), Button 3 (Backward)
+**Button Layout (Embedded in Costume):**
+- **Left Wrist/Clothing**: Button 0 (Advance narrative), Button 1 (Retreat narrative)
+- **Right Wrist/Clothing**: Button 2 (Advance narrative), Button 3 (Retreat narrative)
 
 **Quick Start:**
 ```csharp
+// In your scene
 var experience = gameObject.AddComponent<AIFacemaskExperience>();
-experience.InitializeExperience();
+experience.numberOfLiveActors = 1;
+experience.numberOfPlayers = 4;
+experience.liveActorMesh = myCharacterMesh;
 
-// React to experience state changes
+// ServerMode is already set to DedicatedServer by default
+// DO NOT CHANGE IT - initialization will fail if you do
+
+experience.InitializeExperience();  // Will validate server mode
+
+// Live actor controls high-level flow via wireless trigger buttons embedded in costume
+// Buttons advance/retreat narrative state machine, which triggers automated AI facemask performances
+// Facial expressions are fully automated by NVIDIA ACE - no manual control needed
+
+// React to experience state changes (triggered by live actor's buttons)
 string currentState = experience.GetCurrentExperienceState();
 
-// Manually trigger state changes (usually handled by wrist buttons automatically)
-experience.AdvanceExperience();
-experience.RetreatExperience();
+// Programmatically trigger state changes (usually handled by wireless buttons automatically)
+experience.AdvanceExperience();  // Advance narrative state
+experience.RetreatExperience();  // Retreat narrative state
 ```
 
-**Custom State Machine:**
-```csharp
-// Define custom experience states
-var customStates = new List<ExperienceState>
-{
-    new ExperienceState("Intro", "Welcome sequence"),
-    new ExperienceState("Challenge1", "First puzzle"),
-    new ExperienceState("Boss", "Final boss fight")
-};
+**❌ What Happens If You Try to Use Listen Server:**
+```
+========================================
+⚠️  SERVER MODE CONFIGURATION ERROR ⚠️
+========================================
+This experience REQUIRES ServerMode to be set to 'DedicatedServer'
+Current ServerMode is set to 'ListenServer'
 
-// Initialize with custom states
-var loop = GetComponent<ExperienceStateMachine>();
-loop.Initialize(customStates);
-loop.StartExperience();
+Please change ServerMode in the Inspector to 'DedicatedServer'
+========================================
 ```
 
 **Handle State Changes:**
-Override `OnExperienceStateChanged` in your derived class:
+Override `OnNarrativeStateChanged` to trigger game events when live actor advances/retreats narrative state via wireless trigger buttons:
 ```csharp
-protected override void OnExperienceStateChanged(string oldState, string newState, int newStateIndex)
+protected override void OnNarrativeStateChanged(string oldState, string newState, int newStateIndex)
 {
-    base.OnExperienceStateChanged(oldState, newState, newStateIndex);
-    
-    if (newState == "Boss")
+    // State changes are triggered by live actor's wireless trigger buttons
+    // Each state change triggers automated AI facemask performances
+    if (newState == "Act1")
     {
-        SpawnBossEnemy();
-        PlayDramaticMusic();
+        // Spawn enemies, trigger cutscene, etc.
+        // NVIDIA ACE will automatically generate facial expressions for this state
     }
 }
 ```
 
-#### 🎢 Moving Platform Experience
+</div>
+
+</details>
+
+<details>
+<summary><strong>🎢 Moving Platform Experience</strong></summary>
+
+<div style="margin-left: 20px;">
 
 **Class:** `MovingPlatformExperience`
 
 Single-player standing VR experience on an unstable hydraulic platform with safety harness. Provides pitch, roll, and Y/Z translation for immersive motion.
 
 **Includes:**
-- Pre-configured 5DOF hydraulic platform (4 actuators + scissor lift)
+- Pre-configured 4DOF hydraulic platform (4 actuators + scissor lift)
 - 10° pitch and roll capability
 - Vertical translation for rumble/earthquake effects
 - Emergency stop and return-to-neutral functions
+- Blueprint-friendly motion commands
 
 **Quick Start:**
 ```csharp
 var platform = gameObject.AddComponent<MovingPlatformExperience>();
+platform.maxPitch = 10.0f;
+platform.maxRoll = 10.0f;
 platform.InitializeExperience();
 
 // Send normalized tilt (RECOMMENDED - hardware-agnostic)
-platform.SendPlatformTilt(0.3f, -0.5f, 0f, 2f);  // TiltX, TiltY, Vertical, Duration
+// -1.0 to +1.0 automatically scales to hardware capabilities
+platform.SendPlatformTilt(0.3f, -0.5f, 0.0f, 2.0f);  // TiltX (right), TiltY (backward), Vertical, Duration
 
-// Advanced: Use absolute angles if needed
-platform.SendPlatformMotion(5f, -3f, 20f, 2f);  // pitch, roll, vertical, duration
+// Advanced: Use absolute angles if you need precise control
+platform.SendPlatformMotion(5.0f, -3.0f, 20.0f, 2.0f);  // pitch, roll, vertical, duration
 ```
 
-#### 🚁 Gunship Experience
+</div>
+
+</details>
+
+<details>
+<summary><strong>🚁 Gunship Experience</strong></summary>
+
+<div style="margin-left: 20px;">
 
 **Class:** `GunshipExperience`
 
-Four-player seated VR experience on a hydraulic platform. Perfect for multiplayer gunship, helicopter, spaceship, or multi-crew vehicle simulations.
+Four-player VR experience where each player is strapped to the corner of a hydraulic platform capable of 4DOF motion (pitch/roll/forward/reverse/lift-up/liftdown). Perfect for multiplayer gunship, helicopter, spaceship, or multi-crew vehicle simulations.
 
 **Includes:**
-- Pre-configured 5DOF hydraulic platform (6 actuators + scissor lift)
+- Pre-configured 4DOF hydraulic platform (6 actuators + scissor lift)
 - 4 pre-defined seat positions
 - LAN multiplayer support (4 players)
 - Synchronized motion for all passengers
+- Emergency stop and safety functions
 
 **Quick Start:**
 ```csharp
 var gunship = gameObject.AddComponent<GunshipExperience>();
 gunship.InitializeExperience();
 
-// Send normalized motion (RECOMMENDED)
-gunship.SendGunshipTilt(0.5f, 0.8f, 0.2f, 1.5f);
+// Send normalized motion (RECOMMENDED - hardware-agnostic)
+// Values from -1.0 to +1.0 automatically scale to hardware capabilities
+gunship.SendGunshipTilt(0.5f, 0.8f, 0.2f, 0.1f, 1.5f);  // TiltX (roll), TiltY (pitch), ForwardOffset, VerticalOffset, Duration
 
-// Advanced: Use absolute angles
-gunship.SendGunshipMotion(8f, 5f, 10f, 15f, 1.5f);
+// Advanced: Use absolute angles if you need precise control
+gunship.SendGunshipMotion(8.0f, 5.0f, 10.0f, 15.0f, 1.5f);  // pitch, roll, forwardOffset (cm), verticalOffset (cm), duration
 ```
 
-#### 🏎️ Car Sim Experience
+</div>
+
+</details>
+
+<details>
+<summary><strong>🏎️ Car Sim Experience</strong></summary>
+
+<div style="margin-left: 20px;">
 
 **Class:** `CarSimExperience`
 
 Single-player seated racing/driving simulator on a hydraulic platform. Perfect for arcade racing games and driving experiences.
 
 **Includes:**
-- Pre-configured 5DOF hydraulic platform optimized for driving
+- Pre-configured 4DOF hydraulic platform optimized for driving
 - Motion profiles for cornering, acceleration, and bumps
 - Compatible with racing wheels and pedals (via Unity Input System)
+- Simplified API for driving simulation
 
 **Quick Start:**
 ```csharp
 var carSim = gameObject.AddComponent<CarSimExperience>();
 carSim.InitializeExperience();
 
-// Use normalized driving API (RECOMMENDED)
-carSim.SimulateCornerNormalized(-0.8f, 0.5f);      // Left turn (-1 to +1)
-carSim.SimulateAccelerationNormalized(0.5f, 0.5f); // Accelerate (-1 to +1)
-carSim.SimulateBump(0.8f, 0.2f);                   // Bump (intensity 0-1)
+// Use normalized driving API (RECOMMENDED - hardware-agnostic)
+carSim.SimulateCornerNormalized(-0.8f, 0.5f);      // Left turn (normalized -1 to +1)
+carSim.SimulateAccelerationNormalized(0.5f, 0.5f); // Accelerate (normalized -1 to +1)
+carSim.SimulateBump(0.8f, 0.2f);                   // Road bump (intensity 0-1)
 
-// Advanced: Use absolute angles
-carSim.SimulateCorner(-8f, 0.5f);         // degrees
-carSim.SimulateAcceleration(5f, 0.5f);    // degrees
+// Advanced: Use absolute angles if you need precise control
+carSim.SimulateCorner(-8.0f, 0.5f);         // Left turn (degrees)
+carSim.SimulateAcceleration(5.0f, 0.5f);    // Accelerate (degrees)
 ```
 
-#### ✈️ Flight Sim Experience
+</div>
+
+</details>
+
+<details>
+<summary><strong>✈️ Flight Sim Experience</strong></summary>
+
+<div style="margin-left: 20px;">
 
 **Class:** `FlightSimExperience`
 
@@ -410,21 +850,27 @@ Single-player flight simulator using a two-axis gyroscope for continuous rotatio
 **Quick Start:**
 ```csharp
 var flightSim = gameObject.AddComponent<FlightSimExperience>();
+flightSim.hotasType = HOTASType.LogitechX56;
+flightSim.enableJoystick = true;
+flightSim.enableThrottle = true;
 flightSim.InitializeExperience();
 
-// Apply normalized flight input
-flightSim.ApplyFlightInput(-0.5f, 0.3f);  // pitch, roll (-1 to +1)
-
-// Send direct gyroscope rotation (can exceed 360°)
-flightSim.SendGyroscopeRotation(720f, 1080f, 2f);  // 2 full barrel rolls!
-
-// Read HOTAS inputs
-Vector2 joystick = flightSim.GetJoystickInput();
+// Read HOTAS input in Update
+Vector2 joystick = flightSim.GetJoystickInput();  // X=roll, Y=pitch
 float throttle = flightSim.GetThrottleInput();
-float pedals = flightSim.GetPedalInput();
+
+// Send continuous rotation command (can exceed 360°)
+flightSim.SendContinuousRotation(720.0f, 360.0f, 4.0f);  // Two barrel rolls!
 ```
 
-#### 🚪 Escape Room Experience
+</div>
+
+</details>
+
+<details>
+<summary><strong>🚪 Escape Room Experience</strong></summary>
+
+<div style="margin-left: 20px;">
 
 **Class:** `EscapeRoomExperience`
 
@@ -462,18 +908,20 @@ string currentState = escapeRoom.GetCurrentPuzzleState();
 ```
 
 **Handle State Changes:**
-Override `OnExperienceStateChanged` in your derived class:
+Override `OnNarrativeStateChanged` in your derived class:
 ```csharp
-protected override void OnExperienceStateChanged(string oldState, string newState, int newStateIndex)
+protected override void OnNarrativeStateChanged(string oldState, string newState, int newStateIndex)
 {
-    base.OnExperienceStateChanged(oldState, newState, newStateIndex);
-    
     if (newState == "Puzzle1_Complete")
     {
         // Unlock next door, play sound, etc.
     }
 }
 ```
+
+</div>
+
+</details>
 
 ---
 
@@ -500,15 +948,51 @@ Quaternion hmdRot = tracking.GetHMDRotation();
 bool triggerPressed = tracking.IsTriggerPressed(XRNode.RightHand);
 ```
 
-### Large Haptics Module (`LBEAST.LargeHaptics`)
+<details>
+<summary><strong>🎛️ LargeHaptics API</strong></summary>
 
-**Classes:**
-- `HapticPlatformController` - Control 5DOF platforms (4 or 6 actuators) or 2DOF gyroscopes
-- `HapticPlatformConfig` - Platform configuration
-- `PlatformMotionCommand` - Motion commands
-- `GyroscopeConfig` - Gyroscope and HOTAS configuration
+<div style="margin-left: 20px;">
+
+**Module:** `LBEAST.LargeHaptics`
+
+Manual control of individual hydraulic actuators, gyroscopes, and scissor lift translation.
+
+<details>
+<summary><strong>🎮 Hardware-Agnostic Input System - Normalized Tilt Control (-1 to +1)</strong></summary>
+
+<div style="margin-left: 20px;">
+
+LBEAST uses a **joystick-style normalized input system** for all 4DOF hydraulic platforms. This means you write your game code once, and it works on any hardware configuration:
+
+**Why Normalized Inputs?**
+- ✅ **Hardware Independence:** Same game code works on platforms with 5° tilt or 15° tilt
+- ✅ **Venue Flexibility:** Operators can upgrade/downgrade hardware without code changes
+- ✅ **Intuitive API:** Think like a joystick: -1.0 (full left/back), 0.0 (center), +1.0 (full right/forward)
+- ✅ **Automatic Scaling:** SDK maps your inputs to actual hardware capabilities
 
 **Example:**
+```csharp
+// Your game sends: "tilt 50% right, 80% forward"
+platform.SendPlatformTilt(0.5f, 0.8f, 0.0f, 1.0f);
+
+// On 5° max platform: Translates to Roll=2.5°, Pitch=4.0°
+// On 15° max platform: Translates to Roll=7.5°, Pitch=12.0°
+// Same code, automatically scaled!
+```
+
+**Axis Mapping:**
+- **TiltX:** Left/Right roll (-1.0 = full left, +1.0 = full right)
+- **TiltY:** Forward/Backward pitch (-1.0 = full backward, +1.0 = full forward)
+- **ForwardOffset:** Scissor lift forward/reverse (-1.0 = full reverse, +1.0 = full forward, 0.0 = neutral)
+- **VerticalOffset:** Scissor lift up/down (-1.0 = full down, +1.0 = full up, 0.0 = neutral)
+
+**Advanced Users:** If you need precise control and know your hardware specs, angle-based APIs are available in the `Advanced` category.
+
+</div>
+
+</details>
+
+**4DOF Platform Example:**
 ```csharp
 using LBEAST.LargeHaptics;
 
@@ -519,52 +1003,100 @@ HapticPlatformConfig config = new HapticPlatformConfig
     platformType = PlatformType.MovingPlatform_SinglePlayer,
     maxPitchDegrees = 10f,
     maxRollDegrees = 10f,
-    maxTranslationZ = 100f
+    maxTranslationY = 100f,  // Scissor lift forward/reverse
+    maxTranslationZ = 100f   // Scissor lift up/down
 };
 
 controller.InitializePlatform(config);
 
 // Send normalized motion (recommended)
-controller.SendNormalizedMotion(0.5f, -0.3f, 0f, 1.5f);
+controller.SendNormalizedMotion(0.5f, -0.3f, 0.2f, 0.1f, 1.5f);  // TiltX, TiltY, ForwardOffset, VerticalOffset, Duration
 
 // Or send absolute motion command (advanced)
 PlatformMotionCommand cmd = new PlatformMotionCommand
 {
     pitch = 5f,
     roll = -3f,
-    translationZ = 20f,
+    translationY = 20f,  // Scissor lift forward/reverse (cm)
+    translationZ = 15f,  // Scissor lift up/down (cm)
     duration = 1.5f
 };
 controller.SendMotionCommand(cmd);
 ```
 
-### AI Facemask Module (`LBEAST.AIFacemask`)
+**2DOF Flight Sim with HOTAS Example:**
+```csharp
+var flightSimController = gameObject.AddComponent<HapticPlatformController>();
 
-**Classes:**
-- `FacialAnimationController` - Control facial blend shapes
-- `FacialAnimationMode` - Live, Prerecorded, or Procedural
-- `FacialAnimationFrame` - Animation data structure
+HapticPlatformConfig config = new HapticPlatformConfig
+{
+    platformType = PlatformType.FlightSim_2DOF,
+    gyroscopeConfig = new GyroscopeConfig
+    {
+        maxRotationSpeed = 90.0f,  // degrees per second
+        hotasType = HOTASType.LogitechX56,  // or ThrustmasterTFlight
+        enableJoystick = true,
+        enableThrottle = true,
+        enablePedals = true,
+        joystickSensitivity = 1.5f,
+        throttleSensitivity = 1.0f
+    }
+};
 
-**Example:**
+flightSimController.InitializePlatform(config);
+
+// Read HOTAS input
+Vector2 joystickInput = flightSimController.GetHOTASJoystickInput();  // X = roll, Y = pitch
+float throttleInput = flightSimController.GetHOTASThrottleInput();
+float pedalInput = flightSimController.GetHOTASPedalInput();
+
+// Send gyroscope command
+PlatformMotionCommand cmd = new PlatformMotionCommand
+{
+    pitch = 720.0f,  // Two full rotations
+    roll = 360.0f,   // One full roll
+    useContinuousRotation = true,  // Enable continuous rotation
+    duration = 4.0f
+};
+flightSimController.SendMotionCommand(cmd);
+```
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>🤖 AIFace API</strong></summary>
+
+<div style="margin-left: 20px;">
+
+**Module:** `LBEAST.AIFacemask`
+
+Receive and apply NVIDIA ACE facial animation output to a live actor's HMD-mounted mesh.
+
+**Important:** This is a receiver/display system - facial animation is fully automated by NVIDIA ACE. No manual control, keyframe animation, or rigging required.
+
 ```csharp
 using LBEAST.AIFacemask;
 
-var facial = GetComponentInChildren<FacialAnimationController>();
-facial.Initialize();
+var faceController = gameObject.AddComponent<AIFaceController>();
 
-// Set animation mode
-facial.SetAnimationMode(FacialAnimationMode.Live);
-facial.StartAnimation();
+AIFaceConfig config = new AIFaceConfig
+{
+    targetMesh = liveActorMesh,  // Mesh attached to live actor's HMD/head
+    nvidiaACEEndpointURL = "http://localhost:8080/ace",  // NVIDIA ACE endpoint
+    updateRate = 30.0f  // Receive updates at 30 Hz
+};
 
-// Manual control
-facial.SetBlendShapeWeight("smile", 80f);
-facial.SetBlendShapeWeight("eyebrow_left_raise", 50f);
+faceController.InitializeAIFace(config);
 
-// Record animation
-facial.StartRecording();
-// ... perform animation ...
-var recording = facial.StopRecording();
+// NVIDIA ACE will automatically stream facial animation data
+// Component receives and applies it via ReceiveFacialAnimationData()
 ```
+
+</div>
+
+</details>
 
 ### Embedded Systems Module (`LBEAST.EmbeddedSystems`)
 
@@ -754,15 +1286,16 @@ lightingController.StartFixtureFade(fixtureId, 0.0f, 1.0f, 2.0f);  // Fade from 
 - ✅ **Art-Net Discovery** - Auto-detect Art-Net nodes on network
 - ✅ **Multiple Fixture Types** - Dimmable, RGB, RGBW, Moving Head, Custom
 
-### VOIP Module (`LBEAST.VOIP`)
+<details>
+<summary><strong>🎤 VOIP API</strong></summary>
 
-**Classes:**
-- `VOIPManager` - Main component for managing VOIP connections
-- `MumbleClient` - Mumble protocol wrapper
-- `SteamAudioSourceComponent` - Per-user spatial audio source
-- `VOIPConnectionState` - Connection state enumeration
+<div style="margin-left: 20px;">
 
-**Example:**
+**Module:** `LBEAST.VOIP`
+
+Low-latency voice communication with 3D HRTF spatialization using Mumble protocol and Steam Audio.
+
+**Basic Example:**
 ```csharp
 using LBEAST.VOIP;
 
@@ -788,17 +1321,72 @@ voipManager.OnConnectionStateChanged.AddListener((state) =>
 });
 ```
 
+**Custom Audio Processing (Visitor Pattern):**
+
+If your experience genre template needs to process player voice (speech recognition, voice commands, audio analysis, etc.), use the **visitor interface pattern** to subscribe to audio events without coupling your module to VOIP:
+
+```csharp
+// 1. Create a component that implements IVOIPAudioVisitor
+public class MyAudioProcessor : MonoBehaviour, IVOIPAudioVisitor
+{
+    public void OnPlayerAudioReceived(int playerId, float[] audioData, int sampleRate, Vector3 position)
+    {
+        // Process audio for your custom use case
+        // AudioData is PCM (decoded from Opus), SampleRate is typically 48000
+        ProcessVoiceCommand(audioData, sampleRate);
+    }
+    
+    private void ProcessVoiceCommand(float[] audioData, int sampleRate)
+    {
+        // Your custom audio processing logic
+    }
+}
+
+// 2. In your experience's InitializeExperienceImpl(), register as visitor:
+protected override bool InitializeExperienceImpl()
+{
+    // ... other initialization ...
+    
+    if (VOIPManager voipManager = GetComponent<VOIPManager>())
+    {
+        if (MyAudioProcessor audioProcessor = GetComponent<MyAudioProcessor>())
+        {
+            voipManager.RegisterAudioVisitor(audioProcessor);
+        }
+    }
+}
+```
+
+**Why Use the Visitor Pattern?**
+
+- ✅ **Decoupled Architecture** - VOIP module doesn't know about your experience
+- ✅ **Multiple Visitors** - Multiple components can subscribe to the same audio stream
+- ✅ **Clean Separation** - Your experience code stays in your experience module
+- ✅ **Reusable Pattern** - Same approach works for any experience genre template
+
+**Real-World Example:**
+
+`AIFacemaskExperience` uses this pattern for speech recognition:
+- `AIFacemaskASRManager` implements `IVOIPAudioVisitor`
+- Receives player audio → Converts to text → Triggers AI improv responses
+- All AIFacemask code stays in the AIFacemask module, VOIP module remains decoupled
+
 **Features:**
 - ✅ **Mumble Protocol** - Low-latency VOIP (< 50ms on LAN)
 - ✅ **Steam Audio** - 3D HRTF spatialization for positional audio
 - ✅ **Per-User Audio Sources** - Automatic spatialization for each remote player
 - ✅ **HMD-Agnostic** - Works with any HMD's microphone and headphones
 - ✅ **Unity-Friendly** - Easy integration via MonoBehaviour component
+- ✅ **Visitor Pattern** - Subscribe to audio events without module coupling
 
 **Prerequisites:**
 - Murmur server running on LAN
 - Steam Audio plugin (git submodule)
 - MumbleLink plugin (git submodule)
+
+</div>
+
+</details>
 
 ---
 
@@ -808,21 +1396,91 @@ LBEAST is distributed as a Unity Package, making it easy to integrate into your 
 
 ### **Installation Methods**
 
-#### **Option 1: Local Package (If You Cloned This Repo)**
+> **✅ Simple Installation:** The LBEAST repository root **is** the package folder. You can clone directly into your project's `Packages/` directory - no need to extract subfolders or copy files manually.
 
-If you've cloned the `LBEAST_Unity` repository, the package is already set up:
+<details>
+<summary><strong>Option 1: Git Clone (Recommended - Simple One-Command Install)</strong></summary>
 
-1. **Open your Unity project**
-2. The package will automatically appear in **Package Manager**
-3. **Window > Package Manager**
-4. Switch to **"In Project"** tab
-5. Look for **"LBEAST - Location-Based Entertainment Activation Standard"**
+<div style="margin-left: 20px;">
 
-> **✅ Already Done!** If you cloned the repo, LBEAST is already configured as a local package in `Packages/com.ajcampbell.lbeast/`
+The LBEAST repository root **is** the package folder. Simply clone directly into your project's `Packages/` directory:
 
-#### **Option 2: Git URL Installation (Recommended for Distribution)**
+```bash
+# From your Unity project root
+cd Packages
+git clone https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+```
 
-Install LBEAST directly from a Git repository:
+**Windows PowerShell:**
+```powershell
+# From your Unity project root
+cd Packages
+git clone https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+```
+
+That's it! The package is ready to use.
+
+**Next steps:**
+1. Open Unity Editor
+2. Unity will automatically detect and import the package
+3. Verify in **Window > Package Manager > "In Project"**
+
+**To update the package later:**
+```bash
+cd Packages/com.ajcampbell.lbeast
+git pull
+```
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>Option 2: Git Submodule (Recommended for Git-based Projects)</strong></summary>
+
+<div style="margin-left: 20px;">
+
+If your project uses Git, add LBEAST as a submodule:
+
+```bash
+# From your Unity project root
+cd Packages
+git submodule add https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+```
+
+**Windows PowerShell:**
+```powershell
+# From your Unity project root
+cd Packages
+git submodule add https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+```
+
+Then:
+1. Open Unity Editor
+2. Unity will automatically detect and import the package
+3. Verify in **Window > Package Manager > "In Project"**
+
+**To update the package later:**
+```bash
+cd Packages/com.ajcampbell.lbeast
+git submodule update --remote
+```
+
+**To clone a project that uses LBEAST as a submodule:**
+```bash
+git clone --recursive https://github.com/yourusername/yourproject.git
+```
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>Option 3: Git URL Installation (Package Manager)</strong></summary>
+
+<div style="margin-left: 20px;">
+
+Install LBEAST directly from a Git repository via Unity Package Manager:
 
 1. **Open Unity Editor**
 2. **Window > Package Manager**
@@ -835,7 +1493,7 @@ Install LBEAST directly from a Git repository:
 6. Click **"Add"**
 7. Unity will download and install the package
 
-> **📌 Note:** LBEAST is currently in **early alpha (version 0.1.0)**. Version tags are not yet available, so the Git URL above will pull the latest commit from the `main` branch. Once version tags are added, you can pin to specific versions using `#v0.1.0` syntax. LBEAST uses **Semantic Versioning** (SemVer): MAJOR.MINOR.PATCH (e.g., 0.1.0 = minor changes, 1.0.0 = major/breaking changes).
+> **📌 Note:** LBEAST is currently **version 0.1.0**. Version tags are not yet available, so the Git URL above will pull the latest commit from the `main` branch. Once version tags are added, you can pin to specific versions using `#v0.1.0` syntax. LBEAST uses **Semantic Versioning** (SemVer): MAJOR.MINOR.PATCH (e.g., 0.1.0 = minor changes, 1.0.0 = major/breaking changes).
 
 **For a specific branch:**
 ```
@@ -852,33 +1510,34 @@ https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.
 git@github.com:ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
 ```
 
-#### **Option 3: Manual Package Installation**
+</div>
 
-If you have the package folder locally (e.g., downloaded ZIP or different location):
+</details>
 
-1. **Open Unity Editor**
-2. **Window > Package Manager**
-3. Click **"+"** button (top-left)
-4. Select **"Add package from disk..."**
-5. Navigate to the `package.json` file in the LBEAST package folder:
+<details>
+<summary><strong>Option 4: Download ZIP (Manual Installation)</strong></summary>
+
+<div style="margin-left: 20px;">
+
+1. **Download** the repository as a ZIP from GitHub
+2. **Extract** the ZIP to a temporary location
+3. **Copy the entire extracted folder** to your project's `Packages/` directory and rename it to `com.ajcampbell.lbeast`:
    ```
-   Packages/com.ajcampbell.lbeast/package.json
+   YourProject/
+   └── Packages/
+       └── com.ajcampbell.lbeast/          ← Copy entire extracted folder here
+           ├── package.json
+           ├── Runtime/
+           ├── Editor/
+           └── ...
    ```
-6. Select `package.json`
-7. Click **"Open"**
+4. **Open Unity Editor**
+5. Unity will automatically detect and import the package
+6. Verify in **Window > Package Manager > "In Project"**
 
-#### **Option 4: Copy Package to Your Project**
+</div>
 
-If you want to embed LBEAST directly in your project:
-
-1. **Copy the package folder** to your project:
-   ```
-   Copy: Packages/com.ajcampbell.lbeast/
-   To: YourProject/Packages/com.ajcampbell.lbeast/
-   ```
-2. **Open Unity Editor**
-3. Unity will automatically detect and import the package
-4. Verify in **Window > Package Manager > "In Project"**
+</details>
 
 ### **Verifying Installation**
 
@@ -886,7 +1545,7 @@ After installation, verify LBEAST is properly installed:
 
 1. **Window > Package Manager**
 2. Switch to **"In Project"** tab
-3. Look for **"LBEAST - Location-Based Entertainment Activation Standard"** (version 0.1.0)
+3. Look for **"LBEAST - Location-Based Entertainment Activation Standard"** (v0.1.0)
 4. **Create a test script** to verify namespaces:
    ```csharp
    using LBEAST.Core;
@@ -1239,9 +1898,9 @@ The Command Protocol (UDP port 7779) **can work over the internet** with proper 
 
 ## 🗺️ Roadmap
 
-### ✅ Completed (v1.0)
+### ✅ Completed (v0.1.0 - Current)
 - [x] Core VR tracking abstraction
-- [x] 5DOF hydraulic platform support (4 & 6 actuators)
+- [x] 4DOF hydraulic platform support (4 & 6 actuators)
 - [x] 2DOF gyroscope support
 - [x] **Dedicated Server** architecture
 - [x] **Server Manager GUI** (UI Toolkit-based)
@@ -1251,7 +1910,14 @@ The Command Protocol (UDP port 7779) **can work over the internet** with proper 
 - [x] AI facial animation control
 - [x] Embedded systems (Arduino, ESP32, STM32)
 - [x] LAN multiplayer (Unity NetCode)
-- [x] 5 experience templates
+- [x] Experience Genre Templates (AIFacemask, MovingPlatform, Gunship, CarSim, FlightSim, EscapeRoom)
+- [x] **NVIDIA ACE Integration Architecture** (data structures, visitor pattern, component architecture)
+
+### 🎯 Planned (v1.0)
+- [ ] **Finishing AIFacemask functionality** - Complete all NOOP implementations for NVIDIA ACE service integration (ASR, TTS, Audio2Face, LLM, script pre-baking)
+- [ ] **Implementing HOTAS integration** - Full Unity Input System HOTAS profiles and complete HOTAS controller support
+- [ ] **Adding Weight & Height Safety Check Embedded Firmware** - Safety firmware for motion platforms to prevent operation if weight/height limits are exceeded
+- [ ] **Go-Kart Experience** - Electric go-karts, bumper cars, race boats, or bumper boats augmented by passthrough VR or AR headsets enabling overlaid virtual weapons and pickups that affect the performance of the vehicles
 
 ### 🔄 In Progress (v1.1)
 - [ ] Meta Quest 3 native integration
@@ -1265,6 +1931,47 @@ The Command Protocol (UDP port 7779) **can work over the internet** with proper 
 - [ ] Visual scripting (Bolt/Visual Scripting) support
 - [ ] Cloud multiplayer (Photon/Mirror)
 - [ ] Prefab packages (ready-to-use scene templates)
+
+### AI Facemask Experience - Service Integration (NOOP)
+
+The AI Facemask system architecture is complete with all data structures, component integration, and visitor patterns in place. The following service integrations are marked as NOOP (Not Operationally Programmed) and need implementation:
+
+#### **High Priority (Core Functionality)**
+
+- [ ] **AIFaceController** - Receive facial animation data from NVIDIA ACE endpoint (HTTP/WebSocket client)
+- [ ] **AIFaceController** - Apply blend shape weights to SkinnedMeshRenderer morph targets
+- [ ] **AIFaceController** - Apply facial texture to mesh material
+- [ ] **ACE Script Manager** - Request script playback from NVIDIA ACE server (HTTP POST)
+- [ ] **ACE Script Manager** - Request script pre-baking from NVIDIA ACE server (TTS → Audio, Audio → Facial data)
+- [ ] **ACE Script Manager** - Async pre-baking support (background processing)
+- [ ] **ACE ASR Manager** - Request ASR transcription from local ASR service (gRPC/HTTP to NVIDIA Riva ASR)
+- [ ] **ACE ASR Manager** - Trigger improv after transcription (wire to ACEImprovManager)
+- [ ] **ACE Improv Manager** - Request LLM response from local LLM (HTTP to Ollama/vLLM/NVIDIA NIM)
+- [ ] **ACE Improv Manager** - Request TTS conversion from local TTS (gRPC to NVIDIA Riva TTS)
+- [ ] **ACE Improv Manager** - Request Audio2Face conversion from local Audio2Face (HTTP/gRPC to NVIDIA NIM)
+- [ ] **ACE Improv Manager** - Auto-trigger Audio2Face after TTS completes (callback chain)
+- [ ] **ACE Improv Manager** - Monitor async response generation status (track LLM/TTS/Audio2Face operations)
+- [ ] **AIFacemaskExperience** - Configure NVIDIA ACE endpoint URL (load from project settings/config)
+- [ ] **AIFacemaskExperience** - Register ASR Manager as visitor with VOIPManager (wire visitor pattern)
+- [ ] **AIFacemaskExperience** - Configure NVIDIA ACE server base URL (load from project settings/config)
+
+#### **Medium Priority (Infrastructure)**
+
+- [ ] **VOIPManager** - Decode Opus to PCM for visitors (decode Mumble Opus before passing to visitors)
+- [ ] **VOIPManager** - Integrate with player replication system (get remote player positions)
+- [ ] **Server Beacon** - Get server port from project settings (load port configuration)
+- [ ] **Server Beacon** - Track actual player count (query Unity networking)
+
+#### **Low Priority (Optimization)**
+
+- [ ] **AIFaceController** - Optimize blend shape application (batch updates, interpolation, caching)
+- [ ] **AIFaceController** - Texture streaming optimization (efficient texture updates, compression)
+
+**Implementation Notes:**
+- All NOOP functions have detailed comments explaining expected API formats
+- Backend-agnostic design supports multiple service providers (Ollama, vLLM, NVIDIA NIM, etc.)
+- Visitor pattern keeps modules decoupled - VOIP doesn't know about AIFacemask
+- All data structures are complete and ready for service integration
 
 ---
 

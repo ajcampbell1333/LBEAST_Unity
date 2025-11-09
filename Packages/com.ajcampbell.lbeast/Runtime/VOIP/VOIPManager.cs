@@ -74,6 +74,11 @@ namespace LBEAST.VOIP
         /// </summary>
         private Dictionary<int, SteamAudioSourceComponent> audioSourceMap = new Dictionary<int, SteamAudioSourceComponent>();
 
+        /// <summary>
+        /// Registered audio visitors (for decoupled module integration)
+        /// </summary>
+        private List<IVOIPAudioVisitor> audioVisitors = new List<IVOIPAudioVisitor>();
+
         private void Start()
         {
             // Auto-generate player name if not set
@@ -257,6 +262,22 @@ namespace LBEAST.VOIP
 
             // Broadcast event
             OnRemotePlayerAudioReceived?.Invoke(userId, position);
+
+            // Notify all registered visitors
+            // NOOP: TODO - Decode Opus to PCM before passing to visitors
+            // For now, pass empty PCM data - visitor will need to decode Opus themselves
+            // Or we decode here and pass PCM
+            float[] decodedPCM = new float[0];  // Placeholder - actual implementation will decode Opus
+            // TODO: Decode opusData to decodedPCM using Opus decoder
+            // Typical Mumble sample rate is 48000 Hz
+            
+            foreach (IVOIPAudioVisitor visitor in audioVisitors)
+            {
+                if (visitor != null)
+                {
+                    visitor.OnPlayerAudioReceived(userId, decodedPCM, 48000, position);  // Mumble uses 48kHz
+                }
+            }
         }
 
         /// <summary>
@@ -322,6 +343,43 @@ namespace LBEAST.VOIP
                 }
                 audioSourceMap.Remove(userId);
                 Debug.Log($"VOIPManager: Removed audio source for user {userId}");
+            }
+        }
+
+        /// <summary>
+        /// Register an audio visitor to receive audio events
+        /// Visitors are notified when player audio is received
+        /// </summary>
+        /// <param name="visitor">Visitor implementing IVOIPAudioVisitor interface</param>
+        public void RegisterAudioVisitor(IVOIPAudioVisitor visitor)
+        {
+            if (visitor == null)
+            {
+                Debug.LogWarning("VOIPManager: Attempted to register null audio visitor");
+                return;
+            }
+
+            if (!audioVisitors.Contains(visitor))
+            {
+                audioVisitors.Add(visitor);
+                Debug.Log($"VOIPManager: Registered audio visitor {visitor.GetType().Name}");
+            }
+        }
+
+        /// <summary>
+        /// Unregister an audio visitor
+        /// </summary>
+        /// <param name="visitor">Visitor to remove</param>
+        public void UnregisterAudioVisitor(IVOIPAudioVisitor visitor)
+        {
+            if (visitor == null)
+            {
+                return;
+            }
+
+            if (audioVisitors.Remove(visitor))
+            {
+                Debug.Log($"VOIPManager: Unregistered audio visitor {visitor.GetType().Name}");
             }
         }
 
