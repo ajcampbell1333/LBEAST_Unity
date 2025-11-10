@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using LBEAST.Core.Networking;
 
 namespace LBEAST.LargeHaptics
 {
@@ -124,12 +125,15 @@ namespace LBEAST.LargeHaptics
 
     /// <summary>
     /// Controls hydraulic platform motion with normalized input system
-    /// Supports 5DOF moving platforms (4 or 6 actuators) and 2DOF gyroscope systems
+    /// Supports 4DOF moving platforms (4 actuators + scissor lift) and 2DOF gyroscope systems
     /// </summary>
     public class HapticPlatformController : MonoBehaviour
     {
         [Header("Platform Configuration")]
         [SerializeField] private HapticPlatformConfig config = new HapticPlatformConfig();
+
+        [Header("UDP Transport")]
+        [SerializeField] protected LBEASTUDPTransport udpTransport;
 
         private bool isInitialized = false;
         private PlatformMotionCommand currentState = new PlatformMotionCommand();
@@ -145,6 +149,19 @@ namespace LBEAST.LargeHaptics
 
         #region Initialization
 
+        protected virtual void Awake()
+        {
+            // Find or create UDP transport
+            if (udpTransport == null)
+            {
+                udpTransport = GetComponent<LBEASTUDPTransport>();
+                if (udpTransport == null)
+                {
+                    udpTransport = gameObject.AddComponent<LBEASTUDPTransport>();
+                }
+            }
+        }
+
         /// <summary>
         /// Initialize the platform with specified configuration
         /// </summary>
@@ -156,6 +173,17 @@ namespace LBEAST.LargeHaptics
             if (config.actuators.Count == 0)
             {
                 ConfigureDefaultActuators();
+            }
+
+            // Initialize UDP transport
+            if (udpTransport != null)
+            {
+                bool udpSuccess = udpTransport.InitializeUDPConnection(config.controllerIPAddress, config.controllerPort, "HapticPlatform");
+                if (!udpSuccess)
+                {
+                    Debug.LogError("[LBEAST] Failed to initialize UDP transport");
+                    return false;
+                }
             }
 
             // Initialize HOTAS if needed
@@ -255,7 +283,9 @@ namespace LBEAST.LargeHaptics
         /// Send motion command using absolute angles (advanced users only)
         /// For most game code, use SendNormalizedMotion() instead
         /// </summary>
-        public void SendMotionCommand(PlatformMotionCommand command)
+        /// <param name="command">The motion command to execute</param>
+        /// <param name="useStructPacket">If true, sends as single struct packet; if false, sends as 5 separate channel packets (default: false for compatibility)</param>
+        public void SendMotionCommand(PlatformMotionCommand command, bool useStructPacket = false)
         {
             if (!isInitialized)
             {
@@ -286,7 +316,7 @@ namespace LBEAST.LargeHaptics
             motionTimeRemaining = command.duration;
             motionTotalDuration = command.duration;
 
-            SendCommandToHardware(targetState);
+            SendCommandToHardware(targetState, useStructPacket);
         }
 
         #endregion
@@ -423,14 +453,35 @@ namespace LBEAST.LargeHaptics
 
         #region Hardware Communication
 
-        private void SendCommandToHardware(PlatformMotionCommand command)
+        protected virtual void SendCommandToHardware(PlatformMotionCommand command, bool useStructPacket = false)
         {
-            // NOOP: TODO - Implement actual hardware communication
-            // - Perform inverse kinematics to calculate actuator extensions
-            // - Send commands via TCP/UDP to hydraulic controller
-            // - Handle safety checks and emergency stop conditions
+            if (!isInitialized || udpTransport == null || !udpTransport.IsUDPConnected())
+            {
+                Debug.LogWarning("[LBEAST] HapticPlatformController: Cannot send command - not initialized or not connected");
+                return;
+            }
 
-            Debug.Log($"[LBEAST] Sending to hardware: Pitch={command.pitch:F2}°, Roll={command.roll:F2}°");
+            if (useStructPacket)
+            {
+                // Send as single struct packet (Channel 200) - 1 UDP packet instead of 5
+                udpTransport.SendStruct(200, command);
+                Debug.Log($"[LBEAST] HapticPlatformController: Sent command as struct - Pitch: {command.pitch:F2}, Roll: {command.roll:F2}, Y: {command.translationY:F2}, Z: {command.translationZ:F2}, Duration: {command.duration:F2}");
+            }
+            else
+            {
+                // Map motion command to channels (experience-specific)
+                // GunshipExperience uses: Ch0=Pitch, Ch1=Roll, Ch2=TranslationY, Ch3=TranslationZ, Ch4=Duration
+                // Other experiences can override this mapping by calling SendFloat directly
+                
+                // For GunshipExperience (4DOF platform):
+                udpTransport.SendFloat(0, command.pitch);           // Channel 0: Pitch (degrees)
+                udpTransport.SendFloat(1, command.roll);            // Channel 1: Roll (degrees)
+                udpTransport.SendFloat(2, command.translationY);   // Channel 2: Forward/Reverse (cm)
+                udpTransport.SendFloat(3, command.translationZ);   // Channel 3: Up/Down (cm)
+                udpTransport.SendFloat(4, command.duration);        // Channel 4: Duration (seconds)
+
+                Debug.Log($"[LBEAST] HapticPlatformController: Sent command as channels - Pitch: {command.pitch:F2}, Roll: {command.roll:F2}, Y: {command.translationY:F2}, Z: {command.translationZ:F2}, Duration: {command.duration:F2}");
+            }
         }
 
         #endregion

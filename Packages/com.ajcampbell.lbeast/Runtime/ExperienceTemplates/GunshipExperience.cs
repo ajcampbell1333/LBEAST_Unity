@@ -3,18 +3,21 @@
 using UnityEngine;
 using LBEAST.Core;
 using LBEAST.LargeHaptics;
+using LBEAST.LargeHaptics.Models;
 
 namespace LBEAST.ExperienceTemplates
 {
     /// <summary>
-    /// 5DOF Gunship Experience Template
+    /// 4DOF Gunship Experience Template
     /// 
     /// Pre-configured four-player seated VR experience on a hydraulic platform.
     /// Combines:
-    /// - 5DOF hydraulic platform (pitch, roll, Y/Z translation)
+    /// - 4DOF motion platform:
+    ///   - Hydraulic platform: pitch, roll (yaw restricted)
+    ///   - Scissor lift: forward/reverse, up/down
     /// - Four player seated positions
     /// - LAN multiplayer support
-    /// - Synchronized motion for all passengers
+    /// - Synchronized motion for all players
     /// 
     /// Perfect for gunship, helicopter, spaceship, or any multi-crew vehicle
     /// experiences requiring shared motion simulation.
@@ -22,7 +25,7 @@ namespace LBEAST.ExperienceTemplates
     public class GunshipExperience : LBEASTExperienceBase
     {
         [Header("Platform Configuration")]
-        [SerializeField] private HapticPlatformController platformController;
+        [SerializeField] private PlatformController4DOF platformController;
 
         [Header("Seating")]
         [SerializeField] private Transform[] seatTransforms = new Transform[4];
@@ -44,10 +47,10 @@ namespace LBEAST.ExperienceTemplates
             // Find or create platform controller
             if (platformController == null)
             {
-                platformController = GetComponent<HapticPlatformController>();
+                platformController = GetComponent<PlatformController4DOF>();
                 if (platformController == null)
                 {
-                    platformController = gameObject.AddComponent<HapticPlatformController>();
+                    platformController = gameObject.AddComponent<PlatformController4DOF>();
                 }
             }
 
@@ -123,37 +126,55 @@ namespace LBEAST.ExperienceTemplates
 
         /// <summary>
         /// Send normalized gunship tilt (RECOMMENDED - hardware-agnostic)
+        /// Uses struct-based MVC pattern for efficient UDP transmission.
         /// </summary>
         /// <param name="tiltX">Left/Right tilt (-1.0 = full left, +1.0 = full right)</param>
         /// <param name="tiltY">Forward/Backward tilt (-1.0 = full backward, +1.0 = full forward)</param>
-        /// <param name="verticalOffset">Vertical translation (-1.0 to +1.0)</param>
+        /// <param name="forwardOffset">Scissor lift forward/reverse (-1.0 = full reverse, +1.0 = full forward, 0.0 = neutral)</param>
+        /// <param name="verticalOffset">Scissor lift up/down (-1.0 = full down, +1.0 = full up, 0.0 = neutral)</param>
         /// <param name="duration">Time to reach target (seconds)</param>
-        public void SendGunshipTilt(float tiltX, float tiltY, float verticalOffset = 0f, float duration = 1f)
+        public void SendGunshipTilt(float tiltX, float tiltY, float forwardOffset = 0f, float verticalOffset = 0f, float duration = 1f)
         {
-            if (platformController != null)
-            {
-                platformController.SendNormalizedMotion(tiltX, tiltY, verticalOffset, duration);
-            }
+            if (platformController == null)
+                return;
+
+            // Use struct-based MVC pattern for efficient UDP transmission
+            // Create tilt state from normalized input
+            TiltState tiltState = TiltState.FromNormalized(tiltY, tiltX, maxPitch, maxRoll);
+            
+            // Create scissor lift state from normalized input
+            ScissorLiftState liftState = ScissorLiftState.FromNormalized(forwardOffset, verticalOffset, 100f, 100f);
+            
+            // Send as struct packets (more efficient: 2 UDP packets instead of 4)
+            platformController.SendTiltStruct(tiltState, 100);
+            platformController.SendScissorLiftStruct(liftState, 101);
+            
+            // Send duration separately (Channel 4)
+            platformController.SendDuration(duration, 4);
         }
 
         /// <summary>
         /// Send motion command to platform (ADVANCED - uses absolute angles)
+        /// Uses struct-based MVC pattern for efficient UDP transmission.
         /// </summary>
-        public void SendGunshipMotion(float pitch, float roll, float lateralOffset, float verticalOffset, float duration = 1f)
+        public void SendGunshipMotion(float pitch, float roll, float forwardOffset, float verticalOffset, float duration = 1f)
         {
-            if (platformController != null)
-            {
-                PlatformMotionCommand command = new PlatformMotionCommand
-                {
-                    pitch = pitch,
-                    roll = roll,
-                    translationY = lateralOffset,
-                    translationZ = verticalOffset,
-                    duration = duration
-                };
+            if (platformController == null)
+                return;
 
-                platformController.SendMotionCommand(command);
-            }
+            // Use struct-based MVC pattern for efficient UDP transmission
+            // Option 1: Send as single full command struct (Channel 200) - most efficient
+            PlatformMotionCommand command = new PlatformMotionCommand
+            {
+                pitch = Mathf.Clamp(pitch, -maxPitch, maxPitch),
+                roll = Mathf.Clamp(roll, -maxRoll, maxRoll),
+                translationY = forwardOffset,
+                translationZ = verticalOffset,
+                duration = duration
+            };
+
+            // Send as single struct packet (Channel 200) - 1 UDP packet instead of 5
+            platformController.SendMotionCommand(command, true);
         }
 
         /// <summary>

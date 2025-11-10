@@ -92,10 +92,10 @@ bool LBEAST_Initialized = false;
  * Initialize wireless communication
  * @param ssid WiFi network name
  * @param password WiFi password
- * @param targetIP Unreal Engine PC IP address
+ * @param targetIP Unity/Unreal Engine PC IP address
  * @param targetPort UDP port (default 8888)
  */
-void LBEAST_Wireless_Init(const char* ssid, const char* password, IPAddress targetIP, uint16_t targetPort = 8888) {
+void LBEAST_Wireless_TX_Init(const char* ssid, const char* password, IPAddress targetIP, uint16_t targetPort = 8888) {
   Serial.begin(115200);
   Serial.println("\nLBEAST Wireless TX Initializing...");
   
@@ -212,6 +212,26 @@ void LBEAST_SendString(uint8_t channel, const char* str) {
   
   LBEAST_UDP.beginPacket(LBEAST_TargetIP, LBEAST_TargetPort);
   LBEAST_UDP.write(packet, 5 + len);
+  LBEAST_UDP.endPacket();
+}
+
+/**
+ * Send bytes/struct packet (for struct-based MVC pattern)
+ */
+void LBEAST_SendBytes(uint8_t channel, uint8_t* data, uint8_t length) {
+  if (!LBEAST_Initialized) return;
+  if (length > 255) length = 255;
+  
+  uint8_t packet[256];
+  packet[0] = LBEAST_PACKET_START_MARKER;
+  packet[1] = LBEAST_TYPE_BYTES;
+  packet[2] = channel;
+  packet[3] = length;
+  memcpy(&packet[4], data, length);
+  packet[4 + length] = LBEAST_CalculateCRC(packet, 4 + length);
+  
+  LBEAST_UDP.beginPacket(LBEAST_TargetIP, LBEAST_TargetPort);
+  LBEAST_UDP.write(packet, 5 + length);
   LBEAST_UDP.endPacket();
 }
 
