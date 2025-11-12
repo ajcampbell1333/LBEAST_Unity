@@ -333,6 +333,25 @@ See `COST_ANALYSIS.md` in `Runtime/ExperienceTemplates/` for complete hardware c
 - **[Base/Examples/README.md](../../Base/Examples/README.md)** - Base example documentation
 - **[COST_ANALYSIS.md](../../../Runtime/ExperienceTemplates/COST_ANALYSIS.md)** - Complete cost breakdown
 - **[GunshipExperience.cs](../../../Runtime/ExperienceTemplates/GunshipExperience.cs)** - Unity API
+- **[Gunship_Hardware_Specs.md](Gunship_Hardware_Specs.md)** - Complete hardware specifications for gun solenoid kickers, PWM drivers, thermal management, and communication architecture
+
+## Gun ECU Instances
+
+The Gunship Experience requires **four Gun ECU instances** (one per play station). Each Gun ECU:
+
+- **Hardware**: Dual thumb buttons, 24V solenoid kicker(s), SteamVR Ultimate tracker on gun nose
+- **Communication**: Syncs over UDP to the primary Gunship ECU (mounted on scissor lift)
+  - **Wired Ethernet (Recommended)**: Lower latency, more reliable
+  - **WiFi (Optional)**: For wireless deployments or testing
+- **Station Assignment**: Each Gun ECU is assigned to a station (0-3) via channel mapping or IP-based identification
+- **Firmware**: See `Gun_ECU.ino` in this directory for the complete firmware implementation
+
+**Configuration:**
+- Each Gun ECU listens on a unique port (8888-8891) for commands from the Gunship ECU
+- Each Gun ECU sends telemetry to the Gunship ECU on port 8892
+- The Gunship ECU aggregates all gun telemetry and relays it to the game engine
+
+For complete hardware specifications, see **[Gunship_Hardware_Specs.md](Gunship_Hardware_Specs.md)**.
 
 ---
 

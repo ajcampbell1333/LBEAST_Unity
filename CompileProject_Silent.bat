@@ -25,9 +25,9 @@ if exist "%PROJECT_PATH%\Temp\UnityBatchCompile.log" del "%PROJECT_PATH%\Temp\Un
 REM Start Unity without -quit flag
 start "LBEAST Unity Compiler" /B %UNITY_PATH% -batchmode -nographics -projectPath "%PROJECT_PATH%" -executeMethod LBEAST.Editor.CompilationReporterCLI.CompileAndExit -logFile "%PROJECT_PATH%\Temp\UnityBatchCompile.log"
 
-REM Wait for report (2 minute timeout)
+REM Wait for report (3 minute timeout - increased to account for initial Unity compilation)
 set TIMEOUT_COUNTER=0
-set MAX_TIMEOUT=120
+set MAX_TIMEOUT=180
 
 :WAIT_FOR_REPORT
 if exist "%PROJECT_PATH%\Temp\CompilationErrors.log" goto REPORT_FOUND
@@ -48,6 +48,8 @@ set WAIT_COMPLETE=0
 set MAX_WAIT_COMPLETE=30
 :WAIT_FOR_COMPLETE
 findstr /C:"[LBEAST AUTO-COMPILE] Compilation complete" "%PROJECT_PATH%\Temp\UnityBatchCompile.log" >nul 2>&1
+if %errorlevel% NEQ 0 findstr /C:"Compilation finished" "%PROJECT_PATH%\Temp\UnityBatchCompile.log" >nul 2>&1
+if %errorlevel% NEQ 0 findstr /C:"Report generated successfully" "%PROJECT_PATH%\Temp\UnityBatchCompile.log" >nul 2>&1
 if %errorlevel% EQU 0 goto COMPILATION_COMPLETE
 timeout /t 1 /nobreak >nul
 set /a WAIT_COMPLETE+=1

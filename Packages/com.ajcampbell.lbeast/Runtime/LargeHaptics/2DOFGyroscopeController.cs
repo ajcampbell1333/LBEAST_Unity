@@ -16,16 +16,16 @@ namespace LBEAST.LargeHaptics
 	/// Mirrors Unreal's U2DOFGyroPlatformController feature set.
 	/// </summary>
 	[DisallowMultipleComponent]
-	public class 2DOFGyroscopeController : MonoBehaviour
+	public class GyroscopeController2DOF : MonoBehaviour
 	{
 		[Header("Embedded Device (UDP)")]
 		[SerializeField] private EmbeddedDeviceConfig deviceConfig = new EmbeddedDeviceConfig
 		{
-			ipAddress = "192.168.1.120",
+			deviceAddress = "192.168.1.120",
 			port = 8888,
 			securityLevel = SecurityLevel.None
 		};
-		[SerializeField] private EmbeddedDeviceController device;
+		[SerializeField] private SerialDeviceController device;
 
 		[Header("Gyro Settings")]
 		[Range(10f, 180f)]
@@ -59,10 +59,10 @@ namespace LBEAST.LargeHaptics
 		{
 			if (device == null)
 			{
-				device = GetComponent<EmbeddedDeviceController>();
+				device = GetComponent<SerialDeviceController>();
 				if (device == null)
 				{
-					device = gameObject.AddComponent<EmbeddedDeviceController>();
+					device = gameObject.AddComponent<SerialDeviceController>();
 				}
 			}
 		}
@@ -70,7 +70,7 @@ namespace LBEAST.LargeHaptics
 		private void Start()
 		{
 			// Initialize device connection
-			if (!device.IsDeviceConnected())
+			if (device != null && !device.IsDeviceConnected())
 			{
 				device.InitializeDevice(deviceConfig);
 			}
@@ -117,10 +117,10 @@ namespace LBEAST.LargeHaptics
 		{
 			if (device == null)
 			{
-				device = GetComponent<EmbeddedDeviceController>();
+				device = GetComponent<SerialDeviceController>();
 				if (device == null)
 				{
-					device = gameObject.AddComponent<EmbeddedDeviceController>();
+					device = gameObject.AddComponent<SerialDeviceController>();
 				}
 			}
 

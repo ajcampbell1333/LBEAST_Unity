@@ -29,8 +29,8 @@ namespace LBEAST.Core.Networking
 
         [Header("Events")]
         public IntEvent onFloatReceived = new IntEvent();
-        public IntEvent onBoolReceived = new IntEvent();
-        public IntEvent onInt32Received = new IntEvent();
+        public BoolEvent onBoolReceived = new BoolEvent();
+        public Int32Event onInt32Received = new Int32Event();
         public BytesEvent onBytesReceived = new BytesEvent();
 
         // Base UDP transport (handles raw socket management)
@@ -346,4 +346,5 @@ namespace LBEAST.Core.Networking
         }
     }
 }
+
 

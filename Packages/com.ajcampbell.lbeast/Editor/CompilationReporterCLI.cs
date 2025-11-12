@@ -23,12 +23,35 @@ namespace LBEAST.Editor
         /// </summary>
         public static void CompileAndExit()
         {
-            Debug.Log("🚀🤖 [LBEAST AUTO-COMPILE] CLI invoked - forcing compilation...");
+            Debug.Log("🚀🤖 [LBEAST AUTO-COMPILE] CLI invoked - waiting for Unity to finish initial compilation...");
 
-            // Wait for Unity to fully initialize before forcing compilation
+            // First, wait for Unity to finish its initial startup compilation
+            // This prevents race conditions where we request compilation before Unity is ready
             EditorApplication.delayCall += () =>
             {
-                // Force a recompilation to ensure we actually compile
+                // Wait for any ongoing compilation to finish (Unity's initial compile)
+                int initialWaitCount = 0;
+                while (EditorApplication.isCompiling && initialWaitCount < 300) // Max 30 seconds for initial compile
+                {
+                    System.Threading.Thread.Sleep(100);
+                    initialWaitCount++;
+                }
+
+                if (EditorApplication.isCompiling && initialWaitCount >= 300)
+                {
+                    Debug.LogWarning("⚠️ [LBEAST AUTO-COMPILE] Initial compilation still in progress after 30s - proceeding anyway");
+                }
+                else if (initialWaitCount > 0)
+                {
+                    Debug.Log($"✅ [LBEAST AUTO-COMPILE] Initial compilation finished after {initialWaitCount * 0.1f:F1}s");
+                }
+
+                // Additional delay to ensure Unity has fully settled after compilation
+                System.Threading.Thread.Sleep(500); // 500ms grace period
+
+                Debug.Log("📦 [LBEAST AUTO-COMPILE] Requesting manual recompilation...");
+
+                // Now force a recompilation to ensure we actually compile
                 CompilationPipeline.RequestScriptCompilation();
                 
                 Debug.Log("📦 [LBEAST AUTO-COMPILE] Recompilation requested - waiting for compilation to start...");

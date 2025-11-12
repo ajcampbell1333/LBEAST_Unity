@@ -128,6 +128,64 @@ namespace LBEAST.LargeHaptics
             }
             return false;
         }
+
+        /// <summary>
+        /// Get gun button events from hardware (Channel 310)
+        /// Used by GunshipExperience for low-latency button event handling.
+        /// </summary>
+        /// <param name="outButtonEvents">Output button events received from hardware</param>
+        /// <returns>True if valid button events were received</returns>
+        public bool GetGunButtonEvents(out GunButtonEvents outButtonEvents)
+        {
+            outButtonEvents = default(GunButtonEvents);
+
+            // Hardware sends button events on Channel 310
+            // Parse from received bytes cache
+            byte[] receivedBytes = udpTransport.GetReceivedBytes(310);
+            if (receivedBytes != null && receivedBytes.Length >= System.Runtime.InteropServices.Marshal.SizeOf<GunButtonEvents>())
+            {
+                System.Runtime.InteropServices.GCHandle handle = System.Runtime.InteropServices.GCHandle.Alloc(receivedBytes, System.Runtime.InteropServices.GCHandleType.Pinned);
+                try
+                {
+                    outButtonEvents = (GunButtonEvents)System.Runtime.InteropServices.Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(GunButtonEvents));
+                    return true;
+                }
+                finally
+                {
+                    handle.Free();
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get gun telemetry from hardware (Channel 311)
+        /// Used by GunshipExperience for monitoring gun system health.
+        /// </summary>
+        /// <param name="outTelemetry">Output telemetry received from hardware</param>
+        /// <returns>True if valid telemetry was received</returns>
+        public bool GetGunTelemetry(out GunTelemetry outTelemetry)
+        {
+            outTelemetry = default(GunTelemetry);
+
+            // Hardware sends gun telemetry on Channel 311
+            // Parse from received bytes cache
+            byte[] receivedBytes = udpTransport.GetReceivedBytes(311);
+            if (receivedBytes != null && receivedBytes.Length >= System.Runtime.InteropServices.Marshal.SizeOf<GunTelemetry>())
+            {
+                System.Runtime.InteropServices.GCHandle handle = System.Runtime.InteropServices.GCHandle.Alloc(receivedBytes, System.Runtime.InteropServices.GCHandleType.Pinned);
+                try
+                {
+                    outTelemetry = (GunTelemetry)System.Runtime.InteropServices.Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(GunTelemetry));
+                    return true;
+                }
+                finally
+                {
+                    handle.Free();
+                }
+            }
+            return false;
+        }
     }
 }
 

@@ -111,14 +111,14 @@ namespace LBEAST.LargeHaptics
     /// Motion command for absolute angle control (advanced use)
     /// </summary>
     [Serializable]
-    public class PlatformMotionCommand
+    public struct PlatformMotionCommand
     {
-        public float pitch = 0f;              // Degrees
-        public float roll = 0f;               // Degrees
-        public float translationY = 0f;       // cm
-        public float translationZ = 0f;       // cm
-        public float duration = 1f;           // seconds
-        public bool useContinuousRotation = false;
+        public float pitch;              // Degrees
+        public float roll;               // Degrees
+        public float translationY;       // cm
+        public float translationZ;       // cm
+        public float duration;           // seconds
+        public bool useContinuousRotation;
     }
 
     #endregion
@@ -136,8 +136,8 @@ namespace LBEAST.LargeHaptics
         [SerializeField] protected LBEASTUDPTransport udpTransport;
 
         private bool isInitialized = false;
-        private PlatformMotionCommand currentState = new PlatformMotionCommand();
-        private PlatformMotionCommand targetState = new PlatformMotionCommand();
+        private PlatformMotionCommand currentState;
+        private PlatformMotionCommand targetState;
         private float motionTimeRemaining = 0f;
         private float motionTotalDuration = 0f;
 

@@ -33,7 +33,7 @@ namespace LBEAST.ExperienceTemplates
     public class FlightSimExperience : LBEASTExperienceBase
     {
         [Header("Platform Configuration")]
-        [SerializeField] private 2DOFGyroscopeController gyroscopeController;
+        [SerializeField] private GyroscopeController2DOF gyroscopeController;
 
         [Header("Gyroscope Settings")]
         [Range(10f, 180f)]
@@ -86,10 +86,10 @@ namespace LBEAST.ExperienceTemplates
             // Find or create gyroscope controller
             if (gyroscopeController == null)
             {
-                gyroscopeController = GetComponent<2DOFGyroscopeController>();
+                gyroscopeController = GetComponent<GyroscopeController2DOF>();
                 if (gyroscopeController == null)
                 {
-                    gyroscopeController = gameObject.AddComponent<2DOFGyroscopeController>();
+                    gyroscopeController = gameObject.AddComponent<GyroscopeController2DOF>();
                 }
             }
         }
