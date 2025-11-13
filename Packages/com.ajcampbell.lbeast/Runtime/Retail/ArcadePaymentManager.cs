@@ -414,7 +414,7 @@ namespace LBEAST.Retail
                 if (instance == null && UnityEngine.Application.isPlaying)
                 {
                     // Check if one already exists from another module
-                    var existing = FindObjectOfType<UnityMainThreadDispatcher>();
+                    var existing = FindFirstObjectByType<UnityMainThreadDispatcher>();
                     if (existing != null)
                     {
                         instance = existing;
