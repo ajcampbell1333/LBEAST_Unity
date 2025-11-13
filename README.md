@@ -268,6 +268,7 @@ Foundation modules providing core functionality:
 - `EmbeddedSystems` - Microcontroller integration
 - `ProAudio` - Professional audio console control via OSC
 - `ProLighting` - DMX lighting control (Art-Net, USB DMX)
+- `Retail` - Cashless tap card payment interface for VR tap-to-play
 - `VOIP` - Low-latency voice communication with 3D HRTF spatialization
 
 **Use these when:** Building custom experiences from scratch with full control.
@@ -1350,7 +1351,7 @@ platform.SendPlatformTilt(0.5f, 0.8f, 0.0f, 1.0f);
 ```csharp
 using LBEAST.LargeHaptics;
 
-var controller = gameObject.AddComponent<HapticPlatformController>();
+var controller = gameObject.AddComponent<PlatformController4DOF>();
 
 HapticPlatformConfig config = new HapticPlatformConfig
 {
@@ -1364,7 +1365,7 @@ HapticPlatformConfig config = new HapticPlatformConfig
 controller.InitializePlatform(config);
 
 // Send normalized motion (recommended)
-controller.SendNormalizedMotion(0.5f, -0.3f, 0.2f, 0.1f, 1.5f);  // TiltX, TiltY, ForwardOffset, VerticalOffset, Duration
+controller.SendNormalizedMotion(0.5f, -0.3f, 0.2f, 1.5f);  // TiltX, TiltY, VerticalOffset, Duration
 
 // Or send absolute motion command (advanced)
 PlatformMotionCommand cmd = new PlatformMotionCommand
@@ -1380,39 +1381,29 @@ controller.SendMotionCommand(cmd);
 
 **2DOF Flight Sim with HOTAS Example:**
 ```csharp
-var flightSimController = gameObject.AddComponent<HapticPlatformController>();
+var flightSimController = gameObject.AddComponent<GyroscopeController2DOF>();
 
-HapticPlatformConfig config = new HapticPlatformConfig
-{
-    platformType = PlatformType.FlightSim_2DOF,
-    gyroscopeConfig = new GyroscopeConfig
-    {
-        maxRotationSpeed = 90.0f,  // degrees per second
-        hotasType = HOTASType.LogitechX56,  // or ThrustmasterTFlight
-        enableJoystick = true,
-        enableThrottle = true,
-        enablePedals = true,
-        joystickSensitivity = 1.5f,
-        throttleSensitivity = 1.0f
-    }
-};
+// Configure gyroscope settings
+flightSimController.SetMaxRotationSpeed(90.0f);  // degrees per second
+flightSimController.SetJoystickSensitivity(1.5f);
+flightSimController.SetEnableHOTAS(true);
 
-flightSimController.InitializePlatform(config);
+// Initialize connection to ECU
+flightSimController.Initialize();
 
 // Read HOTAS input
 Vector2 joystickInput = flightSimController.GetHOTASJoystickInput();  // X = roll, Y = pitch
 float throttleInput = flightSimController.GetHOTASThrottleInput();
 float pedalInput = flightSimController.GetHOTASPedalInput();
 
-// Send gyroscope command
-PlatformMotionCommand cmd = new PlatformMotionCommand
+// Send gyroscope state (automatically sent in Update() based on HOTAS input)
+// Or send custom gyro state:
+GyroState gyroState = new GyroState
 {
     pitch = 720.0f,  // Two full rotations
-    roll = 360.0f,   // One full roll
-    useContinuousRotation = true,  // Enable continuous rotation
-    duration = 4.0f
+    roll = 360.0f    // One full roll
 };
-flightSimController.SendMotionCommand(cmd);
+flightSimController.SendGyroStruct(gyroState, 102);
 ```
 
 </div>
@@ -1453,7 +1444,7 @@ faceController.InitializeAIFace(config);
 </details>
 
 <details>
-<summary><strong>Embedded Systems Module (`LBEAST.EmbeddedSystems`)</strong></summary>
+<summary><strong>🔌 Embedded Systems Module (`LBEAST.EmbeddedSystems`)</strong></summary>
 
 <div style="margin-left: 20px;">
 
@@ -1498,7 +1489,7 @@ device.SendCustomCommand("PLAY:SOUND:1");
 </details>
 
 <details>
-<summary><strong>Pro Audio Module (`LBEAST.ProAudio`)</strong></summary>
+<summary><strong>🎚️ Pro Audio Module (`LBEAST.ProAudio`)</strong></summary>
 
 <div style="margin-left: 20px;">
 
@@ -1607,7 +1598,7 @@ audioController.OnMasterFaderChanged += (level) =>
 </details>
 
 <details>
-<summary><strong>Pro Lighting Module (`LBEAST.ProLighting`)</strong></summary>
+<summary><strong>💡 Pro Lighting Module (`LBEAST.ProLighting`)</strong></summary>
 
 <div style="margin-left: 20px;">
 
@@ -1662,6 +1653,66 @@ lightingController.StartFixtureFade(fixtureId, 0.0f, 1.0f, 2.0f);  // Fade from 
 - ✅ **RDM Discovery** - Automatic fixture discovery (stubbed)
 - ✅ **Art-Net Discovery** - Auto-detect Art-Net nodes on network
 - ✅ **Multiple Fixture Types** - Dimmable, RGB, RGBW, Moving Head, Custom
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>💳 Retail API</strong></summary>
+
+<div style="margin-left: 20px;">
+
+**Module:** `LBEAST.Retail`
+
+Cashless tap card payment interface for VR tap-to-play capability. Supports multiple payment providers and provides in-process HTTP webhook server for receiving payment confirmations.
+
+**Use Case:** Setting up self-assist VR play stations with tap-card or tap-wristband token payment provider kiosks? LBEAST provides integration with five different tap-card providers.
+
+**Supported Providers:**
+- ✅ Embed
+- ✅ Nayax
+- ✅ Intercard
+- ✅ Core Cashless
+- ✅ Cantaloupe
+
+**Example:**
+```csharp
+using LBEAST.Retail;
+
+var paymentManager = gameObject.AddComponent<ArcadePaymentManager>();
+
+// Configure payment provider
+paymentManager.config.provider = PaymentProvider.Embed;
+paymentManager.config.apiKey = "your-api-key";
+paymentManager.config.baseUrl = "https://api.embed.com";
+paymentManager.config.cardId = "player-card-id";
+
+// Check card balance (async coroutine)
+StartCoroutine(paymentManager.CheckBalance(paymentManager.config.cardId, (balance) =>
+{
+    Debug.Log($"Card balance: ${balance:F2}");
+}));
+
+// Allocate tokens for gameplay (async coroutine)
+StartCoroutine(paymentManager.AllocateTokens("station-1", 10.0f, (success) =>
+{
+    if (success)
+    {
+        Debug.Log("Tokens allocated successfully");
+    }
+}));
+```
+
+**Webhook Server:**
+The payment manager automatically starts an in-process HTTP webhook server on port 8080 (configurable) to receive payment confirmations from the payment provider. When a player taps their card, the provider sends a POST request to the webhook endpoint, which triggers `OnPaymentConfirmed()` automatically and can be wired to start a VR session.
+
+**Features:**
+- ✅ **In-Process Webhook Server** - Runs in the same executable as the VR HMD using `HttpListener` (no separate server process)
+- ✅ **Multi-Provider Support** - Provider-specific API endpoints and webhook paths
+- ✅ **Async Coroutine API** - Balance checking and token allocation with callback support
+- ✅ **Automatic Payment Processing** - Webhook triggers payment confirmation callback on successful payment
+- ✅ **Unity-Friendly** - Easy integration via MonoBehaviour component
 
 </div>
 
@@ -2147,6 +2198,7 @@ LBEAST/
 ├── LBEAST.EmbeddedSystems # Microcontroller integration API
 ├── LBEAST.ProAudio      # Professional audio console control via OSC
 ├── LBEAST.ProLighting   # DMX lighting control (Art-Net, USB DMX)
+├── LBEAST.Retail        # Cashless tap card payment interface for VR tap-to-play
 ├── LBEAST.VOIP          # Low-latency voice communication with 3D HRTF
 └── LBEAST.ExperienceTemplates # Pre-configured experience genre templates
     ├── AIFacemaskExperience
@@ -2696,24 +2748,52 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 ## 🗺️ Roadmap
 
 <details>
-<summary><strong>v0.1.0 (Current)</strong></summary>
+<summary><strong>v0.1.0 (Complete)</strong></summary>
 
 <div style="margin-left: 20px;">
 
-### ✅ Completed (v0.1.0 - Current)
-- [x] Core VR tracking abstraction
-- [x] 4DOF hydraulic platform support (4 & 6 actuators)
-- [x] 2DOF gyroscope support
-- [x] **Dedicated Server** architecture
-- [x] **Server Manager GUI** (UI Toolkit-based)
-- [x] **Automatic Server Discovery** (UDP broadcast)
-- [x] Normalized input system (-1 to +1)
-- [x] HOTAS integration framework
-- [x] AI facial animation control
-- [x] Embedded systems (Arduino, ESP32, STM32)
-- [x] LAN multiplayer (Unity NetCode)
-- [x] Experience Genre Templates (AIFacemask, MovingPlatform, Gunship, CarSim, FlightSim, EscapeRoom)
-- [x] **NVIDIA ACE Integration Architecture** (data structures, visitor pattern, component architecture)
+### ✅ Completed (v0.1.0)
+- ✅ Core VR tracking abstraction
+- ✅ 4DOF hydraulic platform support (4 & 6 actuators)
+- ✅ 2DOF gyroscope support
+- ✅ **Dedicated Server** architecture
+- ✅ **Server Manager GUI** (UI Toolkit-based)
+- ✅ **Automatic Server Discovery** (UDP broadcast)
+- ✅ Normalized input system (-1 to +1)
+- ✅ HOTAS integration framework
+- ✅ AI facial animation control
+- ✅ Embedded systems (Arduino, ESP32, STM32)
+- ✅ LAN multiplayer (Unity NetCode)
+- ✅ Experience Genre Templates (AIFacemask, MovingPlatform, Gunship, CarSim, FlightSim, EscapeRoom)
+- ✅ **NVIDIA ACE Integration Architecture** (data structures, visitor pattern, component architecture)
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>v0.1.2 (Current)</strong></summary>
+
+<div style="margin-left: 20px;">
+
+### 🎯 Planned (v0.1.2 - Current)
+- ✅ **24V Large Solenoid Kicker with Dual-Handle Thumb Triggers** - 24V large solenoid kicker with dual-handle thumb triggers connected to an embedded system to simulate a large gun/rocket/laser/plasma mini-gun/rifle/launcher mounted to the hydraulic rig in the GunshipExperience
+- ✅ **Implementing HOTAS integration** - Full Unity Input System HOTAS profiles and complete HOTAS controller support (completed for FlightSimExperience; other experiences can migrate from FlightSimExperience if needed)
+- ✅ **Cashless Tap Card Payment Interface** - Implement cashless tap card payment interface for VR tap-to-play capability. Enables players to tap NFC/RFID cards or devices to initiate gameplay sessions without cash transactions.
+- [ ] **Finishing AIFacemask functionality** - Complete all NOOP implementations for NVIDIA ACE service integration:
+  - **AIFaceController**: Receive facial animation data from NVIDIA ACE endpoint (HTTP/WebSocket client), apply blend shape weights to SkinnedMeshRenderer morph targets, apply facial texture to mesh material
+  - **ACE Script Manager**: Request script playback from NVIDIA ACE server (HTTP POST), request script pre-baking (TTS → Audio, Audio → Facial data), async pre-baking support (background processing)
+  - **ACE ASR Manager**: Request ASR transcription from local ASR service (gRPC/HTTP to NVIDIA Riva ASR), trigger improv after transcription (wire to ACEImprovManager)
+  - **ACE Improv Manager**: Request LLM response from local LLM (HTTP to Ollama/vLLM/NVIDIA NIM), request TTS conversion from local TTS (gRPC to NVIDIA Riva TTS), request Audio2Face conversion from local Audio2Face (HTTP/gRPC to NVIDIA NIM), auto-trigger Audio2Face after TTS completes (callback chain), monitor async response generation status (track LLM/TTS/Audio2Face operations)
+  - **AIFacemaskExperience**: Configure NVIDIA ACE endpoint URL (load from project settings/config), register ASR Manager as visitor with VOIPManager (wire visitor pattern), configure NVIDIA ACE server base URL (load from project settings/config)
+  - **VOIPManager**: Decode Opus to PCM for visitors (decode Mumble Opus before passing to visitors), integrate with player replication system (get remote player positions)
+  - **Server Beacon**: Get server port from project settings (load port configuration), track actual player count (query Unity networking)
+  - **Optimization**: Optimize blend shape application (batch updates, interpolation, caching), texture streaming optimization (efficient texture updates, compression)
+- [ ] **Go-Kart Experience** - Electric go-karts, bumper cars, race boats, or bumper boats augmented by passthrough VR or AR headsets enabling overlaid virtual weapons and pickups that affect the performance of the vehicles
+- [ ] **VR Player Transport (Server ↔ VR Clients)** - Bidirectional communication between game server and VR players:
+  - **Server → VR Players**: Relay gun button events (Ch 310), gun state (firing, intensity), gun transforms (from trackers), and platform motion state. Use Unity NetCode for reliable state synchronization and optional UDP multicast for low-latency events.
+  - **VR Players → Server**: Receive fire commands from VR controllers/triggers, relay to Gunship ECU → Gun ECU for solenoid firing. Support both centralized (via Gunship ECU) and direct (to Gun ECU) routing modes for latency optimization.
+  - **Implementation**: Integrate with Unity's multiplayer networking system (NetCode for GameObjects) for state management, with optional custom UDP transport for time-critical events. Handle player connection/disconnection, station assignment, and network recovery.
 
 </div>
 
@@ -2725,19 +2805,7 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 <div style="margin-left: 20px;">
 
 ### 🎯 Planned (v1.0)
-- [ ] **Finishing AIFacemask functionality** - Complete all NOOP implementations for NVIDIA ACE service integration:
-  - **AIFaceController**: Receive facial animation data from NVIDIA ACE endpoint (HTTP/WebSocket client), apply blend shape weights to SkinnedMeshRenderer morph targets, apply facial texture to mesh material
-  - **ACE Script Manager**: Request script playback from NVIDIA ACE server (HTTP POST), request script pre-baking (TTS → Audio, Audio → Facial data), async pre-baking support (background processing)
-  - **ACE ASR Manager**: Request ASR transcription from local ASR service (gRPC/HTTP to NVIDIA Riva ASR), trigger improv after transcription (wire to ACEImprovManager)
-  - **ACE Improv Manager**: Request LLM response from local LLM (HTTP to Ollama/vLLM/NVIDIA NIM), request TTS conversion from local TTS (gRPC to NVIDIA Riva TTS), request Audio2Face conversion from local Audio2Face (HTTP/gRPC to NVIDIA NIM), auto-trigger Audio2Face after TTS completes (callback chain), monitor async response generation status (track LLM/TTS/Audio2Face operations)
-  - **AIFacemaskExperience**: Configure NVIDIA ACE endpoint URL (load from project settings/config), register ASR Manager as visitor with VOIPManager (wire visitor pattern), configure NVIDIA ACE server base URL (load from project settings/config)
-  - **VOIPManager**: Decode Opus to PCM for visitors (decode Mumble Opus before passing to visitors), integrate with player replication system (get remote player positions)
-  - **Server Beacon**: Get server port from project settings (load port configuration), track actual player count (query Unity networking)
-  - **Optimization**: Optimize blend shape application (batch updates, interpolation, caching), texture streaming optimization (efficient texture updates, compression)
-- [ ] **Implementing HOTAS integration** - Full Unity Input System HOTAS profiles and complete HOTAS controller support
 - [ ] **Adding Weight & Height Safety Check Embedded Firmware** - Safety firmware for motion platforms to prevent operation if weight/height limits are exceeded
-- [ ] **Go-Kart Experience** - Electric go-karts, bumper cars, race boats, or bumper boats augmented by passthrough VR or AR headsets enabling overlaid virtual weapons and pickups that affect the performance of the vehicles
-- [ ] **24V Large Solenoid Kicker with Dual-Handle Thumb Triggers** - 24V large solenoid kicker with dual-handle thumb triggers connected to an embedded system to simulate a large gun/rocket/laser/plasma mini-gun/rifle/launcher mounted to the hydraulic rig in the GunshipExperience
 - [ ] **Network Configuration Module** - Build a network configuration system with console interface for OpsTech to manage IP addresses and UDP ports:
   - **IP & Port Configuration Console**: Centralized console interface for assigning static IP addresses and UDP ports to all LBEAST devices (ECUs, game engine servers, VR clients, console). Manual entry interface for consumer router deployments (requires keying-in IP addresses from router admin panel). Automatic device discovery for professional router deployments (via router API integration).
   - **Connection Verification**: At session start, verify connection to all devices and confirm IP addresses match expected values. If any device connection fails, automatically attempt reconnection via NAT punchthrough or re-authentication. Ensures all devices are reachable before gameplay begins.
@@ -2747,11 +2815,6 @@ LBEAST requires reliable network communication between game engine servers, ECUs
   - **Router API Connectivity**: Support for enterprise router APIs (Ubiquiti UniFi, Cisco, pfSense, MikroTik RouterOS, etc.) to programmatically query and manage DHCP reservations. Automatic device discovery by querying router for all LBEAST device reservations.
   - **Network-Wide IP Refresh**: Queue network-wide IP address rotation via router API - updates all DHCP reservations simultaneously, then triggers network-wide NAT punchthrough to re-establish all connections. Optional module for advanced users with professional routers. Consumer router users must manually update IPs in router admin panel and console (see Network Configuration documentation).
   - **Scheduled Rotation**: Configure IP rotation schedules (morning/evening, before/after hours) that trigger router API bulk updates. Prevents IP changes during work hours or mid-session. Router DHCP lease times and reservation rules handle timing enforcement.
-
-- [ ] **VR Player Transport (Server ↔ VR Clients)** - Bidirectional communication between game server and VR players:
-  - **Server → VR Players**: Relay gun button events (Ch 310), gun state (firing, intensity), gun transforms (from trackers), and platform motion state. Use Unity NetCode for reliable state synchronization and optional UDP multicast for low-latency events.
-  - **VR Players → Server**: Receive fire commands from VR controllers/triggers, relay to Gunship ECU → Gun ECU for solenoid firing. Support both centralized (via Gunship ECU) and direct (to Gun ECU) routing modes for latency optimization.
-  - **Implementation**: Integrate with Unity's multiplayer networking system (NetCode for GameObjects) for state management, with optional custom UDP transport for time-critical events. Handle player connection/disconnection, station assignment, and network recovery.
 
 #### Gunship Experience — Alpha Readiness
 
@@ -2816,7 +2879,6 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 
 ### 🔄 In Progress (v1.1)
 - [ ] Meta Quest 3 native integration
-- [ ] Unity Input System HOTAS profiles
 - [ ] Sample Arduino/ESP32 firmware
 - [ ] WebSocket alternative for live actor streaming
 
@@ -2831,10 +2893,14 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 
 ### 🎯 Planned (v2.0)
 - [ ] Apple Vision Pro support
+- [ ] **Holographic Render Target Support** - Support for holographic display technologies including swept-plane, swept-volume, Pepper's Ghost, lenticular, and other volumetric display methods. Enables rendering to specialized holographic hardware for immersive product visualization and LBE installations.
+- [ ] **GunshipExperience HOTAS Pilot Support** - Add optional 5th player (pilot) support to GunshipExperience with HOTAS controller integration. Enables pilot-controlled flight while 4 gunners operate weapons, expanding gameplay possibilities for multi-crew vehicle experiences.
 - [ ] Advanced inverse kinematics for custom actuator configs
 - [ ] Visual scripting (Bolt/Visual Scripting) support
 - [ ] Cloud multiplayer (Photon/Mirror)
 - [ ] Prefab packages (ready-to-use scene templates)
+- [ ] **RenderTexture Arrays and Matrices** - Support for RenderTexture arrays and matrices with hardware-agnostic output to video spheres, 360 video, stereoscopic 3D billboards, stereoscopic 360 video, LED walls, projectors (front projection, rear projection, variable-depth projection), and drone swarm renderers. Enables synchronized multi-display installations for immersive LBE experiences.
+- [ ] **OTA Firmware Updates** - Implement and test OTA (Over-The-Air) firmware flashing for ESP32-based reference design, APT package management for Raspberry Pi and Jetson Nano, and ESP32-as-wireless-adapter for STM32 OTA based on the rounakdatta open-source project. **Note:** The rounakdatta project will be included as a git submodule when implementing OTA functionality.
 - [ ] **3D-Printable 1/8th-Scale Platform Model** - Design a 3D-printable 1/8th-scale model of the scissor lift and tilt platform with complete ECU prototype integration capability for use in off-site network debugging. Enables developers to test network configurations, firmware updates, and communication protocols without requiring access to full-scale hardware. Includes mounting points for ESP32 ECUs, mock actuators, and all necessary interfaces for full system validation.
 
 </div>
