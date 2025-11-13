@@ -537,6 +537,20 @@ LBEAST is designed for **1-to-4 player co-located VR multiplayer experiences** i
 - Corporate events
 - Brand activations
 
+#### Open Layout
+
+- Standard minimum roomscale dimensions suitable for AIFacemask narratives and escape rooms
+- Minimum 10' × 10' cordoned-off play space
+- Virtual guardian setup recommended with 2-foot padding buffer to the cord to prevent player from striking outside viewer
+- Consider outer margin buffer with secondary cord for extra safety (12' × 12')
+- 20' × 20' recommended for any open layout using large haptics
+
+#### Closed Layout
+
+- 20' × 40' minimum play space to accommodate swinging ingress/egress walls
+- Establish guardian with 2-foot padding buffer to walls for safety
+- Consider safety cord to prevent players from reaching the Ops console
+
 </div>
 
 </details>
