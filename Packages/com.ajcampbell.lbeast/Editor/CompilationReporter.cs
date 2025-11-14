@@ -13,8 +13,34 @@ namespace LBEAST.Editor
     /// <summary>
     /// Compilation Reporter for LBEAST
     /// 
-    /// Captures Unity compilation errors and writes them to a file that can be read by external tools.
-    /// Useful for CI/CD, automated testing, or external IDE integration.
+    /// **What is this?**
+    /// This is an automated compilation monitoring system that captures Unity compilation errors
+    /// and writes them to a structured report file (Temp/CompilationErrors.log) that can be read
+    /// by external tools, CI/CD pipelines, or AI assistants.
+    /// 
+    /// **Why do I see console messages like "[LBEAST AUTO-COMPILE]"?**
+    /// These messages indicate that the automated compilation system is active and monitoring
+    /// your project's compilation status. This is normal and expected behavior.
+    /// 
+    /// **What does it do?**
+    /// - Automatically monitors Unity's compilation pipeline
+    /// - Captures compilation errors and warnings as they occur
+    /// - Writes structured reports to Temp/CompilationErrors.log
+    /// - Enables external tools to check compilation status without opening Unity Editor
+    /// 
+    /// **When is it used?**
+    /// - During automated builds (CI/CD pipelines)
+    /// - When running CompileProject_Silent.bat script
+    /// - When AI assistants need to check compilation status
+    /// - Any time Unity compiles scripts (normal editor usage)
+    /// 
+    /// **Can I disable it?**
+    /// This system is lightweight and doesn't impact normal Unity Editor usage. If you need to
+    /// disable it, you can comment out the [InitializeOnLoad] attribute, but this is not recommended
+    /// as it helps with automated testing and development workflows.
+    /// 
+    /// **For more information:**
+    /// See Claude_Unity_AutoCompilation/README.md in the repository root for detailed documentation.
     /// </summary>
     [InitializeOnLoad]
     public static class CompilationReporter

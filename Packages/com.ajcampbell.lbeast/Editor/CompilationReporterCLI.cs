@@ -9,11 +9,38 @@ using System.IO;
 namespace LBEAST.Editor
 {
     /// <summary>
-    /// Command-line interface for triggering compilation reports
-    /// Can be called from external tools or CI/CD pipelines
+    /// Command-Line Interface (CLI) for LBEAST Compilation Reporter
     /// 
-    /// Usage:
-    /// Unity.exe -quit -batchmode -projectPath "path/to/project" -executeMethod LBEAST.Editor.CompilationReporterCLI.CompileAndExit
+    /// **What is this?**
+    /// This is a command-line entry point that allows external tools (batch scripts, CI/CD pipelines,
+    /// or AI assistants) to trigger Unity compilation and generate a structured report file without
+    /// requiring manual interaction with the Unity Editor.
+    /// 
+    /// **Why do I see console messages like "[LBEAST AUTO-COMPILE] CLI invoked"?**
+    /// These messages appear when you run CompileProject_Silent.bat or when an external tool
+    /// launches Unity in batch mode with the -executeMethod flag. This is normal automated behavior.
+    /// 
+    /// **What does it do?**
+    /// - Launches Unity in batch mode (no GUI, headless operation)
+    /// - Waits for Unity to finish initial compilation
+    /// - Forces a recompilation to ensure fresh results
+    /// - Generates a compilation report (Temp/CompilationErrors.log)
+    /// - Exits Unity automatically (batch script terminates the process)
+    /// 
+    /// **When is it used?**
+    /// - Running CompileProject_Silent.bat from command line
+    /// - CI/CD pipelines that need to check compilation status
+    /// - Automated testing workflows
+    /// - AI assistants checking for compilation errors
+    /// 
+    /// **How to use it manually:**
+    /// Unity.exe -batchmode -nographics -projectPath "path/to/project" -executeMethod LBEAST.Editor.CompilationReporterCLI.CompileAndExit
+    /// 
+    /// **Note:** The batch script (CompileProject_Silent.bat) handles Unity process management.
+    /// You typically don't need to call this directly - use the batch script instead.
+    /// 
+    /// **For more information:**
+    /// See Claude_Unity_AutoCompilation/README.md in the repository root for detailed documentation.
     /// </summary>
     public static class CompilationReporterCLI
     {
