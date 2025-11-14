@@ -6,8 +6,11 @@ using UnityEngine.XR;
 namespace LBEAST.Core
 {
     /// <summary>
-    /// Abstracts VR/AR tracking across multiple platforms (OpenXR, Meta, SteamVR)
+    /// Abstracts VR/AR tracking using Unity's native OpenXR system
     /// Provides unified interface for HMD and controller tracking
+    /// 
+    /// Note: LBEAST uses OpenXR exclusively for HMD and hand tracking.
+    /// Unity's XR system (InputDevices) provides OpenXR data when available.
     /// </summary>
     public class LBEASTTrackingSystem : MonoBehaviour
     {

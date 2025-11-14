@@ -237,7 +237,7 @@ namespace LBEAST.Core
         /// <summary>
         /// Get the maximum number of players supported
         /// </summary>
-        public int GetMaxPlayers() => maxPlayers;
+        public virtual int GetMaxPlayers() => maxPlayers;
 
         #endregion
 

@@ -13,6 +13,24 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 
 > **🔗 Unreal Version:** Also available at [github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
 
+## Overview
+
+LBEAST is a comprehensive SDK for developing VR and AR Location-Based Entertainment (LBE) experiences. This repository contains the **Unity 6 LTS** implementation of the LBEAST SDK.
+
+The LBEAST SDK democratizes LBE development by providing:
+- **Experience Genre Templates** - Drag-and-drop complete LBE solutions
+- **Low-Level APIs** - Technical modules for custom integration between game engine and various physical systems
+- **AI-Driven Facial Animation** for immersive theater live actors (automated w/ NVIDIA ACE)
+- **Wireless Trigger Controls** - Embedded buttons in costume/clothing for narrative state machine control through WiFi/Bluetooth
+- **Large-Scale Hydraulic Haptics** for lift/motion platforms
+- **Embedded Systems Integration** for costume-/prop-/wall-/furniture-mounted interfaces
+- **Embedded Sensors** temperature, motion, face, and body tracking sensors to trigger escape room actions
+- **Co-located XR Multiplayer LAN Experiences** with Unity NetCode for GameObjects
+- **HMD and Hand Tracking** via OpenXR (Unity's native XR system)
+- **6DOF Tracking** with SteamVR trackers and future extensibility
+
+> **⚠️ HMD System Note:** LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through Unity's native XR system (`XRHandSubsystem`, `InputDevices`). If OpenXR is not desired for your LBE deployment for any reason, but you still want to use an LBEAST experience genre template to get started, there may be some customization necessary in `LBEASTHandGestureRecognizer` and in some of the Experience classes. Anywhere OpenXR is referenced, you may need to create an alternative version of that class with your SDK of choice replacing OpenXR usage.
+
 ## Philosophy
 
 <details>
@@ -20,7 +38,41 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 
 <div style="margin-left: 20px;">
 
-If a Hollywood studio invested millions in a new project, and then only showed in one theater? They'd never turn profit. We need hundreds of VR venues ready to deploy the same experience at once, and hundreds of developer teams need a way to deploy to the specs of those venues reliably so the venues and their customers can count on a continuous variety of new content. Enter LBEAST.
+Home console VR usage is nascent and difficult despite being steadily on the rise:
+* 80 million monthly active users in the U.S. in 2025
+* up 60% from 2020
+* 10% of Americans started using VR regularly so far this decade
+
+If that growth holds, we might reach 100 million regular VR users by end-of-decade, more than 1/4 of the population. It's not smartphone-era growth, but it's steady.
+
+BUT...
+
+Content budgets are skin-and-bone. 
+
+Building for VR requires specialty talent compared to film/TV/gaming, and every dollar spent goes half as far due to...
+* deeper fidelity challenges
+* bigger QA hurdles
+* evil perf op constraints
+
+VR devs need a leg up. The industry has been in a funding desert since the Pandemic. "VR is all hype" rumors put the dev community on a respirator, and we never got off the ropes.
+
+I get where investors are coming from. We're 10 years into modern VR. They need proof of ROI. We need to deliver in the black. We need better tools. We were building cars without factories.
+
+
+A better analogy - Movie Theaters:
+If a Hollywood studio invested millions on a new film before the streaming era, they'd be sunk if there were no 35mm projector and no movie theaters hungry to roll the next hit.
+
+An even better analogy - the JAMMA Arcade Spec:
+In 1985, the arcade industry was in a slump. All the arcade boxes were proprietary. Venues had to buy a new arcade box for every game. Devs had to design a whole arcade box for just THEIR game. Enter the JAMMA Spec. Suddenly venues could leave the same box in place and swap a card, and suddenly it's a new game! Same hardware, fresh regular content. Devs could focus on the game knowing reliable hardware was already on-site.
+
+We need that for the VR industry:
+* Devs need to be able to focus on dev, not hardware
+* Venues need standard hardware so devs can bring them regular new content.
+
+We have an chicken-egg situation. A standard spec for VR LBE is what we need.
+
+Enter LBEAST. Free, open-source, plug-n-play across multiple genres.
+
 
 </div>
 
@@ -128,9 +180,12 @@ LBEAST requires several Unity packages. These are **automatically installed** wh
 | Package | Version | Purpose | Installation |
 |---------|---------|---------|--------------|
 | **XR Plugin Management** | 4.4.0+ | VR/AR runtime management | `com.unity.xr.management` |
-| **OpenXR Plugin** | 1.9.0+ | Cross-platform VR support | `com.unity.xr.openxr` |
+| **OpenXR Plugin** | 1.9.0+ | Cross-platform VR support (required for HMD and hand tracking) | `com.unity.xr.openxr` |
+| **XR Hands** | 1.3.0+ | Hand tracking support (required for gesture recognition) | `com.unity.xr.hands` |
 | **Input System** | 1.7.0+ | Modern input handling | `com.unity.inputsystem` |
 | **TextMeshPro** | 3.0.6+ | UI text rendering | `com.unity.textmeshpro` |
+
+> **⚠️ OpenXR Requirement:** LBEAST uses OpenXR exclusively for all HMD and hand tracking. Your HMD must support OpenXR (most modern VR headsets do, including Meta Quest, Windows Mixed Reality, and SteamVR-compatible headsets via OpenXR). If your deployment requires a different XR SDK, you will need to customize the HMD/hand tracking components. See the main Overview section for details.
 
 #### **Multiplayer Dependencies (Required for AIFacemask)**
 
@@ -143,8 +198,8 @@ LBEAST requires several Unity packages. These are **automatically installed** wh
 
 | Package | Version | Purpose | When Needed |
 |---------|---------|---------|-------------|
-| **SteamVR Plugin** | 2.7.3+ | SteamVR integration | If using Valve Index, HTC Vive |
-| **Oculus Integration** | Latest | Meta Quest integration | If targeting Quest 2/3/Pro |
+| **SteamVR Plugin** | 2.7.3+ | SteamVR integration (optional, for 6DOF body/prop tracking with SteamVR trackers) | If using SteamVR trackers for body/prop tracking |
+| **Oculus Integration** | Latest | Meta Quest integration (optional, OpenXR handles Quest via OpenXR) | Only if you need Oculus-specific features beyond OpenXR |
 | **XR Interaction Toolkit** | 2.5.0+ | VR interaction helpers | For advanced VR interactions |
 
 </div>
@@ -180,8 +235,9 @@ After installing packages, configure:
 
 1. **XR Plugin Management**
    - **Edit > Project Settings > XR Plug-in Management**
-   - Enable **OpenXR** for your target platform
+   - Enable **OpenXR** for your target platform (required for HMD and hand tracking)
    - Configure **OpenXR Feature Sets** (hand tracking, controllers, etc.)
+   - **Note:** LBEAST uses OpenXR exclusively. Ensure hand tracking is enabled in OpenXR settings for gesture recognition to work.
 
 2. **Input System**
    - **Edit > Project Settings > Player > Active Input Handling**
@@ -270,6 +326,7 @@ Foundation modules providing core functionality:
 - `ProLighting` - DMX lighting control (Art-Net, USB DMX)
 - `Retail` - Cashless tap card payment interface for VR tap-to-play
 - `VOIP` - Low-latency voice communication with 3D HRTF spatialization
+- `RF433MHz` - 433MHz wireless remote/receiver integration with rolling code validation
 
 **Use these when:** Building custom experiences from scratch with full control.
 
@@ -1283,6 +1340,59 @@ protected override void OnNarrativeStateChanged(string oldState, string newState
 
 </details>
 
+<details>
+<summary><strong>🦸 Superhero Flight Experience</strong></summary>
+
+<div style="margin-left: 20px;">
+
+**Class:** `SuperheroFlightExperience`
+
+Pre-configured dual-winch suspended harness system for free-body flight (flying like Superman). Uses gesture-based control (10-finger/arm gestures) - no HOTAS, no button events, no 6DOF body tracking.
+
+**Features:**
+- Dual-winch system (front shoulder-hook, rear pelvis-hook)
+- Five flight modes: Standing, Hovering, Flight-Up, Flight-Forward, Flight-Down
+- Gesture-based control (fist detection, HMD-to-hands vector analysis)
+- Virtual altitude system (raycast for landable surfaces)
+- 433MHz wireless height calibration clicker
+- Server-side parameter exposure (airHeight, proneHeight, speeds, angles)
+- Safety interlocks (calibration mode only, movement limits, timeout)
+
+**Note:** Distinct from FlightSimExperience (2DOF gyroscope HOTAS cockpit for jet/spaceship simulation).
+
+**Quick Start:**
+```csharp
+var superheroFlight = gameObject.AddComponent<SuperheroFlightExperience>();
+superheroFlight.ECUIPAddress = "192.168.1.100";
+superheroFlight.ECUPort = 8888;
+superheroFlight.InitializeExperience();
+
+// Get current gesture state
+SuperheroFlightGestureState gestureState = superheroFlight.FlightHandsController.GetGestureState();
+
+// Get current flight mode
+SuperheroFlightGameState flightMode = superheroFlight.GetCurrentGameState();
+
+// Acknowledge standing ground height (after calibration)
+superheroFlight.AcknowledgeStandingGroundHeight();
+```
+
+**Gesture Control:**
+- **Both fists closed** = Flight motion enabled
+- **Single hand release** = Hover/stop
+- **Arms pointing up** = Flight-Up mode
+- **Arms pointing forward** = Flight-Forward mode (prone position)
+- **Arms pointing down** = Flight-Down mode
+
+**Height Calibration:**
+- Use 433MHz wireless clicker for height adjustment during calibration mode
+- Buttons mapped to "HeightUp" and "HeightDown" functions
+- Calibration mode automatically disabled after 5 minutes of inactivity
+
+</div>
+
+</details>
+
 ---
 
 ## 🔧 Low-Level APIs (Technical Modules)
@@ -1297,9 +1407,12 @@ When you need full control or custom hardware configurations, use the low-level 
 ### Core Module (`LBEAST.Core`)
 
 **Classes:**
-- `LBEASTTrackingSystem` - VR/XR tracking abstraction (OpenXR, Meta, SteamVR)
+- `LBEASTTrackingSystem` - VR/XR tracking using Unity's native OpenXR system (HMD and controller tracking)
+- `LBEASTHandGestureRecognizer` - Hand gesture recognition component using OpenXR hand tracking
 - `LBEASTNetworkManager` - LAN multiplayer with Unity NetCode for GameObjects
 - `LBEASTExperienceBase` - Base class for custom experiences
+
+> **⚠️ OpenXR Requirement:** LBEAST uses OpenXR exclusively for HMD and hand tracking. If you need to use a different XR SDK (SteamVR native, Meta SDK, etc.), you will need to customize `LBEASTHandGestureRecognizer` and experience classes that use HMD/hand tracking. See the main Overview section for details.
 
 **Example:**
 ```csharp
@@ -1834,6 +1947,105 @@ protected override bool InitializeExperienceImpl()
 
 </details>
 
+<details>
+<summary><strong>📡 RF433MHz API</strong></summary>
+
+<div style="margin-left: 20px;">
+
+**Module:** `LBEAST.RF433MHz`
+
+Hardware-agnostic 433MHz wireless remote/receiver integration. Provides abstraction layer for different USB receiver modules (RTL-SDR, CC1101, RFM69, Generic) with rolling code validation and replay attack prevention.
+
+**Features:**
+- **Multiple Receiver Types:** RTL-SDR, CC1101, RFM69, RFM95, Generic USB receivers
+- **Rolling Code Validation:** Prevents replay attacks with rolling code protocols
+- **Replay Attack Prevention:** Rejects duplicate codes within time window
+- **AES Encryption:** Optional encryption support for custom solutions
+- **Button Learning Mode:** Pair new remotes by pressing buttons during learning mode
+- **Button Function Mapping:** Map button codes to function names (e.g., "HeightUp", "HeightDown")
+- **Persistence:** Save/load button mappings to JSON file
+- **Auto-Save:** Automatically save mappings when buttons are learned or mappings change
+
+**Basic Example:**
+```csharp
+using LBEAST.RF433MHz;
+
+var rfReceiver = gameObject.AddComponent<RF433MHzReceiver>();
+
+// Configure receiver
+RF433MHzReceiverConfig config = new RF433MHzReceiverConfig
+{
+    ReceiverType = RF433MHzReceiverType.Generic,
+    USBDevicePath = "COM3",  // Windows COM port, or /dev/ttyUSB0 on Linux
+    EnableRollingCodeValidation = true,
+    EnableReplayAttackPrevention = true,
+    UpdateRate = 20.0f  // 20 Hz
+};
+
+// Initialize receiver
+rfReceiver.InitializeReceiver(config);
+
+// Subscribe to button events
+rfReceiver.OnButtonPressed.AddListener((buttonCode) =>
+{
+    Debug.Log($"Button {buttonCode} pressed");
+});
+
+rfReceiver.OnButtonFunctionTriggered.AddListener((buttonCode, functionName, pressed) =>
+{
+    Debug.Log($"Function '{functionName}' triggered by button {buttonCode}");
+});
+```
+
+**Button Learning & Mapping:**
+```csharp
+// Enable learning mode (30 second timeout)
+rfReceiver.EnableLearningMode(30.0f);
+
+// Press buttons on remote - they will be automatically learned
+// OnCodeLearned event fires when new button is learned
+
+// Map learned button to function
+rfReceiver.AssignButtonFunction(buttonCode: 1, functionName: "HeightUp");
+rfReceiver.AssignButtonFunction(buttonCode: 2, functionName: "HeightDown");
+
+// Now OnButtonFunctionTriggered will fire when these buttons are pressed
+```
+
+**Persistence:**
+```csharp
+// Save button mappings to JSON file
+rfReceiver.SaveButtonMappings();  // Saves to default path: Application.persistentDataPath/Config/LBEAST/RF433MHz_Buttons.json
+
+// Load button mappings on startup (automatically called in Start())
+rfReceiver.LoadButtonMappings();
+
+// Custom file path
+rfReceiver.SaveButtonMappings("/path/to/custom/file.json");
+```
+
+**Security Features:**
+- **Rolling Code Validation:** Validates rolling codes to prevent replay attacks
+- **Replay Attack Prevention:** Rejects duplicate codes within configurable time window
+- **AES Encryption:** Optional 128-bit or 256-bit AES encryption for encrypted remotes
+- **Network Isolation:** Recommended for security (see Network Configuration documentation)
+
+**Supported Receiver Types:**
+- ✅ **RTL-SDR:** Software-defined radio USB dongle
+- ✅ **CC1101:** Dedicated 433MHz transceiver module with USB interface
+- ✅ **RFM69/RFM95:** LoRa/RF modules with USB interface (433MHz capable)
+- ✅ **Generic:** Off-the-shelf USB dongles available on Amazon/eBay
+
+**Use Cases:**
+- Height calibration clicker for SuperheroFlightExperience
+- Wireless remote control for embedded systems
+- Custom button interfaces for LBE installations
+- Safety interlock controls (emergency stop, calibration mode)
+
+</div>
+
+</details>
+
 ---
 
 ## 📦 Installation
@@ -2253,7 +2465,7 @@ LBEAST v0.1.0 focuses on **local LAN multiplayer** using Unity NetCode for GameO
 
 All hardware communication is **abstracted** through interfaces:
 
-- **HMD Interface** → OpenXR, SteamVR, Meta
+- **HMD and Hand Tracking** → OpenXR (Unity's native XR system) - **Note:** OpenXR is used exclusively. If you need a different XR SDK, customization of `LBEASTHandGestureRecognizer` and experience classes will be required.
 - **Tracking Interface** → SteamVR Trackers (future: UWB, optical, ultrasonic)
 - **Platform Controller** → UDP/TCP to hydraulic controller
 - **Embedded Devices** → Serial, WiFi, Bluetooth, Ethernet
@@ -2262,6 +2474,8 @@ This allows you to:
 1. Develop with simulated hardware
 2. Integrate real hardware without changing game code
 3. Swap hardware systems in configuration
+
+> **⚠️ OpenXR Requirement:** LBEAST uses OpenXR exclusively for HMD and hand tracking. If your deployment requires a different XR SDK (SteamVR native, Meta SDK, etc.), you will need to create alternative versions of classes that use OpenXR APIs. See the main Overview section for details.
 
 </div>
 
@@ -2768,6 +2982,8 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 
 ### ✅ Completed (v0.1.0)
 - ✅ Core VR tracking abstraction
+- ✅ HMD and hand tracking via OpenXR (Unity's native XR system)
+- ✅ Hand gesture recognition (`LBEASTHandGestureRecognizer`)
 - ✅ 4DOF hydraulic platform support (4 & 6 actuators)
 - ✅ 2DOF gyroscope support
 - ✅ **Dedicated Server** architecture
@@ -2778,8 +2994,9 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 - ✅ AI facial animation control
 - ✅ Embedded systems (Arduino, ESP32, STM32)
 - ✅ LAN multiplayer (Unity NetCode)
-- ✅ Experience Genre Templates (AIFacemask, MovingPlatform, Gunship, CarSim, FlightSim, EscapeRoom)
+- ✅ Experience Genre Templates (AIFacemask, MovingPlatform, Gunship, CarSim, FlightSim, EscapeRoom, SuperheroFlight)
 - ✅ **NVIDIA ACE Integration Architecture** (data structures, visitor pattern, component architecture)
+- ✅ **433MHz RF Trigger API** - Hardware-agnostic 433MHz wireless remote/receiver integration with rolling code validation, button learning, and function mapping
 
 </div>
 

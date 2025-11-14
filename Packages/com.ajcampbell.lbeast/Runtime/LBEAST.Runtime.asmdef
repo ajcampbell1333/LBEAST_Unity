@@ -5,7 +5,8 @@
         "Unity.InputSystem",
         "Unity.Netcode.Runtime",
         "Unity.XR.Management",
-        "Unity.XR.OpenXR"
+        "Unity.XR.OpenXR",
+        "Unity.XR.Hands"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
