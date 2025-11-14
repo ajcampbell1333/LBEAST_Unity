@@ -4,9 +4,16 @@
 
 **Location-Based Entertainment Activation Standard Toolkit (LBEAST)** - A comprehensive SDK for developing VR/AR Location-Based Entertainment experiences in Unity with support for AI facial animation, large hydraulic haptics, and embedded systems integration.
 
-**Author Disclaimer**
-This is a brand new plugin as of November 2025. Parts of it are not fully fleshed out. I built a lot of LBE for Fortune 10 brands in the 20-teens. This is the dream game-engine toolchain I wish we had back then, but I'm 100% certain it's full of unforeseen bugs in its current form. If you're seeing this message, it's because I have yet to deploy this plugin on a single professional project. I'm sure I will have lots of fixes to push after I've deployed it a few times in-situ. Use at your own risk in the meantime.
+<details>
+<summary><strong>⚠️Author Disclaimer:</strong></summary>
 
+<div style="margin-left: 20px;">
+This is a brand new plugin as of November 2025. Parts of it are not fully fleshed out. The author built LBE activations for Fortune 10 brands over the past decade. This is the dream toolchain he wishes we had back then, but it probably still contains unforeseen bugs in its current form. V1.0 is considered Alpha. This is v0.1.1. If you're seeing this message, it's because LBEAST has yet to deploy on a single professional project. Please use this code at your own risk. Also, this plugin provides code that may or may not run on systems your local and state officials may classify as  "amusement rides" or "theme park rides" which may fall under ASTM standards or other local regulations. LBEAST's author disclaims any liability for safety of guests or patrons or regulatory readiness. Please review the local regulations in your area prior to executing this code in any public venue. You are responsible for compliance in your state.
+</div>
+
+</details><br>
+
+[![LBEAST](https://img.shields.io/github/v/tag/ajcampbell1333/lbeast_unity?label=LBEAST&color=orange)](https://github.com/ajcampbell1333/lbeast_unity/releases)
 [![Unity](https://img.shields.io/badge/Unity-6%20LTS-black?logo=unity)](https://unity.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://microsoft.com/windows)
@@ -29,7 +36,16 @@ The LBEAST SDK democratizes LBE development by providing:
 - **HMD and Hand Tracking** via OpenXR (Unity's native XR system)
 - **6DOF Tracking** with SteamVR trackers and future extensibility
 
-> **⚠️ HMD System Note:** LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through Unity's native XR system (`XRHandSubsystem`, `InputDevices`). If OpenXR is not desired for your LBE deployment for any reason, but you still want to use an LBEAST experience genre template to get started, there may be some customization necessary in `LBEASTHandGestureRecognizer` and in some of the Experience classes. Anywhere OpenXR is referenced, you may need to create an alternative version of that class with your SDK of choice replacing OpenXR usage.
+
+<details>
+<summary><strong>⚠️OpenXR Note:</strong></summary>
+
+<div style="margin-left: 20px;">
+LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through Unity's native XR system (`XRHandSubsystem`, `InputDevices`). If OpenXR is not desired for your LBE deployment for any reason, but you still want to use an LBEAST experience genre template to get started, there may be some customization necessary in `LBEASTHandGestureRecognizer` and in some of the Experience classes. Anywhere OpenXR is referenced, you may need to create an alternative version of that class with your SDK of choice replacing OpenXR usage.
+
+</div>
+
+</details><br>
 
 ## Philosophy
 
