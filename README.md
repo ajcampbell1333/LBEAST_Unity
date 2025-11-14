@@ -13,7 +13,7 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 
 </details><br>
 
-[![LBEAST](https://img.shields.io/github/v/tag/ajcampbell1333/lbeast_unity?label=LBEAST&color=orange)](https://github.com/ajcampbell1333/lbeast_unity/releases)
+[![LBEAST](https://img.shields.io/github/v/tag/ajcampbell1333/lbeast_unity?label=LBEAST&color=lightgreen)](https://github.com/ajcampbell1333/lbeast_unity/releases)
 [![Unity](https://img.shields.io/badge/Unity-6%20LTS-black?logo=unity)](https://unity.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://microsoft.com/windows)
