@@ -540,54 +540,6 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 
 ---
 
-## Unity Terminology
-
-<details>
-<summary><strong>Unity MonoBehaviour vs. Live Actor</strong></summary>
-
-<div style="margin-left: 20px;">
-
-### Unity MonoBehaviour (Game Object Component)
-
-A **Unity MonoBehaviour** refers to a C# class that inherits from `MonoBehaviour` and exists as a component on a GameObject in the Unity scene.
-
-```csharp
-// This is a Unity MonoBehaviour
-public class AIFacemaskExperience : LBEASTExperienceBase
-{
-    // Component code...
-}
-```
-
-### Live Actor (Physical Performer)
-
-A **Live Actor** refers to a **physical human performer** wearing VR equipment and/or costumes in the LBE installation. They drive in-game avatars with real-time facial animation and interact with players.
-
-```csharp
-// This configures support for 2 physical performers
-experience.numberOfLiveActors = 2;  // Human performers wearing facemasks
-experience.numberOfPlayers = 4;     // VR players
-```
-
-### Quick Reference
-- **"Unity MonoBehaviour"** = C# class that exists as a component on a GameObject
-- **"Live Actor"** = Physical person performing in the experience
-- **"Avatar"** = The in-game character controlled by a live actor
-- **"Player"** = VR participant (not performing, just experiencing)
-
-**In this documentation:**
-- When we say "MonoBehaviour" or "Component" in code context, we mean the Unity class
-- When we say "Live Actor" or "live actors", we mean physical human performers
-- Context should make it clear, but this distinction is important for the AI Facemask system
-
-</div>
-
-</details>
-
----
-
-
----
 
 ## 🏗️ Standard Pop-up Layout
 
