@@ -48,9 +48,9 @@ namespace LBEAST.ExperienceTemplates
         [Header("Components")]
         [SerializeField] private AIFaceController faceController;
         [SerializeField] private SerialDeviceController costumeController;
-        [SerializeField] private AIFacemaskACEScriptManager aceScriptManager;
-        [SerializeField] private AIFacemaskACEImprovManager aceImprovManager;
-        [SerializeField] private AIFacemaskASRManager aceASRManager;
+        [SerializeField] private AIFacemaskScriptManager scriptManager;
+        [SerializeField] private AIFacemaskImprovManager improvManager;
+        [SerializeField] private AIFacemaskASRManager asrManager;
         [SerializeField] private VOIPManager voipManager;
 
         [Header("Live Actor Configuration")]
@@ -94,33 +94,33 @@ namespace LBEAST.ExperienceTemplates
                 }
             }
 
-            // Find or create ACE Script Manager
-            if (aceScriptManager == null)
+            // Find or create Script Manager
+            if (scriptManager == null)
             {
-                aceScriptManager = GetComponent<AIFacemaskACEScriptManager>();
-                if (aceScriptManager == null)
+                scriptManager = GetComponent<AIFacemaskScriptManager>();
+                if (scriptManager == null)
                 {
-                    aceScriptManager = gameObject.AddComponent<AIFacemaskACEScriptManager>();
+                    scriptManager = gameObject.AddComponent<AIFacemaskScriptManager>();
                 }
             }
 
-            // Find or create ACE Improv Manager
-            if (aceImprovManager == null)
+            // Find or create Improv Manager
+            if (improvManager == null)
             {
-                aceImprovManager = GetComponent<AIFacemaskACEImprovManager>();
-                if (aceImprovManager == null)
+                improvManager = GetComponent<AIFacemaskImprovManager>();
+                if (improvManager == null)
                 {
-                    aceImprovManager = gameObject.AddComponent<AIFacemaskACEImprovManager>();
+                    improvManager = gameObject.AddComponent<AIFacemaskImprovManager>();
                 }
             }
 
-            // Find or create ACE ASR Manager
-            if (aceASRManager == null)
+            // Find or create ASR Manager
+            if (asrManager == null)
             {
-                aceASRManager = GetComponent<AIFacemaskASRManager>();
-                if (aceASRManager == null)
+                asrManager = GetComponent<AIFacemaskASRManager>();
+                if (asrManager == null)
                 {
-                    aceASRManager = gameObject.AddComponent<AIFacemaskASRManager>();
+                    asrManager = gameObject.AddComponent<AIFacemaskASRManager>();
                 }
             }
 
@@ -219,59 +219,53 @@ namespace LBEAST.ExperienceTemplates
                 Debug.Log($"[LBEAST] AIFacemaskExperience: Narrative state machine initialized with {defaultStates.Count} states");
             }
 
-            // Initialize ACE Script Manager (pre-baked script collections for NVIDIA ACE)
-            if (aceScriptManager != null)
+            // Initialize Script Manager (pre-baked script collections for NVIDIA ACE)
+            if (scriptManager != null)
             {
                 // NOOP: TODO - Configure NVIDIA ACE server base URL from project settings or config
                 string aceServerBaseURL = "http://localhost:8000";  // Default to localhost
 
-                if (aceScriptManager.InitializeScriptManager(aceServerBaseURL))
+                if (scriptManager.InitializeScriptManager(aceServerBaseURL))
                 {
-                    Debug.Log("[LBEAST] AIFacemaskExperience: ACE Script Manager initialized");
+                    Debug.Log("[LBEAST] AIFacemaskExperience: Script Manager initialized");
                 }
                 else
                 {
-                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: ACE Script Manager initialization failed, continuing without script automation");
+                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: Script Manager initialization failed, continuing without script automation");
                 }
             }
 
-            // Initialize ACE Improv Manager (real-time improvised responses using local LLM + TTS + Audio2Face)
-            if (aceImprovManager != null)
+            // Initialize Improv Manager (real-time improvised responses using local LLM + TTS + Audio2Face)
+            if (improvManager != null)
             {
-                // Set reference to AIFaceController for streaming facial animation
-                aceImprovManager.aiFaceController = faceController;
-
-                if (aceImprovManager.InitializeImprovManager())
+                if (improvManager.InitializeImprovManager())
                 {
-                    Debug.Log("[LBEAST] AIFacemaskExperience: ACE Improv Manager initialized (local LLM + TTS + Audio2Face)");
+                    Debug.Log("[LBEAST] AIFacemaskExperience: Improv Manager initialized (local LLM + TTS + Audio2Face)");
                 }
                 else
                 {
-                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: ACE Improv Manager initialization failed, continuing without improv responses");
+                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: Improv Manager initialization failed, continuing without improv responses");
                 }
             }
 
-            // Initialize ACE ASR Manager (converts player voice to text for improv responses)
-            if (aceASRManager != null)
+            // Initialize ASR Manager (converts player voice to text for improv responses)
+            if (asrManager != null)
             {
-                // Set reference to ACE Improv Manager for triggering improv after transcription
-                aceASRManager.aceImprovManager = aceImprovManager;
-
-                if (aceASRManager.InitializeASRManager())
+                if (asrManager.InitializeASRManager())
                 {
-                    Debug.Log("[LBEAST] AIFacemaskExperience: ACE ASR Manager initialized (player voice → text for improv)");
+                    Debug.Log("[LBEAST] AIFacemaskExperience: ASR Manager initialized (player voice → text for improv)");
 
                     // Register ASR Manager as visitor with VOIPManager
                     // This keeps AIFacemask module decoupled from VOIP module
                     if (voipManager != null)
                     {
-                        voipManager.RegisterAudioVisitor(aceASRManager);
+                        voipManager.RegisterAudioVisitor(asrManager);
                         Debug.Log("[LBEAST] AIFacemaskExperience: ASR Manager registered with VOIPManager");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: ACE ASR Manager initialization failed, continuing without voice input");
+                    Debug.LogWarning("[LBEAST] AIFacemaskExperience: ASR Manager initialization failed, continuing without voice input");
                 }
             }
 
@@ -288,9 +282,9 @@ namespace LBEAST.ExperienceTemplates
             }
 
             // Unregister ASR Manager from VOIPManager
-            if (voipManager != null && aceASRManager != null)
+            if (voipManager != null && asrManager != null)
             {
-                voipManager.UnregisterAudioVisitor(aceASRManager);
+                voipManager.UnregisterAudioVisitor(asrManager);
             }
 
             // Disconnect embedded systems
@@ -390,10 +384,10 @@ namespace LBEAST.ExperienceTemplates
 
             // State changes are triggered by live actor's wireless trigger buttons
             // Each state change triggers automated AI facemask performances via NVIDIA ACE
-            // Trigger ACE script for the new state (if script manager is available and auto-trigger is enabled)
-            if (aceScriptManager != null && aceScriptManager.autoTriggerOnStateChange)
+            // Trigger script for the new state (if script manager is available and auto-trigger is enabled)
+            if (scriptManager != null && scriptManager.autoTriggerOnStateChange)
             {
-                aceScriptManager.HandleNarrativeStateChanged(oldState, newState, newStateIndex);
+                scriptManager.HandleNarrativeStateChanged(oldState, newState, newStateIndex);
             }
 
             // Override this method in derived classes to trigger additional game events based on state changes

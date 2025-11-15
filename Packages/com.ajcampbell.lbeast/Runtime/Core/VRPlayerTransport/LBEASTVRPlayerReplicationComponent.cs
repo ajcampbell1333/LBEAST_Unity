@@ -310,11 +310,13 @@ namespace LBEAST.Core
                 Vector3 worldPosition = xrOrigin.TransformPoint(localPose.position);
                 Quaternion worldRotation = xrOrigin.rotation * localPose.rotation;
 
+                // Unity 6.0: XRHandJoint doesn't have radius property, use default value
+                float jointRadius = 0.01f; // Default radius for hand joints
                 ReplicatedHandKeypoint keypoint = new ReplicatedHandKeypoint(
                     worldPosition,
                     worldRotation,
                     true,
-                    joint.radius
+                    jointRadius
                 );
                 handData.SetKeypoint(jointID, keypoint);
             }

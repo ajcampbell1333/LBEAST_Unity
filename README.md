@@ -153,6 +153,11 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 
 ## 📚 Table of Contents
 
+<details>
+<summary><strong>THIS README</strong></summary>
+
+<div style="margin-left: 20px;">
+
 - [Prerequisites & Package Dependencies](#-prerequisites--package-dependencies)
 - [Three-Tier Architecture](#-three-tier-architecture)
 - [Hardware-Agnostic Input System](#-hardware-agnostic-input-system)
@@ -164,6 +169,33 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 - [Dedicated Server & Server Manager](#-dedicated-server--server-manager)
 - [Roadmap](#-roadmap)
 - [License](#-license)
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>OTHER READMEs IN THIS PROJECT</strong></summary>
+
+<div style="margin-left: 20px;">
+
+**Low-Level APIs:**
+- [VRPlayerTransport README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md`
+- [Input README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/Core/Input/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/Core/Input/README.md`
+- [VOIP README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/VOIP/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/VOIP/README.md`
+- [EmbeddedSystems README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/EmbeddedSystems/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/EmbeddedSystems/README.md`
+
+**Firmware Examples:**
+- [FirmwareExamples README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/README.md`
+- [GunshipExperience README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/README.md`
+- [FlightSimExperience README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/FlightSimExperience/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/FlightSimExperience/README.md`
+- [EscapeRoom README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/EscapeRoom/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/EscapeRoom/README.md`
+- [Base Examples README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md`
+- [Base Templates README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md`
+
+</div>
+
+</details>
 
 ---
 
@@ -335,7 +367,7 @@ LBEAST uses a modular three-tier architecture for code organization and server/c
 
 Foundation modules providing core functionality:
 - `LBEASTCore` - VR/XR tracking abstraction, networking
-- `AIFacemask` - Facial animation control
+- `LBEASTAI` - Low-level AI API (LLM, ASR, TTS, container management)
 - `LargeHaptics` - Platform/gyroscope control
 - `EmbeddedSystems` - Microcontroller integration
 - `ProAudio` - Professional audio console control via OSC
@@ -356,12 +388,14 @@ Foundation modules providing core functionality:
 <div style="margin-left: 20px;">
 
 Ready-to-use complete experiences combining multiple APIs:
-- `AAIFacemaskExperience` - Live actor-driven multiplayer VR with wireless trigger buttons controlling automated AI facemask performances
-- `AMovingPlatformExperience` - A 4-gang hydraulic platform on which a single VR player stands while hooked to a suspended cable harness to prevent falling
-- `AGunshipExperience` - 4-player seated platform with 4DOF hydraulic motion driven by a 4-gang actuator platform with a player strapped in at each corner, all fixed to a hydraulic lift that can dangle players a few feet in the air
-- `ACarSimExperience` - A racing/driving simulator where 1-4 player seats are bolted on top of a 4-gang hydraulic platform
-- `AFlightSimExperience` - A single player flight sim with HOTAS controls in a 2-axis gyroscopic cockpit built with servo motors for pitch and roll. **⚠️ Requires outside-in tracking with cockpit-mounted trackers for Space Reset feature (see FlightSimExperience/README.md)** 
-- `AEscapeRoomExperience` - Puzzle-based escape room with embedded door lock/prop latch solenoids, sensors, and pro AV integration for light/sound and live improv actors
+- `AIFacemaskExperience` - Live actor-driven multiplayer VR with wireless trigger buttons controlling automated AI facemask performances
+- `MovingPlatformExperience` - A 4-gang hydraulic platform on which a single VR player stands while hooked to a suspended cable harness to prevent falling
+- `GunshipExperience` - 4-player seated platform with 4DOF hydraulic motion driven by a 4-gang actuator platform with a player strapped in at each corner, all fixed to a hydraulic lift that can dangle players a few feet in the air
+- `CarSimExperience` - A racing/driving simulator where 1-4 player seats are bolted on top of a 4-gang hydraulic platform
+- `FlightSimExperience` - A single player flight sim with HOTAS controls in a 2-axis gyroscopic cockpit built with servo motors for pitch and roll. **⚠️ Requires outside-in tracking with cockpit-mounted trackers for Space Reset feature (see FlightSimExperience/README.md)** 
+- `EscapeRoomExperience` - Puzzle-based escape room with embedded door lock/prop latch solenoids, sensors, and pro AV integration for light/sound and live improv actors
+- `GoKartExperience` - Electric go-karts, bumper cars, race boats, or bumper boats augmented by passthrough VR or AR headsets enabling overlaid virtual weapons and pickups that affect the performance of the vehicles
+- `SuperheroFlightExperience` - A dual-hoist-harness-and-truss system that lifts a player into the air and turns them prone to create the feeling of superhero flight as they punch fists out forward, up, or down
 
 **Use these when:** Rapid deployment of standard LBE genres.
 
@@ -394,6 +428,8 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 | Custom 3-player standing platform | Low-Level APIs | Need custom configuration not covered by templates |
 | Live actor-driven escape room | `AIFacemaskExperience` | Wireless trigger buttons in costume control narrative state machine, automated AI facemask performances |
 | Puzzle-based escape room | `EscapeRoomExperience` | Narrative state machine, door locks, prop sensors, embedded systems |
+| Go-kart racing with VR/AR overlay | `GoKartExperience` | Passthrough VR/AR support, virtual weapons, item pickups, projectile combat |
+| Superhero flight simulation | `SuperheroFlightExperience` | Dual-winch suspended harness, gesture-based control, free-body flight |
 | Unique hardware configuration | Low-Level APIs | Full control over all actuators and systems |
 
 **Rule of thumb:** Start with templates, drop to APIs only when you need customization beyond what templates offer.
@@ -857,9 +893,61 @@ Experience Genre Templates are complete, pre-configured MonoBehaviours that you 
 
 <div style="margin-left: 20px;">
 
+<br>
+
+<details>
+<summary><strong>How the Live Actor Controls their AI Face</strong></summary>
+
+<div style="margin-left: 20px;">
+
+<details>
+<summary><strong>Head and Body Tracking</strong></summary>
+
+<div style="margin-left: 20px;">
+
+A live actor wears an HMD e.g. Meta Quest or Steam Frame. Any HMD will work as long as it supports 10-finger hand tracking for full-body control. Body tracking may include Ultimate trackers on feet or automated foot IK. Foot tracking is not built-in yet for LBEAST v1.0.
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>Live Actor Narrative Controls</strong></summary>
+
+<div style="margin-left: 20px;">
+
+The live actor can wear custom PCBs (sample code and design provided) that allow production to sew hidden wireless buttons into the lining of costumes. In the provided default example, a forward button is sewn into a right wrist band and a reverse button is sewn into a left wrist band. Hidden buttons are necessary because the live actor needs to portray to the player that they ARE the AI character. They are driving the hands, feet, and head direction of the AI in real-time while the AI animates only the face. They are essentially wearing an AI like a Halloween mask. They have zoomed-out control over the AI face. They don't control emotions or face shapes or specific words. That's all automated. They control the overarching story via at least two buttons, forward/reverse. It's sort of like skip buttons on an MP3 player.
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>The AI Can Improvise Conversation?</strong></summary>
+
+<div style="margin-left: 20px;">
+
+Yes, in the default implementation of the Facemask template, the AI facemask is a fully-functional AI NPC. It has a narrative script that the live actor can see in HUD and control one-sentence-at-a-time via forward/reverse buttons, but the player can also interrupt the AI face with conversation. The default AI face is designed to receive conversation input by processing the player's audio into text, generating a text reply, converting that text reply into an audio voice you've pre-trained, and rendering animation of a neurally-generated face you've also pre-trained. With this method, you can bring historically figures or beloved fictional characters to life, and they can give players haptic feedback with real, physical handshakes, high-fives, etc. You can imagine a beloved fictional character grabbing your hand and taking you on a journey through your favorite fictional setting. The haptic feedback of a fictional character's hand touching yours is next-level immersion that wasn't possible even a few years ago.
+
+</div>
+
+</details>
+
+</div>
+
+</details>
+
+<br>
+
+**📚 Documentation:**
+- [LBEASTAI API README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/LBEASTAI/README.md) - Low-level AI API documentation (LLM, ASR, TTS, container management)
+- [AIFacemask Experience README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/ExperienceTemplates/AIFacemaskExperience/README.md) - Complete AIFacemask experience documentation
+
 **Class:** `AIFacemaskExperience`
 
 Deploy LAN multiplayer VR experiences where immersive theater live actors drive avatars with **fully automated AI-generated facial expressions**. The AI face is controlled entirely by NVIDIA ACE pipeline - no manual animation, rigging, or blend shape tools required.
+
+**Architecture:** This experience template uses the **`LBEASTAI` API** (low-level AI services) for LLM, ASR, and TTS functionality. The `LBEASTAI` API is decoupled and reusable - you can use it to build other AI-powered experiences beyond facemask.
 
 **⚠️ DEDICATED SERVER REQUIRED ⚠️**
 
@@ -1027,6 +1115,25 @@ Facial animation displayed on live actor's HMD-mounted mesh
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+**Integration with LBEASTAI Module:**
+The AIFacemask Experience uses the **LBEASTAI** module for all low-level AI capabilities, but the two are **decoupled**:
+- **LBEASTAI Module**: Provides generic, reusable AI APIs (LLM, ASR, TTS, container management)
+- **AIFacemask Experience**: Uses LBEASTAI but adds experience-specific features:
+  - Narrative state machine integration
+  - Face controller integration
+  - Experience-specific script structures
+  - Experience-specific delegates and events
+
+**AIFacemask Components (extend LBEASTAI base classes):**
+- `AIFacemaskScriptManager` extends `AIScriptManager` (LBEASTAI)
+- `AIFacemaskImprovManager` extends `AIImprovManager` (LBEASTAI)
+- `AIFacemaskASRManager` extends `AIASRManager` (LBEASTAI)
+
+This architecture allows:
+- **Reusability**: LBEASTAI can be used by other experiences without AIFacemask dependencies
+- **Extensibility**: Future experiences can use LBEASTAI for custom AI workflows
+- **Maintainability**: AI capabilities are centralized in LBEASTAI, experience-specific logic in AIFacemask
+
 **Architecture:**
 - **AI Face**: Fully autonomous, driven by NVIDIA ACE pipeline (Audio → NLU → Emotion → Facial Animation)
 - **Live Actor Role**: High-level experience director via wireless trigger buttons, NOT facial puppeteer
@@ -1034,6 +1141,8 @@ Facial animation displayed on live actor's HMD-mounted mesh
 - **Narrative State Machine**: Live actor advances/retreats through story beats (Intro → Tutorial → Act1 → Act2 → Finale → Credits)
 - **Automated Performances**: AI facemask performances are fully automated - live actor controls flow, not expressions
 - **Server Mode**: **ENFORCED** to Dedicated Server (attempting to change will fail initialization)
+
+**Note:** All AI capabilities are provided by the **LBEASTAI** module. AIFacemask components extend LBEASTAI base classes to add narrative state machine integration and experience-specific features.
 
 **Live Actor Control System:**
 - **Wireless Trigger Buttons**: Embedded in live actor's costume/clothes (ESP32-based, WiFi-connected)
@@ -1045,9 +1154,11 @@ Facial animation displayed on live actor's HMD-mounted mesh
 - Pre-configured `AIFaceController` (receives NVIDIA ACE output, applies to mesh)
 - Pre-configured `SerialDeviceController` (wireless trigger buttons embedded in costume)
 - Pre-configured `ExperienceStateMachine` (narrative story progression)
-- Pre-configured `AIFacemaskACEScriptManager` (pre-baked script collections)
-- Pre-configured `AIFacemaskACEImprovManager` (real-time improvised responses)
-- Pre-configured `AIFacemaskASRManager` (speech-to-text for player voice)
+- Pre-configured `AIFacemaskScriptManager` (pre-baked script collections, extends `LBEASTAI.AIScriptManager`)
+- Pre-configured `AIFacemaskImprovManager` (real-time improvised responses, extends `LBEASTAI.AIImprovManager`)
+- Pre-configured `AIFacemaskASRManager` (speech-to-text for player voice, extends `LBEASTAI.AIASRManager`)
+- Pre-configured `AIFacemaskLiveActorHUDComponent` (VR HUD overlay for live actors) - TODO: Implement Unity equivalent
+- Uses `LBEASTAI` API for all AI services (LLM, ASR, TTS, container management)
 - LAN multiplayer support (configurable live actor/player counts)
 - Passthrough mode for live actors to help players
 
@@ -1309,6 +1420,49 @@ protected override void OnNarrativeStateChanged(string oldState, string newState
 </details>
 
 <details>
+<summary><strong>🏎️ Go-Kart Experience</strong></summary>
+
+<div style="margin-left: 20px;">
+
+**Class:** `GoKartExperience`
+
+Electric go-karts, bumper cars, race boats, or bumper boats augmented by passthrough VR or AR headsets enabling overlaid virtual weapons and pickups that affect the performance of the vehicles.
+
+**Includes:**
+- Pre-configured passthrough VR/AR support for real-world vehicle driving
+- Virtual weapon/item pickup system with projectile combat
+- Barrier collision system for projectile interactions
+- Throttle control (boost/reduction based on game events)
+- Shield system (hold item behind kart to block projectiles)
+- Procedural spline-based track generation
+- Multiple track support (switchable during debugging)
+- ECU integration for physical vehicle control
+
+**Quick Start:**
+```csharp
+var goKart = gameObject.AddComponent<GoKartExperience>();
+goKart.ECUIPAddress = "192.168.1.100";
+goKart.ECUPort = 8888;
+goKart.InitializeExperience();
+
+// Apply throttle boost/reduction based on game event
+goKart.ApplyThrottleEffect(1.5f, 5.0f);  // 50% boost for 5 seconds
+
+// Switch to a different track (for debugging)
+goKart.SwitchTrack(1);  // Switch to track index 1
+```
+
+**Use Cases:**
+- Electric go-kart racing with VR weapon overlay
+- Bumper car arenas with virtual power-ups
+- Race boat experiences with AR overlays
+- Bumper boat attractions with virtual combat
+
+</div>
+
+</details>
+
+<details>
 <summary><strong>🦸 Superhero Flight Experience</strong></summary>
 
 <div style="margin-left: 20px;">
@@ -1506,7 +1660,81 @@ flightSimController.SendGyroStruct(gyroState, 102);
 </details>
 
 <details>
-<summary><strong>🤖 AIFace API</strong></summary>
+<summary><strong>🤖 LBEASTAI API</strong></summary>
+
+<div style="margin-left: 20px;">
+
+**Module:** `LBEAST.LBEASTAI`
+
+Low-level AI API for all generative AI capabilities in LBEAST. This module provides LLM providers, ASR providers, TTS providers, Audio2Face integration, container management, and HTTP/gRPC clients for AI service communication.
+
+**Important:** This is a **decoupled, reusable API** that can be used by any experience template. The `AIFacemaskExperience` uses this API, but you can build other experiences that leverage the same AI capabilities.
+
+**LLM Provider Example:**
+```csharp
+using LBEAST.LBEASTAI;
+
+var llmManager = gameObject.AddComponent<LLMProviderManager>();
+llmManager.InitializeProvider("http://localhost:8000", LLMProviderType.OpenAICompatible, "llama-3.2-3b-instruct");
+
+var request = new LLMRequest
+{
+    playerInput = "Hello!",
+    systemPrompt = "You are a helpful assistant.",
+    modelName = "llama-3.2-3b-instruct",
+    temperature = 0.7f,
+    maxTokens = 150
+};
+
+llmManager.RequestResponse(request, (response) =>
+{
+    Debug.Log($"Response: {response.responseText}");
+});
+```
+
+**ASR Provider Example:**
+```csharp
+using LBEAST.LBEASTAI;
+
+var asrManager = gameObject.AddComponent<AIASRManager>();
+asrManager.InitializeASRManager();
+
+// ASR Manager implements IVOIPAudioVisitor
+// Register with VOIPManager to receive audio automatically
+voipManager.RegisterAudioVisitor(asrManager);
+```
+
+**Container Management Example:**
+```csharp
+using LBEAST.LBEASTAI;
+
+var containerManager = gameObject.AddComponent<ContainerManagerDockerCLI>();
+var config = new ContainerConfig
+{
+    imageName = "nvcr.io/nim/llama-3.2-3b-instruct:latest",
+    containerName = "lbeast-llm-llama",
+    hostPort = 8000,
+    containerPort = 8000,
+    requireGPU = true
+};
+
+containerManager.StartContainer(config);
+```
+
+**Supported Providers:**
+- **LLM**: Ollama, OpenAI-compatible (NVIDIA NIM, vLLM, OpenAI API, Claude API)
+- **ASR**: NVIDIA Riva, Parakeet, Canary, Whisper (via NIM)
+- **TTS**: NVIDIA Riva (via gRPC)
+- **Container Management**: Docker CLI wrapper for managing AI service containers
+
+**Hot-Swapping:** All providers support hot-swapping at runtime by changing endpoint URLs - perfect for NVIDIA NIM containerized models.
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>🎭 AI Face Controller (AIFacemask Module)</strong></summary>
 
 <div style="margin-left: 20px;">
 
@@ -1533,6 +1761,8 @@ faceController.InitializeAIFace(config);
 // NVIDIA ACE will automatically stream facial animation data
 // Component receives and applies it via ReceiveFacialAnimationData()
 ```
+
+**Note:** This component is part of the `AIFacemask` module, which is used by `AIFacemaskExperience`. The `LBEASTAI` API provides the underlying AI services (LLM, ASR, TTS) that generate the content for facial animation.
 
 </div>
 
@@ -1894,9 +2124,10 @@ protected override bool InitializeExperienceImpl()
 **Real-World Example:**
 
 `AIFacemaskExperience` uses this pattern for speech recognition:
-- `AIFacemaskASRManager` implements `IVOIPAudioVisitor`
+- `AIFacemaskASRManager` (extends `LBEASTAI.AIASRManager`) implements `IVOIPAudioVisitor`
 - Receives player audio → Converts to text → Triggers AI improv responses
 - All AIFacemask code stays in the AIFacemask module, VOIP module remains decoupled
+- `LBEASTAI` API provides the underlying ASR provider system (hot-swappable backends)
 
 **Features:**
 - ✅ **Mumble Protocol** - Low-latency VOIP (< 50ms on LAN)
@@ -2387,7 +2618,7 @@ public class GunshipGameController : MonoBehaviour
 ```
 LBEAST/
 ├── LBEAST.Core          # Core systems, VR/XR tracking abstraction, networking
-├── LBEAST.AIFacemask    # AI facial animation API
+├── LBEAST.LBEASTAI      # Low-level AI API (LLM, ASR, TTS, container management)
 ├── LBEAST.LargeHaptics  # Hydraulic platform & gyroscope control API
 ├── LBEAST.EmbeddedSystems # Microcontroller integration API
 ├── LBEAST.ProAudio      # Professional audio console control via OSC
@@ -2400,7 +2631,9 @@ LBEAST/
     ├── GunshipExperience
     ├── CarSimExperience
     ├── FlightSimExperience
-    └── EscapeRoomExperience
+    ├── EscapeRoomExperience
+    ├── GoKartExperience
+    └── SuperheroFlightExperience
 ```
 
 </div>
@@ -3093,23 +3326,57 @@ For any experience running one year or longer, LBEAST's author recommends consid
 
 </details>
 
-### ✅ Current (v0.1.2) Pre-Alpha
-
 <details>
-<summary><strong>v0.1.2 (In-Progress)</strong></summary>
+<summary><strong>v0.1.2 (Complete)</strong></summary>
 
 <div style="margin-left: 20px;">
 
-### 🎯 Planned (v0.1.2 - In-Progress)
-- [ ] **Finishing AIFacemask functionality** - Complete all NOOP implementations for NVIDIA ACE service integration:
+### ✅ Completed (v0.1.2)
+- ✅ **VR Player Transport (Server ↔ VR Clients)** - Bidirectional communication between game server and VR players for replicating OpenXR HMD and hand tracking data across LAN multiplayer experiences. Integrates with Unity NetCode for GameObjects for state synchronization. Enables gesture recognition for remote players in 6DOF multiplayer experiences.
+- ✅ **Guns Subsystem (Per-Station Solenoid Kicker)** - Per-station embedded controllers with dual thumb buttons, 24V solenoid kicker for haptic recoil, SteamVR Ultimate tracker on gun nose. Station ECUs sync over UDP to primary Gunship ECU, which relays aggregated per-station state to game engine. Engine-side APIs include real-time tracker node per gun transform, event/delegate surface for fire presses, fire rate gating, safety lockouts, and per-station ID mapping.
+- ✅ **Virtual Scissor Lift Platform Representation** - SteamVR Ultimate tracker on platform chassis with engine-side transform fusion (commanded pose vs tracker pose). Performance optimization module with responsiveness measurement and rolling KPIs. Unity GameObject locator for easy attachment of chopper/gunship/spaceship meshes. Grounded/In-Flight state management with safety interlocks.
+- ✅ **LBEASTAI Module Architecture** - Complete low-level AI API module with decoupled architecture. Includes LLM providers (Ollama, OpenAI-compatible), ASR providers (NVIDIA Riva, Parakeet, Canary, Whisper), container management, HTTP/gRPC clients, and base manager classes (AIScriptManager, AIImprovManager, AIASRManager). Fully extensible provider system with hot-swapping support. AIFacemaskExperience refactored to use LBEASTAI base classes.
+- ✅ **Finishing AIFacemask functionality** - Complete all NOOP implementations for NVIDIA ACE service integration:
   - **AIFaceController**: Receive facial animation data from NVIDIA ACE endpoint (HTTP/WebSocket client), apply blend shape weights to SkinnedMeshRenderer morph targets, apply facial texture to mesh material
-  - **ACE Script Manager**: Request script playback from NVIDIA ACE server (HTTP POST), request script pre-baking (TTS → Audio, Audio → Facial data), async pre-baking support (background processing)
-  - **ACE ASR Manager**: Request ASR transcription from local ASR service (gRPC/HTTP to NVIDIA Riva ASR), trigger improv after transcription (wire to ACEImprovManager)
-  - **ACE Improv Manager**: Request LLM response from local LLM (HTTP to Ollama/vLLM/NVIDIA NIM), request TTS conversion from local TTS (gRPC to NVIDIA Riva TTS), request Audio2Face conversion from local Audio2Face (HTTP/gRPC to NVIDIA NIM), auto-trigger Audio2Face after TTS completes (callback chain), monitor async response generation status (track LLM/TTS/Audio2Face operations)
+  - **AIFacemaskScriptManager** (uses LBEASTAI `AIScriptManager`): Request script playback from NVIDIA ACE server (HTTP POST), request script pre-baking (TTS → Audio, Audio → Facial data), async pre-baking support (background processing)
+  - **AIFacemaskASRManager** (uses LBEASTAI `AIASRManager`): Request ASR transcription from local ASR service (gRPC/HTTP to NVIDIA Riva/Parakeet/Canary), trigger improv after transcription (wire to AIFacemaskImprovManager)
+  - **AIFacemaskImprovManager** (uses LBEASTAI `AIImprovManager`): Request LLM response from local LLM (HTTP to Ollama/vLLM/NVIDIA NIM via LBEASTAI), request TTS conversion from local TTS (gRPC to NVIDIA Riva TTS), request Audio2Face conversion from local Audio2Face (HTTP/gRPC to NVIDIA NIM), auto-trigger Audio2Face after TTS completes (callback chain), monitor async response generation status (track LLM/TTS/Audio2Face operations)
   - **AIFacemaskExperience**: Configure NVIDIA ACE endpoint URL (load from project settings/config), register ASR Manager as visitor with VOIPManager (wire visitor pattern), configure NVIDIA ACE server base URL (load from project settings/config)
   - **VOIPManager**: Decode Opus to PCM for visitors (decode Mumble Opus before passing to visitors), integrate with player replication system (get remote player positions)
   - **Server Beacon**: Get server port from project settings (load port configuration), track actual player count (query Unity networking)
   - **Optimization**: Optimize blend shape application (batch updates, interpolation, caching), texture streaming optimization (efficient texture updates, compression)
+  - **Live Actor HUD Overlay**: Create stereo VR HUD overlay for live actors showing upcoming AI dialogue line, forward/backward arrow buttons with visual feedback on wrist button presses, and current narrative state (name + index). Uses Unity UI Canvas attached to live actor's camera for stereo rendering. Procedurally generated in C# (AIFacemaskLiveActorHUD widget class + AIFacemaskLiveActorHUDComponent MonoBehaviour component). Client-only, visible only to live actor HMD clients.
+
+</div>
+
+</details>
+
+### ✅ Current (v0.1.3) Pre-Alpha
+
+<details>
+<summary><strong>v0.1.3 (In-Progress)</strong></summary>
+
+<div style="margin-left: 20px;">
+
+### 🎯 Planned (v0.1.3 - In-Progress)
+
+#### Gunship Experience — Alpha Readiness
+
+> **📋 Hardware Specifications:** See **[FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md](Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md)** for complete hardware specifications including solenoid selection, PWM driver modules, thermal management, redundancy, and communication architecture.
+
+- [ ] **ESP32 Shield Design (Hardware)**
+  - **Example Shield Designs**: Design example shields/breakout boards for ESP32 plus needed modules for both ECU types:
+    - **GunshipExperience_ECU**: ESP32 + Ethernet PHY (LAN8720A) + actuator control interfaces + scissor lift control interfaces
+    - **Gun_ECU**: ESP32 + Ethernet PHY (LAN8720A) + dual thumb button inputs + N× solenoid PWM driver interfaces + NTC thermistor ADC inputs
+  - **Source Files**: Include PCB design source files in KiCAD format (`.kicad_pcb`, `.kicad_sch`) for maximum extensibility
+    - **Note**: EasyEDA projects can be exported to KiCAD format for cross-tool compatibility
+    - **Alternative**: Include source files in EasyEDA format if preferred, but provide KiCAD export
+  - **Manufacturing Files**: Include GERBER files (industry standard) for direct PCB manufacturing
+    - GERBER files are tool-agnostic and can be used with any PCB manufacturer (JLCPCB, PCBWay, OSH Park, etc.)
+    - Include drill files, pick-and-place files, and assembly drawings
+  - **Documentation**: Include schematics (PDF), PCB layouts (PDF), BOM (CSV/Excel), and assembly instructions
+  - **Purpose**: Provide reference designs for developers building custom hardware or adapting existing ESP32 boards
+  - **File Structure**: Organize in `Hardware/Shields/` directory with subdirectories for each shield type
 
 </div>
 
@@ -3131,58 +3398,6 @@ For any experience running one year or longer, LBEAST's author recommends consid
   - **Router API Connectivity**: Support for enterprise router APIs (Ubiquiti UniFi, Cisco, pfSense, MikroTik RouterOS, etc.) to programmatically query and manage DHCP reservations. Automatic device discovery by querying router for all LBEAST device reservations.
   - **Network-Wide IP Refresh**: Queue network-wide IP address rotation via router API - updates all DHCP reservations simultaneously, then triggers network-wide NAT punchthrough to re-establish all connections. Optional module for advanced users with professional routers. Consumer router users must manually update IPs in router admin panel and console (see Network Configuration documentation).
   - **Scheduled Rotation**: Configure IP rotation schedules (morning/evening, before/after hours) that trigger router API bulk updates. Prevents IP changes during work hours or mid-session. Router DHCP lease times and reservation rules handle timing enforcement.
-
-#### Gunship Experience — Alpha Readiness
-
-> **📋 Hardware Specifications:** See **[FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md](Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md)** for complete hardware specifications including solenoid selection, PWM driver modules, thermal management, redundancy, and communication architecture.
-
-- [ ] **Guns Subsystem (Per-Station Solenoid Kicker)**
-  - **Hardware**: One embedded controller per play station (4 total), each with:
-    - Dual thumb buttons (fire mode controls)
-    - 24V solenoid kicker (haptic recoil) — see [Gunship_Hardware_Specs.md](Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md) for detailed specifications
-    - One SteamVR Ultimate tracker on the gun nose
-  - **Networking**:
-    - Station ECUs sync over UDP to the primary Gunship ECU (mounted on scissor lift) — see [Gunship_Hardware_Specs.md](Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md) for communication architecture
-    - Primary ECU relays aggregated per-station state to game engine:
-      - Button states (debounced, rate-limited)
-      - Gun orientation vectors (from trackers)
-      - Optional kicker telemetry (duty, temp, faults)
-  - **Engine-Side APIs**:
-    - Real-time tracker node per gun transform (C# component + Unity Inspector access)
-    - Event/delegate surface for fire presses, fire rate gating, and safety lockouts
-    - Sample rendering helpers for minigun/grenade/alt-fire archetypes
-    - Per-station ID mapping and replication-safe routing
-
-- [ ] **Virtual Scissor Lift Platform Representation**
-  - **Tracking**:
-    - At least one SteamVR Ultimate tracker on the platform chassis
-    - Engine-side transform fusion: commanded pose vs tracker pose
-  - **Performance Optimization Module**:
-    - Measure responsiveness to tilt/translation commands (latency, overshoot, settling)
-    - Rolling KPIs exposed to Command Console/UI Toolkit (basic performance dashboard)
-  - **Unity GameObject Locator**:
-    - Simple GameObject representing the moving platform root
-    - Easy attachment point for chopper/gunship/spaceship meshes
-    - Auto-follows fused platform transform (commanded ⊕ tracker correction)
-  - **Grounded/In-Flight State**:
-    - Digital state surfaced from ECU and engine logic:
-      - Grounded: calibration zeroed; tilt/move commands ignored
-      - In-Flight: motion enabled within safety limits
-    - Visual state and API for mode transitions, with safety interlocks
-
-- [ ] **ESP32 Shield Design (Hardware)**
-  - **Example Shield Designs**: Design example shields/breakout boards for ESP32 plus needed modules for both ECU types:
-    - **GunshipExperience_ECU**: ESP32 + Ethernet PHY (LAN8720A) + actuator control interfaces + scissor lift control interfaces
-    - **Gun_ECU**: ESP32 + Ethernet PHY (LAN8720A) + dual thumb button inputs + N× solenoid PWM driver interfaces + NTC thermistor ADC inputs
-  - **Source Files**: Include PCB design source files in KiCAD format (`.kicad_pcb`, `.kicad_sch`) for maximum extensibility
-    - **Note**: EasyEDA projects can be exported to KiCAD format for cross-tool compatibility
-    - **Alternative**: Include source files in EasyEDA format if preferred, but provide KiCAD export
-  - **Manufacturing Files**: Include GERBER files (industry standard) for direct PCB manufacturing
-    - GERBER files are tool-agnostic and can be used with any PCB manufacturer (JLCPCB, PCBWay, OSH Park, etc.)
-    - Include drill files, pick-and-place files, and assembly drawings
-  - **Documentation**: Include schematics (PDF), PCB layouts (PDF), BOM (CSV/Excel), and assembly instructions
-  - **Purpose**: Provide reference designs for developers building custom hardware or adapting existing ESP32 boards
-  - **File Structure**: Organize in `Hardware/Shields/` directory with subdirectories for each shield type
 
 </div>
 
