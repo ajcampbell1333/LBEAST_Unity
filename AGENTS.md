@@ -12,6 +12,40 @@
 
 Use this tree for context: Root → Runtime Modules → Templates/Hardware. Prioritize OpenXR for VR tasks; use NetCode for multiplayer sims. For cross-engine parity, reference sibling Unreal repo (github.com/ajcampbell1333/LBEAST_Unreal) via shared API mappings in /src/common (if added).
 
+## Table of Contents
+
+### The Main Project README
+- [Prerequisites & Package Dependencies](#-prerequisites--package-dependencies)
+- [Three-Tier Architecture](#-three-tier-architecture)
+- [Hardware-Agnostic Input System](#-hardware-agnostic-input-system)
+- [Features](#-features)
+- [Experience Genre Templates](#experience-genre-templates-pre-configured-solutions)
+- [Low-Level APIs](#low-level-apis-technical-modules)
+- [Installation](#-installation)
+- [Examples](#-examples)
+- [Dedicated Server & Server Manager](#-dedicated-server--server-manager)
+- [Roadmap](#-roadmap)
+- [License](#-license)
+
+### Other READMEs in This Project
+
+**Low-Level APIs:**
+- VRPlayerTransport README - `Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md`
+- Input README - `Packages/com.ajcampbell.lbeast/Runtime/Core/Input/README.md`
+- VOIP README - `Packages/com.ajcampbell.lbeast/Runtime/VOIP/README.md`
+- EmbeddedSystems README - `Packages/com.ajcampbell.lbeast/Runtime/EmbeddedSystems/README.md`
+
+**Experience Genre Templates:**
+- AIFacemask Experience README - `Packages/com.ajcampbell.lbeast/Runtime/ExperienceTemplates/AIFacemaskExperience/README.md`
+
+**Firmware Examples:**
+- FirmwareExamples README - `Packages/com.ajcampbell.lbeast/FirmwareExamples/README.md`
+- GunshipExperience README - `Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/README.md`
+- FlightSimExperience README - `Packages/com.ajcampbell.lbeast/FirmwareExamples/FlightSimExperience/README.md`
+- EscapeRoom README - `Packages/com.ajcampbell.lbeast/FirmwareExamples/EscapeRoom/README.md`
+- Base Examples README - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md`
+- Base Templates README - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md`
+
 ## Dependencies
 ```json
 {
@@ -44,10 +78,11 @@ Use this tree for context: Root → Runtime Modules → Templates/Hardware. Prio
     "notes": "SteamVR for 6DOF; Quest via OpenXR. No npm/pip—Unity-native."
   }
 }
+```
 
-Claude Unity Rules
+## Code Style Guidelines
 
-=== CODE STYLE ===
+### Code Style
 
 * Eliminate curly braces wherever possible.
 * Eliminate extra newline spaces wherever possible.
@@ -63,24 +98,24 @@ Claude Unity Rules
 * Ask my permission before using reflection for anything.
 * If/else formatting: inline each branch if its condition+statement < 100 chars, but put else on its own line; never place both branches on the same line; one semicolon per line.
 
-=== INTERFACE NAMING CONVENTIONS ===
+### Interface Naming Conventions
 
 * Prefer verb-style interface names (e.g., `IBridgeEvents`, `IDMXTransport`) over adjective-style names (e.g., `IEventBridgeable`, `IDMXTransportable`).
 * Verb-style names describe what the interface does, which is more idiomatic in C# and C++.
 * This keeps interface names concise and action-oriented, consistent with common .NET and C++ patterns.
 
-=== AUTOMATED COMPILATION WORKFLOW ===
+## Automated Compilation Workflow
 
 Claude has a custom automated compilation system for Unity projects to enable AI-assisted error detection and debugging without requiring the Unity Editor to be open. This system mirrors the Unreal Engine's command-line build capabilities.
 
-** Architecture Overview **
+### Architecture Overview
 
 The system consists of three components:
 1. CompilationReporter.cs - Editor script that monitors compilation events
 2. CompilationReporterCLI.cs - Command-line interface for batch mode execution
 3. CompileProject_Silent.bat (Windows) / CompileProject.sh (Linux) - Batch scripts that orchestrate the workflow
 
-** How It Works **
+### How It Works
 
 1. Batch script launches Unity in batch mode with -executeMethod flag
 2. Unity loads the project and begins compilation
@@ -90,7 +125,7 @@ The system consists of three components:
 6. Batch script terminates Unity process
 7. Batch script returns exit code 0 (success) or 1 (failure)
 
-** Key Design Decisions **
+### Key Design Decisions
 
 - DO NOT use Unity's -quit flag - it exits before the report can be written
 - Instead, launch Unity with 'start /B' and manually kill it after report generation
@@ -99,7 +134,7 @@ The system consists of three components:
 - Include Report ID (GUID) for tracking across multiple runs
 - Support both event-driven compilation monitoring and CLI-triggered reports
 
-** Usage for Claude **
+### Usage for Claude
 
 When you need to check Unity compilation without user intervention:
 1. Run: .\CompileProject_Silent.bat (Windows) or ./CompileProject.sh (Linux)
@@ -107,17 +142,17 @@ When you need to check Unity compilation without user intervention:
 3. Read: Temp/CompilationErrors.log for structured error report
 4. Parse errors in format: [Type] file(line,column): message
 
-** File Locations **
+### File Locations
 
-Editor Scripts (must be in Assets/[ProjectName]/Editor/ or similar):
+**Editor Scripts** (must be in Assets/[ProjectName]/Editor/ or similar):
 - CompilationReporter.cs - Auto-loads via [InitializeOnLoad]
 - CompilationReporterCLI.cs - Provides static CompileAndExit() method
 
-Batch Scripts (must be at Unity project root):
+**Batch Scripts** (must be at Unity project root):
 - CompileProject_Silent.bat (Windows)
 - CompileProject.sh (Linux)
 
-** Critical Implementation Notes **
+### Critical Implementation Notes
 
 1. CompilationReporter MUST use [InitializeOnLoad] attribute
 2. CompilationReporterCLI.CompileAndExit() MUST NOT call EditorApplication.Exit()
@@ -126,7 +161,7 @@ Batch Scripts (must be at Unity project root):
 5. Include timeout mechanism (default: 120 seconds) to prevent infinite hangs
 6. taskkill /IM Unity.exe /F to forcefully terminate Unity on Windows
 
-** Race Condition Prevention **
+### Race Condition Prevention
 
 The original implementation had a race condition where Unity would exit before writing the report. Solution:
 - Remove -quit flag from Unity command line
@@ -135,7 +170,7 @@ The original implementation had a race condition where Unity would exit before w
 - Batch script adds 2-second grace period after detection
 - Batch script explicitly kills Unity process
 
-** Report Format **
+### Report Format
 
 The report is structured for AI parsing:
 ```
@@ -153,7 +188,7 @@ Status: SUCCESS | FAILED
 ===========================================
 ```
 
-** White-Label Template **
+### White-Label Template
 
 A generic white-label version of this system is available in the Claude_Unity_AutoCompilation directory at the repository root. Copy these files into any Unity project:
 1. Copy Editor scripts to Assets/[YourProject]/Editor/
@@ -164,7 +199,7 @@ A generic white-label version of this system is available in the Claude_Unity_Au
 
 **No namespace customization needed** - Scripts use global namespace for simplicity.
 
-** Integration with AI Workflow **
+### Integration with AI Workflow
 
 This system enables Claude to:
 - Compile Unity projects without user intervention
@@ -175,4 +210,6 @@ This system enables Claude to:
 
 See Claude_Unity_AutoCompilation/README.md for detailed setup instructions.
 
-When generating new code, maintain awareness of all instances of NOOP  parts of the implementation that are intended to be implemented later. Mark them clearly with NOOP comments and list all such instances in summaries of your work in chat when you're done.
+## NOOP Marking
+
+When generating new code, maintain awareness of all instances of NOOP parts of the implementation that are intended to be implemented later. Mark them clearly with NOOP comments and list all such instances in summaries of your work in chat when you're done.
