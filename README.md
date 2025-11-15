@@ -20,7 +20,9 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 
 > **🔗 Unreal Version:** Also available at [github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
 
-## Overview
+---
+
+## 📖 Overview
 
 LBEAST is a comprehensive SDK for developing VR and AR Location-Based Entertainment (LBE) experiences. This repository contains the **Unity 6 LTS** implementation of the LBEAST SDK.
 
@@ -47,7 +49,9 @@ LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through 
 
 </details><br>
 
-## Philosophy
+---
+
+## 💭 Philosophy
 
 <details>
 <summary><strong>Why LBEAST?</strong></summary>
@@ -2606,14 +2610,14 @@ public class GunshipGameController : MonoBehaviour
 
 ---
 
-## Architecture
+## 🏛️ Architecture
 
 <details>
 <summary><strong>Module Structure</strong></summary>
 
 <div style="margin-left: 20px;">
 
-## Module Structure
+## 📦 Module Structure
 
 ```
 LBEAST/
@@ -2645,7 +2649,7 @@ LBEAST/
 
 <div style="margin-left: 20px;">
 
-## Networking
+## 🌐 Networking
 
 LBEAST v0.1.0 focuses on **local LAN multiplayer** using Unity NetCode for GameObjects:
 
@@ -2662,7 +2666,7 @@ LBEAST v0.1.0 focuses on **local LAN multiplayer** using Unity NetCode for GameO
 
 <div style="margin-left: 20px;">
 
-## Hardware Integration
+## ⚙️ Hardware Integration
 
 All hardware communication is **abstracted** through interfaces:
 
@@ -2687,7 +2691,7 @@ This allows you to:
 
 <div style="margin-left: 20px;">
 
-## Use Cases
+## 💡 Use Cases
 
 LBEAST is designed for **commercial LBE installations** including:
 
@@ -2707,7 +2711,7 @@ LBEAST is designed for **commercial LBE installations** including:
 
 <div style="margin-left: 20px;">
 
-## Dedicated Server & Server Manager
+## 🖥️ Dedicated Server & Server Manager
 
 > **Terminology Note:** 
 > - **"Command Console"** (operations terminology) = The UI Panel (admin interface) used by Operations Technicians to monitor and control the experience
@@ -2904,7 +2908,7 @@ The Command Protocol (UDP port 7779) **can work over the internet** with proper 
 
 ---
 
-## Network Configuration
+## ⚙️ Network Configuration
 
 LBEAST requires reliable network communication between game engine servers, ECUs (embedded control units), VR clients, and console interfaces. This section details network setup options and recommended configurations.
 
@@ -3176,7 +3180,7 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 
 ---
 
-## Embedded System Philosophy:
+## 🤖 Embedded System Philosophy:
 
 <details>
 <summary><strong>Microcontrollers vs. PLCs</strong></summary>
@@ -3440,15 +3444,27 @@ For any experience running one year or longer, LBEAST's author recommends consid
 
 ---
 
+## 💬 Support
+
+- **Issues:** [github.com/ajcampbell1333/lbeast_unity/issues](https://github.com/ajcampbell1333/lbeast_unity/issues)
+- **Discussions:** [github.com/ajcampbell1333/lbeast_unity/discussions](https://github.com/ajcampbell1333/lbeast_unity/discussions)
+- **Unreal Version:** [github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
+
+The LBEAST Author may be available for dev contracts and consultations: [https://ajcampbell.info](https://ajcampbell.info)
+
+---
+
 ## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](../LICENSE) file for details.
 
 **TL;DR:** Free to use, modify, and distribute for personal or commercial projects. Attribution appreciated but not required.
 
-## Contributing
+---
 
-LBEAST is open-source under the MIT License. Contributions are welcome!
+## 🤝 Contributing
+
+LBEAST is open-source under the MIT License. Got ideas for how to make LBEAST better? Contributions are welcome!
 
 <details>
 <summary><strong>Development Workflow</strong></summary>
@@ -3457,11 +3473,13 @@ LBEAST is open-source under the MIT License. Contributions are welcome!
 
 ### Development Workflow
 
-1. Fork this repository
+1. Fork this repository and clone it (
+   `git clone https://github.com/your-username/lbeast_unity.git`)
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+3. Add your changes (`git add .`)
+4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+5. Push to the branch (`git push origin feature/AmazingFeature`)
+6. Open a Pull Request
 
 </div>
 
@@ -3483,7 +3501,9 @@ LBEAST is open-source under the MIT License. Contributions are welcome!
 
 </details>
 
-## Credits
+---
+
+## 👤 Credits
 
 Created by **AJ Campbell**.
 
