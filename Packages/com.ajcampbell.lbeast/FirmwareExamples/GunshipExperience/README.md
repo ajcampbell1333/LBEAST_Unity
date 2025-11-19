@@ -2,9 +2,9 @@
 
 **Embedded firmware examples for GunshipExperience motion platform control.**
 
-These examples demonstrate how to control a complete 5DOF motion platform system consisting of:
+These examples demonstrate how to control a complete 4DOF motion platform system consisting of:
 - **Scissor Lift:** Electric lift for vertical translation (TranslationZ) and forward/reverse (TranslationY)
-- **Actuator System:** 4-gang hydraulic actuators for pitch and roll only (2 DOF)
+- **Actuator System:** 4-gang hydraulic actuators for pitch and roll only (yaw restricted)
 
 ---
 
@@ -19,19 +19,74 @@ Located in `../Base/Examples/`:
 | **`ScissorLift_Controller.ino`** | Standalone scissor lift control | Use when you only need vertical translation |
 | **`ActuatorSystem_Controller.ino`** | Standalone 4-actuator system control | Use when you only need pitch/roll/lateral (no vertical) |
 
-### **Combined ECU**
+### **Parent ECU**
 
 Located in `GunshipExperience/`:
 
 | File | Description | Use Case |
 |------|-------------|----------|
-| **`GunshipExperience_ECU.ino`** | Combined ECU for complete 5DOF control | Use for GunshipExperience (combines both modules) |
+| **`GunshipExperience_ECU.ino`** | Parent ECU for complete 4DOF control (uses Universal Shield) | Use for GunshipExperience (combines both modules, interfaces with child ECUs) |
+
+### **Child ECUs (Per-Station Controllers)**
+
+**Note:** Child ECU firmware example (`Gun_ECU.ino`) is available. See **Hardware Specification** below for solenoid/driver details.
+
+**Architecture:**
+- **4× Child ECUs** (one per player station, `Gun_ECU.ino`) connect to the parent ECU (`GunshipExperience_ECU.ino`) in a star topology
+- Each child ECU handles:
+  - Dual thumb button input (debounced, rate-limited)
+  - N× solenoid kicker control (with optional redundancy and thermal management)
+  - SteamVR Ultimate tracker pose reading (or relay from parent ECU)
+  - Telemetry reporting to parent ECU (10–30 Hz)
+- **Connection:** Wired Ethernet (recommended, < 1 ms latency) or WiFi to parent ECU
+- **Protocol:** LBEAST UDP binary protocol (same as engine communication)
+
+**Parent ECU (GunshipExperience_ECU):**
+- Uses the Universal Shield (primary ECU for the experience)
+- Aggregates data from all 4× child ECUs
+- Controls scissor lift platform directly (pitch/roll/Y/Z translation)
+- Relays fused gun/platform state to game engine via wireless UDP
+
+---
+
+## 🔩 Hardware Specification (Child ECU Haptics)
+
+**Default haptic:** Dual 24 V pull-type solenoids inside the gun chassis, driven by the child ECU for each station.  
+For the full BOM, wiring guidance, and redundancy layouts see [`Gunship_Hardware_Specs.md`](Gunship_Hardware_Specs.md).
+
+### Recommended Baseline
+
+- **Solenoids:** 2× Johnson/Guardian pull-type (24 V, 20–40 N @ 5‑8 mm stroke).  
+- **Drivers:** 2× Pololu G2 High-Power Motor Driver 24v13 (one per solenoid).  
+- **Cooling:** Small aluminum heatsink + 40–50 mm fan per driver module.  
+- **Supply:** 24 VDC rail, budget 3–5 A per gun (72–120 W).  
+- **Cost:** ≈ $150–$200 per station (solenoids + drivers + cooling + ECU).
+
+### Redundancy & Thermal Logic
+
+- Install **N ≥ 1** solenoids; ECU alternates sessions using the coolest coil (< 80 °C).  
+- Each solenoid has an NTC sensor; driver modules also monitored.  
+- PWM duty throttles (100 → 50 %) if *all* coils/driver modules exceed 70 °C; hard shutdown at 85 °C.  
+- Telemetry exposes: solenoid temps array, active solenoid ID, total solenoid count, PWM throttle %, thermal shutdown flags.
+
+### Mechanical & Electrical Notes
+
+- Recoil mass is coupled to handle chassis; use elastomer pads to reduce audible ringing.  
+- Rubber-mount SteamVR trackers and add software filtering (10–20 Hz low-pass) to suppress solenoid-induced jitter.  
+- Driver stage: logic-level MOSFET or H-bridge with flyback diode; IBT‑2 modules OK for prototypes, Pololu G2 recommended for production.  
+- Harnessing: locking connectors with strain relief; star-ground at PSU return; separate logic and coil wiring as needed.
+
+### Network / ECU Architecture
+
+- Each gun is a **child ECU** (ESP32/STM32/etc.) sending telemetry (buttons, temps, fire state) to the **parent ECU**; receives play-session and E-stop commands.  
+- Parent ECU aggregates four child ECUs, drives the motion base, and relays fused state to the engine via UDP.  
+- Recommended topology: Ethernet star (parent ↔ 4 child ECUs) + Wi‑Fi link to the game server.
 
 ---
 
 ## 🎯 Quick Start
 
-### **For GunshipExperience (Complete 5DOF)**
+### **For GunshipExperience (Complete 4DOF)**
 
 1. **Open** `GunshipExperience/GunshipExperience_ECU.ino`
 2. **Configure WiFi credentials:**
@@ -41,7 +96,7 @@ Located in `GunshipExperience/`:
    ```
 3. **Adjust hardware pins** in Configuration section to match your setup
 4. **Upload to ESP32** (or your chosen microcontroller)
-5. **Connect from Unity** - the ECU will receive motion commands automatically
+5. **Connect from Unreal/Unity** - the ECU will receive motion commands automatically
 
 ### **For Standalone Use**
 
@@ -77,6 +132,160 @@ config.canBaudRate = 500000;              // Check manufacturer spec (125k, 250k
 config.canIdJoystick = 0x180;             // Manufacturer-specific CAN ID
 config.canIdControl = 0x200;              // E-stop and control commands
 config.canIdFeedback = 0x280;             // Position feedback (if available)
+```
+
+**Important:** Configure CAN IDs to match your manufacturer's ECU protocol. Refer to your lift's CAN bus documentation for correct CAN IDs and message formats.
+
+#### **Direct GPIO Mode (Custom Builds)**
+
+For custom builds or testing without manufacturer ECU:
+
+```
+ESP32 GPIO 12 ──[Relay/Motor Driver]── Lift Motor Up
+ESP32 GPIO 13 ──[Relay/Motor Driver]── Lift Motor Down
+ESP32 GPIO 14 ──[Position Sensor]── Analog Input
+ESP32 GPIO 15 ──[Top Limit Switch]── Digital Input (optional)
+ESP32 GPIO 16 ──[Bottom Limit Switch]── Digital Input (optional)
+```
+
+**Configuration:**
+```cpp
+config.useCANBus = false;
+config.motorUpPin = 12;
+config.motorDownPin = 13;
+config.positionSensorPin = 14;
+```
+
+### **Actuator System**
+
+```
+ESP32 GPIO 18 ──[Valve Driver]── Actuator 0 (Front Left) Proportional Valve
+ESP32 GPIO 19 ──[Valve Driver]── Actuator 1 (Front Right) Proportional Valve
+ESP32 GPIO 21 ──[Valve Driver]── Actuator 2 (Rear Left) Proportional Valve
+ESP32 GPIO 22 ──[Valve Driver]── Actuator 3 (Rear Right) Proportional Valve
+
+ESP32 GPIO 32 ──[4-20mA Sensor]── Actuator 0 Position (via 250Ω resistor)
+ESP32 GPIO 33 ──[4-20mA Sensor]── Actuator 1 Position (via 250Ω resistor)
+ESP32 GPIO 34 ──[4-20mA Sensor]── Actuator 2 Position (via 250Ω resistor)
+ESP32 GPIO 35 ──[4-20mA Sensor]── Actuator 3 Position (via 250Ω resistor)
+```
+
+**Note:** See `COST_ANALYSIS.md` for complete hardware bill of materials. Child ECU haptic details are summarized in the **Hardware Specification** section above.
+
+---
+
+## 📡 Protocol & Channel Mapping
+
+### **GunshipExperience_ECU Channel Mapping**
+
+Matches `FPlatformMotionCommand` from Unreal/Unity:
+
+| Channel | Type | Description | Range |
+|---------|------|-------------|-------|
+| **0** | Float | Pitch (degrees) | -10° to +10° |
+| **1** | Float | Roll (degrees) | -10° to +10° |
+| **2** | Float | TranslationY / Lateral (cm or normalized) | -20 cm to +20 cm, or -1.0 to +1.0 |
+| **3** | Float | TranslationZ / Vertical (cm or normalized) | 0 cm to 300 cm, or -1.0 to +1.0 |
+| **4** | Float | Duration (seconds) | 0.1+ seconds |
+| **5** | Bool | Emergency Stop | true = stop all systems |
+| **6** | Bool | Return to Neutral | true = return all to center |
+
+### **Standalone Modules**
+
+**ScissorLift_Controller:**
+- Channel 0: Vertical translation (float)
+- Channel 1: Emergency stop (bool)
+- Channel 2: Return to neutral (bool)
+
+**ActuatorSystem_Controller:**
+- Channel 0: Pitch (float, degrees)
+- Channel 1: Roll (float, degrees)
+- Channel 2: Lateral translation (float, cm or normalized)
+- Channel 3: Emergency stop (bool)
+- Channel 4: Return to neutral (bool)
+
+---
+
+## 💻 Usage in Unreal/Unity
+
+### **Unreal Engine**
+
+```cpp
+// In GunshipExperience
+AGunshipExperience* Gunship = GetWorld()->SpawnActor<AGunshipExperience>();
+
+// Send normalized motion (RECOMMENDED)
+Gunship->SendGunshipTilt(0.5f, 0.8f, 0.2f, 0.1f, 1.5f);  // TiltX (roll), TiltY (pitch), ForwardOffset, VerticalOffset, Duration
+
+// Advanced: Use absolute angles
+Gunship->SendGunshipMotion(8.0f, 5.0f, 10.0f, 15.0f, 1.5f);  // pitch, roll, forwardOffset (cm), verticalOffset (cm), duration
+
+// Emergency stop
+Gunship->EmergencyStop();
+
+// Return to neutral
+Gunship->ReturnToNeutral(2.0f);
+```
+
+### **Unity**
+
+```csharp
+// In GunshipExperience
+GunshipExperience gunship = FindObjectOfType<GunshipExperience>();
+
+// Send normalized motion (RECOMMENDED)
+gunship.SendGunshipTilt(0.5f, 0.8f, 0.2f, 0.1f, 1.5f);  // TiltX (roll), TiltY (pitch), ForwardOffset, VerticalOffset, Duration
+
+// Advanced: Use absolute angles
+gunship.SendGunshipMotion(8.0f, 5.0f, 10.0f, 15.0f, 1.5f);  // pitch, roll, forwardOffset (cm), verticalOffset (cm), duration
+
+// Emergency stop
+gunship.EmergencyStop();
+
+// Return to neutral
+gunship.ReturnToNeutral(2.0f);
+```
+
+---
+
+## 🔧 Configuration
+
+### **Motion Parameters**
+
+Adjust these in the Configuration section of each example:
+
+```cpp
+// Scissor Lift
+config.maxHeightCm = 300.0f;                // Adjust to your lift
+config.minHeightCm = 0.0f;
+config.softwareUpperLimitCm = 90.0f;        // Software-defined upper limit
+config.maxForwardReverseCm = 90.0f;          // Max forward/reverse travel (safety limit)
+config.enableForwardReverse = true;         // Set false if bolted to floor
+
+// Actuator System
+config.maxPitchDeg = 10.0f;                 // Maximum pitch angle
+config.maxRollDeg = 10.0f;                  // Maximum roll angle
+config.actuatorStrokeCm = 7.62f;            // Actuator stroke (3 inches)
+config.platformWidthCm = 150.0f;            // Platform dimensions
+config.platformLengthCm = 200.0f;
+```
+
+### **CAN Bus Configuration (Scissor Lift)**
+
+For CAN bus mode, configure manufacturer-specific settings:
+
+```cpp
+// CAN Bus Settings
+config.useCANBus = true;
+config.canBaudRate = 500000;                 // 125000, 250000, or 500000 (check manufacturer spec)
+config.canIdJoystick = 0x180;               // Joystick command CAN ID (manufacturer-specific)
+config.canIdControl = 0x200;                // Control commands (E-stop, etc.)
+config.canIdFeedback = 0x280;              // Position feedback CAN ID (if available)
+config.canCSPin = 10;                       // MCP2515 CS pin (only for MCP2515)
+config.useCANFeedback = false;              // Set true if ECU provides position via CAN
+
+// Position Sensor (used if useCANFeedback = false)
+config.positionSensorPin = 14;               // GPIO analog input (use -1 if using CAN feedback)
 ```
 
 **Finding Your CAN IDs:**
@@ -153,145 +362,6 @@ Here are practical approaches:
 
 **Note:** Default values (0x180, 0x200, 0x280) in the example code are **placeholders only** - you must replace them with your actual manufacturer's CAN IDs. The message format may also need adjustment based on your ECU's protocol. You will likely need to reverse-engineer the protocol yourself using CAN bus analysis tools.
 
-#### **Direct GPIO Mode (Custom Builds)**
-
-For custom builds or testing without manufacturer ECU:
-
-```
-ESP32 GPIO 12 ──[Relay/Motor Driver]── Lift Motor Up
-ESP32 GPIO 13 ──[Relay/Motor Driver]── Lift Motor Down
-ESP32 GPIO 14 ──[Position Sensor]── Analog Input
-ESP32 GPIO 15 ──[Top Limit Switch]── Digital Input (optional)
-ESP32 GPIO 16 ──[Bottom Limit Switch]── Digital Input (optional)
-```
-
-**Configuration:**
-```cpp
-config.useCANBus = false;
-config.motorUpPin = 12;
-config.motorDownPin = 13;
-config.positionSensorPin = 14;
-```
-
-### **Actuator System**
-
-```
-ESP32 GPIO 18 ──[Valve Driver]── Actuator 0 (Front Left) Proportional Valve
-ESP32 GPIO 19 ──[Valve Driver]── Actuator 1 (Front Right) Proportional Valve
-ESP32 GPIO 21 ──[Valve Driver]── Actuator 2 (Rear Left) Proportional Valve
-ESP32 GPIO 22 ──[Valve Driver]── Actuator 3 (Rear Right) Proportional Valve
-
-ESP32 GPIO 32 ──[4-20mA Sensor]── Actuator 0 Position (via 250Ω resistor)
-ESP32 GPIO 33 ──[4-20mA Sensor]── Actuator 1 Position (via 250Ω resistor)
-ESP32 GPIO 34 ──[4-20mA Sensor]── Actuator 2 Position (via 250Ω resistor)
-ESP32 GPIO 35 ──[4-20mA Sensor]── Actuator 3 Position (via 250Ω resistor)
-```
-
-**Note:** See `COST_ANALYSIS.md` for complete hardware bill of materials.
-
----
-
-## 📡 Protocol & Channel Mapping
-
-### **GunshipExperience_ECU Channel Mapping**
-
-Matches `FPlatformMotionCommand` from Unity:
-
-| Channel | Type | Description | Range |
-|---------|------|-------------|-------|
-| **0** | Float | Pitch (degrees) | -10° to +10° |
-| **1** | Float | Roll (degrees) | -10° to +10° |
-| **2** | Float | TranslationY / Forward-Reverse (cm or normalized) | -90 cm to +90 cm, or -1.0 to +1.0 |
-| **3** | Float | TranslationZ / Vertical (cm or normalized) | 0 cm to 90 cm, or -1.0 to +1.0 |
-| **4** | Float | Duration (seconds) | 0.1+ seconds |
-| **5** | Bool | Calibration mode | true = enter calibration mode |
-| **6** | Bool | Operation mode | true = auto-calibrate, false = fixed |
-| **7** | Bool | Emergency Stop | true = stop all systems |
-| **8** | Bool | Return to Neutral | true = return all to calibrated zero |
-
-### **Standalone Modules**
-
-**ScissorLift_Controller:**
-- Channel 0: Vertical translation (float)
-- Channel 1: Forward/reverse translation (float)
-- Channel 2: Calibration mode (bool)
-- Channel 3: Operation mode (bool)
-- Channel 4: Emergency stop (bool)
-- Channel 5: Return to neutral (bool)
-
-**ActuatorSystem_Controller:**
-- Channel 0: Pitch (float, degrees)
-- Channel 1: Roll (float, degrees)
-- Channel 2: Calibration mode (bool)
-- Channel 3: Operation mode (bool)
-- Channel 4: Emergency stop (bool)
-- Channel 5: Return to neutral (bool)
-
----
-
-## 💻 Usage in Unity
-
-```csharp
-// In GunshipExperience
-GunshipExperience gunship = FindObjectOfType<GunshipExperience>();
-
-// Send normalized motion (RECOMMENDED)
-gunship.SendGunshipTilt(0.5f, 0.8f, 0.2f, 1.5f);
-// TiltX (right), TiltY (forward), Vertical, Duration
-
-// Advanced: Use absolute angles
-gunship.SendGunshipMotion(8.0f, 5.0f, 10.0f, 15.0f, 1.5f);
-// Pitch, Roll, Lateral, Vertical, Duration
-
-// Emergency stop
-gunship.EmergencyStop();
-
-// Return to neutral
-gunship.ReturnToNeutral(2.0f);
-```
-
----
-
-## 🔧 Configuration
-
-### **Motion Parameters**
-
-Adjust these in the Configuration section of each example:
-
-```cpp
-// Scissor Lift
-config.maxHeightCm = 300.0f;                // Adjust to your lift
-config.minHeightCm = 0.0f;
-config.softwareUpperLimitCm = 90.0f;        // Software-defined upper limit
-config.maxForwardReverseCm = 90.0f;          // Max forward/reverse travel (safety limit)
-config.enableForwardReverse = true;         // Set false if bolted to floor
-
-// Actuator System
-config.maxPitchDeg = 10.0f;                 // Maximum pitch angle
-config.maxRollDeg = 10.0f;                  // Maximum roll angle
-config.actuatorStrokeCm = 7.62f;            // Actuator stroke (3 inches)
-config.platformWidthCm = 150.0f;            // Platform dimensions
-config.platformLengthCm = 200.0f;
-```
-
-### **CAN Bus Configuration (Scissor Lift)**
-
-For CAN bus mode, configure manufacturer-specific settings:
-
-```cpp
-// CAN Bus Settings
-config.useCANBus = true;
-config.canBaudRate = 500000;                 // 125000, 250000, or 500000 (check manufacturer spec)
-config.canIdJoystick = 0x180;               // Joystick command CAN ID (manufacturer-specific)
-config.canIdControl = 0x200;                // Control commands (E-stop, etc.)
-config.canIdFeedback = 0x280;              // Position feedback CAN ID (if available)
-config.canCSPin = 10;                       // MCP2515 CS pin (only for MCP2515)
-config.useCANFeedback = false;              // Set true if ECU provides position via CAN
-
-// Position Sensor (used if useCANFeedback = false)
-config.positionSensorPin = 14;               // GPIO analog input (use -1 if using CAN feedback)
-```
-
 ### **PID Tuning**
 
 For the actuator system, adjust PID parameters:
@@ -320,38 +390,34 @@ All examples include:
 
 ## 📊 Cost Reference
 
-See `COST_ANALYSIS.md` in `Runtime/ExperienceTemplates/` for complete hardware cost breakdown:
+See `COST_ANALYSIS.md` in `Source/LBEASTExperiences/` for complete hardware cost breakdown:
 - Scissor lift: ~$8,000 (used, with certification)
 - Hydraulic system: ~$5,500 (4 actuators + pump + valves + sensors + ESP32 PCB)
 - **Total motion platform:** ~$13,500
 
 ---
 
-## 🔗 Related Documentation
+## 🔁 IO Flow Snapshot
 
-- **[Base/Templates/README.md](../../Base/Templates/README.md)** - Using wireless templates
-- **[Base/Examples/README.md](../../Base/Examples/README.md)** - Base example documentation
-- **[COST_ANALYSIS.md](../../../Runtime/ExperienceTemplates/COST_ANALYSIS.md)** - Complete cost breakdown
-- **[GunshipExperience.cs](../../../Runtime/ExperienceTemplates/GunshipExperience.cs)** - Unity API
-- **[Gunship_Hardware_Specs.md](Gunship_Hardware_Specs.md)** - Complete hardware specifications for gun solenoid kickers, PWM drivers, thermal management, and communication architecture
+```
+Child ECU (Gun_ECU) ──▶ Parent ECU (GunshipExperience_ECU) ──▶ Game Engine ──▶ Console / VR Players
+```
 
-## Gun ECU Instances
+| Link | Direction | Status | Notes |
+|------|-----------|--------|-------|
+| Child → Parent | Telemetry (UDP, 20 Hz default) | ✅ | Buttons, fire intensity, redundancy temps, PWM throttle, faults |
+| Parent → Child | Game state (UDP, 10 Hz + on-demand) | ✅ | Play session active, emergency stop (fire command relay TBD) |
+| Server → Parent | Motion/control | ✅ | Ch0‑9 floats/bools + struct packets (`FPlatformMotionCommand`) |
+| Parent → Server | Motion feedback + gun telemetry | ✅ | Ch100/101 feedback structs, Ch310 button events, Ch311 gun telemetry |
+| Server → Console | Telemetry display | ⚠️ | Parsing done; UMG console widget pending |
+| Server ↔ VR Players | Button/fire replication | ❌ | Deferred (future VR transport work) |
 
-The Gunship Experience requires **four Gun ECU instances** (one per play station). Each Gun ECU:
+**Channel reference**
 
-- **Hardware**: Dual thumb buttons, 24V solenoid kicker(s), SteamVR Ultimate tracker on gun nose
-- **Communication**: Syncs over UDP to the primary Gunship ECU (mounted on scissor lift)
-  - **Wired Ethernet (Recommended)**: Lower latency, more reliable
-  - **WiFi (Optional)**: For wireless deployments or testing
-- **Station Assignment**: Each Gun ECU is assigned to a station (0-3) via channel mapping or IP-based identification
-- **Firmware**: See `Gun_ECU.ino` in this directory for the complete firmware implementation
-
-**Configuration:**
-- Each Gun ECU listens on a unique port (8888-8891) for commands from the Gunship ECU
-- Each Gun ECU sends telemetry to the Gunship ECU on port 8892
-- The Gunship ECU aggregates all gun telemetry and relays it to the game engine
-
-For complete hardware specifications, see **[Gunship_Hardware_Specs.md](Gunship_Hardware_Specs.md)**.
+- **Game engine → parent:** Ch0‑4 (pitch/roll/Y/Z/duration), Ch7 (E‑stop), Ch9 (play session), Ch100/101 (rate control), Ch200 struct for full command.  
+- **Parent → engine:** Ch100/101 feedback structs, `FGunButtonEvents` (Ch310, configurable 20 Hz), `FGunTelemetry` (Ch311, configurable 1 Hz).  
+- **Child → parent:** Per-station channels (10+n button, 20+n fire intensity, 30+n temps, etc.) plus redundancy/driver telemetry.  
+- **Parent → child:** Ch9 play session (authorizes firing) and Ch7 E-stop; fire command propagation planned.
 
 ---
 
@@ -369,7 +435,7 @@ Both standalone modules are designed to be:
 The `GunshipExperience_ECU.ino` combines both modules into a single controller:
 - Coordinates both subsystems simultaneously
 - Unified emergency stop and safety functions
-- Matches `FPlatformMotionCommand` interface from Unity
+- Matches `FPlatformMotionCommand` interface from Unreal/Unity
 
 ---
 
@@ -380,3 +446,4 @@ MIT License - Copyright (c) 2025 AJ Campbell
 ---
 
 **Built for LBEAST - Location-Based Entertainment Activation Standard**
+

@@ -25,9 +25,6 @@ This ECU controls two servo motors for continuous pitch and roll rotation, enabl
 | **4** | Float | Duration (seconds) | 0.1+ seconds |
 | **7** | Bool | Emergency Stop | true = stop all systems |
 | **8** | Bool | Return to Neutral | true = return to 0° pitch and roll |
-| **9** | Bool | Gravity Reset Enable | true = enable gravity reset (sent on connect) |
-| **10** | Float | Reset Speed | deg/s (sent on connect) |
-| **11** | Float | Reset Idle Timeout | seconds (sent on connect) |
 
 ### Struct Packets
 
@@ -39,23 +36,7 @@ This ECU controls two servo motors for continuous pitch and roll rotation, enabl
   };
   ```
 
-## Usage in Unity/Unreal
-
-### Unity
-
-```csharp
-// In FlightSimExperience
-FlightSimExperience flightSim = GetComponent<FlightSimExperience>();
-
-// Send continuous rotation (can exceed 360°)
-flightSim.SendContinuousRotation(720f, 360f, 4f);  // Two barrel rolls!
-
-// Emergency stop
-flightSim.EmergencyStop();
-
-// Return to neutral
-flightSim.ReturnToNeutral(3f);
-```
+## Usage in Unreal/Unity
 
 ### Unreal Engine
 
@@ -83,29 +64,35 @@ Edit the following in `FlightSimExperience_ECU.ino`:
    const char* password = "your_password_here";
    ```
 
-2. **Unity/Unreal Engine PC IP address:**
+2. **Unreal Engine PC IP address:**
    ```cpp
    IPAddress unrealIP(192, 168, 1, 100);
    uint16_t unrealPort = 8888;
    ```
 
-3. **Servo drive configuration:**
+3. **Servo pin assignments:**
    ```cpp
-   gyroConfig.pitchDriveConfig.nodeId = 1;  // MECHATROLINK station or EtherCAT node
-   gyroConfig.rollDriveConfig.nodeId = 2;
+   gyroConfig.pitchServoPin = 12;  // PWM pin for pitch servo
+   gyroConfig.rollServoPin = 13;   // PWM pin for roll servo
    ```
 
-4. **Maximum rotation speed:**
+4. **Servo pulse widths** (adjust for your servos):
+   ```cpp
+   gyroConfig.servoMinPulseWidth = 500;      // Minimum pulse width (microseconds)
+   gyroConfig.servoMaxPulseWidth = 2500;     // Maximum pulse width (microseconds)
+   gyroConfig.servoCenterPulseWidth = 1500;  // Center/stop pulse width
+   ```
+
+5. **Maximum rotation speed:**
    ```cpp
    gyroConfig.maxRotationSpeedDegreesPerSecond = 90.0f;  // Adjust as needed
    ```
 
 ## Dependencies
 
-- `LBEAST_Wireless_RX.h` - For receiving commands from Unity/Unreal
-- `LBEAST_Wireless_TX.h` - For sending feedback to Unity/Unreal
+- `LBEAST_Wireless_RX.h` - For receiving commands from Unreal/Unity
+- `LBEAST_Wireless_TX.h` - For sending feedback to Unreal/Unity
 - `GyroscopeController.h` - Servo motor control logic
-- `Yaskawa_Sigma5_Drive.h` - Servo drive implementation (or other drive type)
 
 Copy these files from `FirmwareExamples/Base/Templates/` to your sketch directory.
 
@@ -113,7 +100,7 @@ Copy these files from `FirmwareExamples/Base/Templates/` to your sketch director
 
 ### ESP32
 
-Use `ledcSetup()` and `ledcWrite()` for PWM control (if using hobby servos):
+Use `ledcSetup()` and `ledcWrite()` for PWM control:
 
 ```cpp
 // In GyroscopeController::initializeServos()
@@ -121,13 +108,15 @@ ledcSetup(0, 50, 16);  // Channel 0, 50Hz, 16-bit resolution
 ledcAttachPin(config.pitchServoPin, 0);
 ledcSetup(1, 50, 16);  // Channel 1, 50Hz, 16-bit resolution
 ledcAttachPin(config.rollServoPin, 1);
-```
 
-For professional servo drives (Yaskawa, Panasonic, Kollmorgen), use MECHATROLINK-II or EtherCAT communication instead of PWM.
+// In GyroscopeController::updateServos()
+ledcWrite(0, pitchPulse);
+ledcWrite(1, rollPulse);
+```
 
 ### Arduino
 
-Use the Servo library (for hobby servos only):
+Use the Servo library:
 
 ```cpp
 #include <Servo.h>
@@ -138,9 +127,11 @@ Servo rollServo;
 // In GyroscopeController::initializeServos()
 pitchServo.attach(config.pitchServoPin);
 rollServo.attach(config.rollServoPin);
-```
 
-**Note:** Professional servo drives require fieldbus communication (MECHATROLINK-II, EtherCAT) and cannot be controlled via Arduino Servo library.
+// In GyroscopeController::updateServos()
+pitchServo.writeMicroseconds(pitchPulse);
+rollServo.writeMicroseconds(rollPulse);
+```
 
 ## Safety
 
@@ -150,7 +141,7 @@ rollServo.attach(config.rollServoPin);
 
 ## Bidirectional IO
 
-The ECU sends position feedback to Unity/Unreal every 100ms (10 Hz) on Channel 102 as `FGyroState` struct packets.
+The ECU sends position feedback to Unreal every 100ms (10 Hz) on Channel 102 as `FGyroState` struct packets.
 
 ## Continuous Rotation
 
@@ -160,22 +151,13 @@ Unlike hydraulic actuators with limit switches, this gyroscope system supports:
 - **Values beyond 360°** for multiple full rotations
 - Example: 450° = 1.25 rotations clockwise, -90° = 0.25 rotations counter-clockwise
 
-## Gravity Reset
-
-The ECU supports automatic gravity reset when HOTAS input is idle:
-- **Channel 9:** Enable/disable gravity reset (sent from Unity/Unreal on connect)
-- **Channel 10:** Reset speed in degrees per second (sent on connect)
-- **Channel 11:** Idle timeout in seconds before reset activates (sent on connect)
-
-When enabled, the gyroscope will smoothstep toward zero (upright) position when no HOTAS input is detected for the idle timeout duration.
-
 ---
 
 # Flight Sim Experience - VR Tracking Recommendations
 
 ## ⚠️ Critical: Tracking System Requirements for Space Reset
 
-The Flight Sim Experience includes a **Space Reset** feature (`spaceReset`) that decouples the virtual cockpit from the physical cockpit during gravity reset. This feature is designed for space flight experiences where there is no gravity, but the physical cockpit must return to upright position.
+The Flight Sim Experience includes a **Space Reset** feature (`bSpaceReset`) that decouples the virtual cockpit from the physical cockpit during gravity reset. This feature is designed for space flight experiences where there is no gravity, but the physical cockpit must return to upright position.
 
 ### Recommended Tracking Solution: Outside-In with Cockpit-Mounted Trackers
 
@@ -190,7 +172,7 @@ The Flight Sim Experience includes a **Space Reset** feature (`spaceReset`) that
 
 #### Why This Matters
 
-When `spaceReset` and `gravityReset` are both enabled:
+When `bSpaceReset` and `bGravityReset` are both enabled:
 1. The physical cockpit smoothly returns to zero (upright) position
 2. The virtual cockpit remains frozen in its current orientation (simulating zero-g)
 3. **The HMD must track relative to the cockpit, not the physical world**
@@ -216,7 +198,7 @@ HMD correction for Space Reset is a **complex and error-prone problem** that inv
 If you must use inside-out tracking or world-mounted base stations:
 
 1. **Implement your own HMD correction system** that:
-   - Reads physical cockpit rotation from ECU feedback
+   - Reads physical cockpit rotation from `GetCurrentGyroState()`
    - Calculates the offset between physical and virtual cockpit
    - Applies inverse rotation to HMD camera transform
    - Handles all edge cases and coordinate system conversions
@@ -239,13 +221,13 @@ If you must use inside-out tracking or world-mounted base stations:
 
 ### Technical Details
 
-- **Cockpit Transform Decoupling:** When `spaceReset = true` and `gravityReset = true`, the virtual cockpit transform is frozen while physical cockpit returns to zero
+- **Cockpit Transform Decoupling:** When `bSpaceReset = true` and `bGravityReset = true`, the virtual cockpit transform is frozen while physical cockpit returns to zero
 - **Recoupling:** Virtual cockpit recouples to physical when:
-  - Physical cockpit reaches near-zero position (within `zeroThresholdDegrees`)
-  - `gravityReset` is disabled
+  - Physical cockpit reaches near-zero position (within `ZeroThresholdDegrees`)
+  - `bGravityReset` is disabled
   - Player provides stick input (resumes normal operation)
 
-For more information, see the `FlightSimExperience` class documentation in the Unity/Unreal source code.
+For more information, see the `AFlightSimExperience` class documentation in the Unreal Engine source code.
 
 ---
 
@@ -402,6 +384,4 @@ See `COST_ANALYSIS.md` for detailed power system costs. Typical power system cos
 - **Total Power System:** ~$445–$640 (excluding servo drives)
 
 For more details, see the Gunship Experience cost analysis section on power systems.
-
-
 

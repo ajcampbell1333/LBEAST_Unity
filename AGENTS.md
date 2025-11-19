@@ -104,6 +104,12 @@ Use this tree for context: Root → Runtime Modules → Templates/Hardware. Prio
 * Verb-style names describe what the interface does, which is more idiomatic in C# and C++.
 * This keeps interface names concise and action-oriented, consistent with common .NET and C++ patterns.
 
+### Unity Meta Files
+
+* Unity expects exactly one `.meta` file per asset. When generating metas, only create them for files that lack one.
+* **Never** point meta-generation helpers at files that already end in `.meta`; doing so creates `.meta.meta` (and worse) duplicates that must be deleted.
+* If you need bulk metas, filter out existing `.meta` files first (e.g., `Get-ChildItem -Recurse -File | Where-Object { $_.Extension -ne '.meta' }`).
+
 ## Automated Compilation Workflow
 
 Claude has a custom automated compilation system for Unity projects to enable AI-assisted error detection and debugging without requiring the Unity Editor to be open. This system mirrors the Unreal Engine's command-line build capabilities.

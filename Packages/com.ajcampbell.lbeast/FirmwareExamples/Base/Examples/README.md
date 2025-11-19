@@ -101,9 +101,9 @@ These examples are **platform-agnostic** in functionality but **platform-specifi
    const char* ssid = "VR_Arcade_LAN";
    const char* password = "your_password_here";
    ```
-3. **Set Unity PC IP address**:
+3. **Set Unreal PC IP address**:
    ```cpp
-   IPAddress unityIP(192, 168, 1, 100);
+   IPAddress unrealIP(192, 168, 1, 100);
    ```
 4. **Adjust GPIO pins** if needed (check your hardware - see comments for ESP8266 pin recommendations)
 5. **Upload to microcontroller**
@@ -132,7 +132,7 @@ These examples are **platform-agnostic** in functionality but **platform-specifi
 - Check signal strength
 
 ### **No packets received**
-- Verify Unity PC IP address
+- Verify Unreal PC IP address
 - Check firewall allows UDP port 8888
 - Ensure both devices on same network
 - Use Wireshark to monitor network traffic
@@ -148,10 +148,11 @@ These examples are **platform-agnostic** in functionality but **platform-specifi
 
 - **[Templates/README.md](../Templates/README.md)** - Using header templates
 - **[EscapeRoom/README.md](../../EscapeRoom/README.md)** - Experience-specific examples
-- **[EmbeddedSystems Module README](../../../Runtime/EmbeddedSystems/README.md)** - Full API documentation
+- **[EmbeddedSystems Module README](../../../Source/EmbeddedSystems/README.md)** - Full API documentation
 
 ---
 
 ## 📄 License
 
 MIT License - Copyright (c) 2025 AJ Campbell
+

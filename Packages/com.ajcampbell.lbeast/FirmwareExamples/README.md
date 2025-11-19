@@ -25,7 +25,8 @@ FirmwareExamples/
 │       └── DoorLock_Example.ino                 # Main example (all platforms)
 │
 └── GunshipExperience/              # Gunship experience specific examples
-    ├── GunshipExperience_ECU.ino   # Combined ECU for 5DOF motion platform
+    ├── GunshipExperience_ECU.ino   # Parent ECU for 4DOF motion platform (uses Universal Shield)
+    ├── Gun_ECU.ino                  # Child ECU for per-station gun control
     └── README.md                    # GunshipExperience firmware documentation
 ```
 
@@ -61,7 +62,7 @@ FirmwareExamples/
    - Use main example (`ButtonMotor_Example.ino` or `DoorLock_Example.ino`) for most platforms
    - Use ESP8266 variant if using ESP8266 (shows platform-specific pin config)
 3. **Adjust GPIO pins** in Configuration section to match your hardware
-4. **Configure WiFi credentials** and Unity PC IP address
+4. **Configure WiFi credentials** and Unreal PC IP address
 5. **Upload to your microcontroller**
 
 ---
@@ -119,7 +120,7 @@ Examples are organized by experience type:
   - `ActuatorSystem_Controller.ino` - Standalone 4-actuator hydraulic control
   - `ButtonMotor_Example.ino` - Generic button & motor example
 - **EscapeRoom/** - Escape room specific (door locks, props, sensors)
-- **GunshipExperience/** - Gunship experience (5DOF motion platform ECU)
+- **GunshipExperience/** - Gunship experience (parent ECU for 4DOF motion platform, child ECUs for per-station gun control)
 - **AIFacemask/** - (Future) Live actor costume examples
 - **MovingPlatform/** - (Future) Motion platform sensor examples
 
@@ -142,3 +143,4 @@ MIT License - Copyright (c) 2025 AJ Campbell
 ---
 
 **Built for LBEAST - Location-Based Entertainment Activation Standard**
+
