@@ -92,7 +92,7 @@ The system uses **two winches per player** mounted to either side of a truss, sp
 
 **⚠️ Security Considerations:**
 
-The `RF433MHz` low-level API provides comprehensive security features (rolling code validation, replay attack prevention, AES encryption). See the main README (`LBEAST_UnrealPlugin/Plugins/LBEAST/README.md`) → RF433MHz API → Security Features for complete documentation.
+The `RF433MHz` low-level API provides comprehensive security features (rolling code validation, replay attack prevention, AES encryption). See the main README → RF433MHz API → Security Features for complete documentation.
 
 **Physical Safety Interlocks (Required at Experience Level):**
 
@@ -412,7 +412,7 @@ Edit the following in `SuperheroFlightExperience_ECU.ino`:
    const char* password = "your_password_here";
    ```
 
-2. **Unreal Engine PC IP address:**
+2. **Unity/Unreal Engine PC IP address:**
    ```cpp
    IPAddress unrealIP(192, 168, 1, 100);
    uint16_t unrealPort = 8888;
@@ -486,7 +486,7 @@ Copy these files from `FirmwareExamples/Base/Templates/` to your sketch director
 
 ---
 
-## Usage in Unreal Engine
+## Usage in Unity/Unreal Engine
 
 ### Basic Setup
 
@@ -602,7 +602,7 @@ See `COST_ANALYSIS.md` (in parent directory) for detailed cost breakdown. Typica
 
 ## References
 
-- **Main README:** See `LBEAST_UnrealPlugin/Plugins/LBEAST/README.md` for complete SDK documentation
+- **Main README:** See the main LBEAST README for complete SDK documentation
 - **Hardware Specs:** See `SuperheroFlightExperience_Hardware_Specs.md` (to be created)
 - **IO Flow Documentation:** See `SuperheroFlightExperience_IO_Flow_Documentation.md` (to be created)
 - **Gunship Experience:** See `GunshipExperience/README.md` for similar dual-ECU architecture reference

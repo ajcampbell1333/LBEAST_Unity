@@ -502,5 +502,3 @@ bool ActuatorSystemController::checkLimitSwitch(int pin) {
 
 #endif // ACTUATOR_SYSTEM_CONTROLLER_H
 
-
-

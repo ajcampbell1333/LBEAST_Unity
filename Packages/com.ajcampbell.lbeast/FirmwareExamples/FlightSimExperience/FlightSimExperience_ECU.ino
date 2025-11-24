@@ -12,7 +12,7 @@
  * - Controls two servo motors (pitch axis and roll axis)
  * - Continuous rotation support (can exceed 360° in either direction)
  * - Emergency stop and return to neutral functions
- * - Position feedback to Unreal/Unity (bidirectional IO)
+ * - Position feedback to Unreal (bidirectional IO)
  * 
  * Supported Platforms:
  * - ESP32 (built-in WiFi) - Recommended for this application
@@ -30,15 +30,12 @@
  * - Power supply for servo motors (separate from microcontroller power)
  * 
  * Protocol: Binary LBEAST protocol
- * Channel Mapping (matches GyroState from Unity/Unreal):
+ * Channel Mapping (matches FGyroState from Unreal):
  * - Channel 0: Pitch (float, degrees - unlimited, can exceed 360°)
  * - Channel 1: Roll (float, degrees - unlimited, can exceed 360°)
  * - Channel 4: Duration (float, seconds) - time to reach target
  * - Channel 7: Emergency stop (bool, true = stop all systems)
  * - Channel 8: Return to neutral (bool, true = return to 0° pitch and roll)
- * - Channel 9: Gravity Reset Enable (bool, sent from Unity/Unreal on connect)
- * - Channel 10: Reset Speed (float, deg/s, sent from Unity/Unreal on connect)
- * - Channel 11: Reset Idle Timeout (float, seconds, sent from Unity/Unreal on connect)
  * 
  * Struct Packets:
  * - Channel 102: FGyroState struct (pitch and roll only)
@@ -59,7 +56,7 @@
 #include "../Base/Templates/GyroscopeController.h"
 #include "../Base/Templates/Yaskawa_Sigma5_Drive.h"  // Default servo drive implementation
 
-// Struct definitions matching Unity/Unreal (must match exactly for binary compatibility)
+// Struct definitions matching Unreal (must match exactly for binary compatibility)
 struct FGyroState {
   float Pitch;  // degrees (unlimited - continuous rotation)
   float Roll;   // degrees (unlimited - continuous rotation)
@@ -73,7 +70,7 @@ struct FGyroState {
 const char* ssid = "VR_Arcade_LAN";
 const char* password = "your_password_here";
 
-// Unity/Unreal Engine PC IP address (for bidirectional IO feedback)
+// Unreal Engine PC IP address (for bidirectional IO feedback)
 IPAddress unrealIP(192, 168, 1, 100);
 uint16_t unrealPort = 8888;
 
@@ -85,7 +82,7 @@ float motionDuration = 1.0f; // Default duration in seconds
 unsigned long motionStartTime = 0;
 bool motionInProgress = false;
 
-// Gravity reset parameters (received from Unity/Unreal on connect)
+// Gravity reset parameters (received from Unreal on connect)
 bool gravityResetEnabled = false;
 float resetSpeed = 30.0f;  // Default reset speed (degrees per second)
 float resetIdleTimeout = 5.0f;  // Default idle timeout (seconds)
@@ -106,9 +103,9 @@ void setup() {
   gyroConfig.servoDriveType = ServoDriveType::YaskawaSigma5;  // Default: Yaskawa Sigma-5
   gyroConfig.maxRotationSpeedDegreesPerSecond = 90.0f;  // Maximum rotation speed
   gyroConfig.smoothingFactor = 0.2f;  // Smoothing factor (0.0-1.0): 0.2 = smooth but responsive
-  gyroConfig.enableGravityReset = false;  // Will be set from Unity/Unreal on connect
-  gyroConfig.resetSpeed = 30.0f;  // Will be set from Unity/Unreal on connect
-  gyroConfig.resetIdleTimeout = 5.0f;  // Will be set from Unity/Unreal on connect
+  gyroConfig.enableGravityReset = false;  // Will be set from Unreal on connect
+  gyroConfig.resetSpeed = 30.0f;  // Will be set from Unreal on connect
+  gyroConfig.resetIdleTimeout = 5.0f;  // Will be set from Unreal on connect
   
   // Configure pitch axis servo drive
   gyroConfig.pitchDriveConfig.nodeId = 1;  // MECHATROLINK station number or EtherCAT node ID
@@ -139,13 +136,13 @@ void setup() {
   // Initialize wireless communication (RX for receiving commands)
   LBEAST_Wireless_Init(ssid, password, 8888);
   
-  // Initialize TX for sending feedback to Unity/Unreal
+  // Initialize TX for sending feedback to Unreal
   LBEAST_Wireless_TX_Init(ssid, password, unrealIP, unrealPort);
   
   motionStartTime = millis();
   
   Serial.println("\nFlight Sim Experience ECU Ready!");
-  Serial.println("Waiting for gyroscope commands from Unity/Unreal...\n");
+  Serial.println("Waiting for gyroscope commands from Unreal/Unity...\n");
   Serial.println("Channel Mapping:");
   Serial.println("  Ch 0: Pitch (degrees, unlimited)");
   Serial.println("  Ch 1: Roll (degrees, unlimited)");
@@ -169,7 +166,7 @@ void loop() {
   // Update gyroscope controller
   gyroController.update();
   
-  // Send position feedback to Unity/Unreal (bidirectional IO) - every 100ms (10 Hz)
+  // Send position feedback to Unreal (bidirectional IO) - every 100ms (10 Hz)
   static unsigned long lastFeedbackTime = 0;
   if (millis() - lastFeedbackTime >= 100) {
     SendPositionFeedback();
@@ -206,14 +203,14 @@ void LBEAST_HandleFloat(uint8_t channel, float value) {
       break;
       
     case 10:
-      // Channel 10: Reset speed (degrees per second, sent from Unity/Unreal on connect)
+      // Channel 10: Reset speed (degrees per second, sent from Unreal on connect)
       resetSpeed = value;
       gyroController.setResetSpeed(value);
       Serial.printf("ECU: Reset speed = %.2f deg/s\n", value);
       break;
       
     case 11:
-      // Channel 11: Reset idle timeout (seconds, sent from Unity/Unreal on connect)
+      // Channel 11: Reset idle timeout (seconds, sent from Unreal on connect)
       resetIdleTimeout = value;
       gyroController.setResetIdleTimeout(value);
       Serial.printf("ECU: Reset idle timeout = %.2f seconds\n", value);
@@ -237,7 +234,7 @@ void LBEAST_HandleBool(uint8_t channel, bool value) {
       Serial.println("ECU: Returning to neutral position (0° pitch, 0° roll)");
     }
   } else if (channel == 9) {
-    // Channel 9: Gravity reset enable (sent from Unity/Unreal on connect)
+    // Channel 9: Gravity reset enable (sent from Unreal on connect)
     gravityResetEnabled = value;
     gyroController.setGravityResetEnabled(value);
     Serial.printf("ECU: Gravity reset %s\n", value ? "enabled" : "disabled");
@@ -283,6 +280,4 @@ void SendPositionFeedback() {
   gyroFeedback.Roll = currentRoll;
   LBEAST_SendBytes(102, (uint8_t*)&gyroFeedback, sizeof(FGyroState));
 }
-
-
 

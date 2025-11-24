@@ -6,7 +6,7 @@
 
 ## 📦 Overview
 
-These header templates provide a simple, drop-in solution for bidirectional wireless communication between microcontrollers and Unreal Engine using the LBEAST EmbeddedSystems protocol.
+These header templates provide a simple, drop-in solution for bidirectional wireless communication between microcontrollers and Unity/Unreal Engine using the LBEAST EmbeddedSystems protocol.
 
 ### Available Templates
 
@@ -35,7 +35,7 @@ These header templates provide a simple, drop-in solution for bidirectional wire
 
 ## 🚀 Quick Start
 
-### **Transmitting to Unreal (TX)**
+### **Transmitting to Unity/Unreal (TX)**
 
 ```cpp
 #include "LBEAST_Wireless_TX.h"
@@ -45,7 +45,7 @@ void setup() {
   LBEAST_Wireless_Init(
     "VR_Arcade_LAN",                    // WiFi SSID
     "your_password",                     // WiFi password
-    IPAddress(192, 168, 1, 100),        // Unreal PC IP
+    IPAddress(192, 168, 1, 100),        // Unity/Unreal PC IP
     8888                                 // UDP port
   );
 }
@@ -64,7 +64,7 @@ void loop() {
 }
 ```
 
-### **Receiving from Unreal (RX)**
+### **Receiving from Unity/Unreal (RX)**
 
 ```cpp
 #include "LBEAST_Wireless_RX.h"
@@ -240,10 +240,10 @@ For production deployments, use the secured firmware templates with AES-128 encr
 
 - [ ] Copy `LBEAST_Wireless_TX.h` and/or `LBEAST_Wireless_RX.h` to your sketch directory
 - [ ] Configure WiFi credentials (SSID, password)
-- [ ] Set Unreal PC IP address
+- [ ] Set Unity/Unreal PC IP address
 - [ ] Implement handler functions (for RX)
 - [ ] Call `LBEAST_ProcessIncoming()` in loop() (for RX)
-- [ ] Test connection with Unreal Engine
+- [ ] Test connection with Unity/Unreal Engine
 - [ ] Configure security settings for production
 
 ---
@@ -260,7 +260,7 @@ For production deployments, use the secured firmware templates with AES-128 encr
 - Check signal strength
 
 ### **No packets received**
-- Verify Unreal PC IP address is correct
+- Verify Unity/Unreal PC IP address is correct
 - Check firewall allows UDP port 8888
 - Ensure both devices are on same network
 - Use Wireshark to monitor network traffic

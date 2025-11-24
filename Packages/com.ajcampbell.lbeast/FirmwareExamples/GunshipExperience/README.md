@@ -51,8 +51,7 @@ Located in `GunshipExperience/`:
 
 ## 🔩 Hardware Specification (Child ECU Haptics)
 
-**Default haptic:** Dual 24 V pull-type solenoids inside the gun chassis, driven by the child ECU for each station.  
-For the full BOM, wiring guidance, and redundancy layouts see [`Gunship_Hardware_Specs.md`](Gunship_Hardware_Specs.md).
+**Default haptic:** Dual 24 V pull-type solenoids inside the gun chassis, driven by the child ECU for each station.
 
 ### Recommended Baseline
 

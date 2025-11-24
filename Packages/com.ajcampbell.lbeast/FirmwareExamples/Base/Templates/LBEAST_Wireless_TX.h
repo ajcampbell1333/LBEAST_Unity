@@ -92,10 +92,10 @@ bool LBEAST_Initialized = false;
  * Initialize wireless communication
  * @param ssid WiFi network name
  * @param password WiFi password
- * @param targetIP Unity/Unreal Engine PC IP address
+ * @param targetIP Unreal Engine PC IP address
  * @param targetPort UDP port (default 8888)
  */
-void LBEAST_Wireless_TX_Init(const char* ssid, const char* password, IPAddress targetIP, uint16_t targetPort = 8888) {
+void LBEAST_Wireless_Init(const char* ssid, const char* password, IPAddress targetIP, uint16_t targetPort = 8888) {
   Serial.begin(115200);
   Serial.println("\nLBEAST Wireless TX Initializing...");
   

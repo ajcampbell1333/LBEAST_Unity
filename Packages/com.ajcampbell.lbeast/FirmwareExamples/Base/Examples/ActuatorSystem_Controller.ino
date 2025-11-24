@@ -16,33 +16,57 @@
 const char* ssid = "VR_Arcade_LAN";
 const char* password = "your_password_here";
 
-// Configuration for the ActuatorSystemController
-ActuatorSystemConfig actuatorConfig = {
-  {12, 13, 14, 15},  // valvePins
-  {32, 33, 34, 35},  // sensorPins
-  {16, 17, 18, 19},  // lowerLimitPins
-  {20, 21, 22, 23},  // upperLimitPins
-  10.0f,             // maxPitchDeg
-  10.0f,             // maxRollDeg
-  7.62f,             // actuatorStrokeCm (3 inches)
-  150.0f,            // platformWidthCm
-  200.0f,            // platformLengthCm
-  2.0f, 0.1f, 0.5f,   // kp, ki, kd
-  true,              // autoCalibrateMode
-  2000               // autoCalibrateTimeoutMs
-};
+// Create controller instance
+ActuatorSystemController actuatorController;
 
-ActuatorSystemController actuatorController; // Instantiate the controller
+// =====================================
+// Setup
+// =====================================
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
   
-  Serial.println("\n\nLBEAST Actuator System Controller (Standalone)");
-  Serial.println("===============================================\n");
+  Serial.println("\n\nLBEAST Actuator System Controller");
+  Serial.println("==================================\n");
   
+  // Configure actuator system
+  ActuatorSystemConfig config;
+  config.valvePins[0] = 12;
+  config.valvePins[1] = 13;
+  config.valvePins[2] = 14;
+  config.valvePins[3] = 15;
+  config.sensorPins[0] = 32;
+  config.sensorPins[1] = 33;
+  config.sensorPins[2] = 34;
+  config.sensorPins[3] = 35;
+  config.lowerLimitPins[0] = 16;
+  config.lowerLimitPins[1] = 17;
+  config.lowerLimitPins[2] = 18;
+  config.lowerLimitPins[3] = 19;
+  config.upperLimitPins[0] = 20;
+  config.upperLimitPins[1] = 21;
+  config.upperLimitPins[2] = 22;
+  config.upperLimitPins[3] = 23;
+  
+  config.maxPitchDeg = 10.0f;
+  config.maxRollDeg = 10.0f;
+  config.actuatorStrokeCm = 7.62f;
+  config.platformWidthCm = 150.0f;
+  config.platformLengthCm = 200.0f;
+  
+  config.kp = 2.0f;
+  config.ki = 0.1f;
+  config.kd = 0.5f;
+  
+  config.autoCalibrateMode = true;
+  config.autoCalibrateTimeoutMs = 2000;
+  
+  // Initialize controller
+  actuatorController.begin(config);
+  
+  // Initialize wireless communication
   LBEAST_Wireless_Init(ssid, password, 8888);
-  actuatorController.begin(actuatorConfig); // Initialize the controller
   
   Serial.println("\nActuator System Controller Ready!");
   Serial.println("Waiting for commands from game engine...\n");
@@ -50,11 +74,23 @@ void setup() {
   Serial.println("Send calibration command (Channel 2 = true) to enter calibration mode.\n");
 }
 
+// =====================================
+// Main Loop
+// =====================================
+
 void loop() {
+  // Process incoming LBEAST commands
   LBEAST_ProcessIncoming();
-  actuatorController.update(); // Update the controller
-  delay(10);
+  
+  // Update controller
+  actuatorController.update();
+  
+  delay(10); // Control loop update rate (~100 Hz)
 }
+
+// =====================================
+// LBEAST Command Handlers
+// =====================================
 
 void LBEAST_HandleFloat(uint8_t channel, float value) {
   actuatorController.handleFloatCommand(channel, value);
@@ -63,3 +99,4 @@ void LBEAST_HandleFloat(uint8_t channel, float value) {
 void LBEAST_HandleBool(uint8_t channel, bool value) {
   actuatorController.handleBoolCommand(channel, value);
 }
+

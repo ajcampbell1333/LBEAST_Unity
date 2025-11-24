@@ -64,7 +64,7 @@ Edit the following in `FlightSimExperience_ECU.ino`:
    const char* password = "your_password_here";
    ```
 
-2. **Unreal Engine PC IP address:**
+2. **Unity/Unreal Engine PC IP address:**
    ```cpp
    IPAddress unrealIP(192, 168, 1, 100);
    uint16_t unrealPort = 8888;
@@ -227,7 +227,7 @@ If you must use inside-out tracking or world-mounted base stations:
   - `bGravityReset` is disabled
   - Player provides stick input (resumes normal operation)
 
-For more information, see the `AFlightSimExperience` class documentation in the Unreal Engine source code.
+For more information, see the FlightSimExperience class documentation in the Unity/Unreal Engine source code.
 
 ---
 

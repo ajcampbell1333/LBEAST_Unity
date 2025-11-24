@@ -136,3 +136,4 @@ void LBEAST_HandleFloat(uint8_t channel, float value) {
 void LBEAST_HandleBool(uint8_t channel, bool value) {
   liftController.handleBoolCommand(channel, value);
 }
+

@@ -101,7 +101,7 @@ These examples are **platform-agnostic** in functionality but **platform-specifi
    const char* ssid = "VR_Arcade_LAN";
    const char* password = "your_password_here";
    ```
-3. **Set Unreal PC IP address**:
+3. **Set Unity/Unreal PC IP address**:
    ```cpp
    IPAddress unrealIP(192, 168, 1, 100);
    ```
@@ -132,7 +132,7 @@ These examples are **platform-agnostic** in functionality but **platform-specifi
 - Check signal strength
 
 ### **No packets received**
-- Verify Unreal PC IP address
+- Verify Unity/Unreal PC IP address
 - Check firewall allows UDP port 8888
 - Ensure both devices on same network
 - Use Wireshark to monitor network traffic
