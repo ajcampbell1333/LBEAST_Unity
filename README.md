@@ -3180,7 +3180,94 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 
 ---
 
-## 🤖 Embedded System Philosophy:
+## 🔧 Embedded System Nuts & Bolts
+
+<img src="Packages/com.ajcampbell.lbeast/Runtime/images/LBUS_case.png" width="100%">
+
+LBUS (the LBEAST Universal Shield) is the suggested motherboard for all small, hidden wireless systems in an LBEAST project. It can host ESP32, STM32, or Arduino as its core driver. It supports CAN for driving high-current devices (hydraulics, big servo motors, etc.), and Ethernet (with optional power).
+
+<img src="Packages/com.ajcampbell.lbeast/Runtime/images/LBUS-alpha-schematic.png" width="100%">
+
+Full hardware design details, KiCAD files, and pin maps live in the dedicated [Universal Shield README](Packages/com.ajcampbell.lbeast/FirmwareExamples/PCBs/LBEAST_Universal_Shield/README.md). Refer to that doc whenever you need schematic/PCB specifics or manufacturing notes.
+
+<img src="Packages/com.ajcampbell.lbeast/Runtime/images/lbeast-alpha-pcb.png" width="100%">
+
+<details>
+<summary><strong>How LBUS handles Power-over-Ethernet (PoE):</strong></summary>
+
+<div style="margin-left: 20px;">
+
+LBUS has togglable power output capability on every one of its 8 ports individually. 5 volts goes out on pin 4 of the connected CAT5 cable when the port switch is on (DIP switch beside the port). There are a handful of power situations you might run into:
+
+1. **LBUS Aux Port J1 connects a module that has a simple sensor and no brain**
+   - The module doesn't have its own power supply
+   - It needs to draw power from LBUS
+   - Aux Port 1 should have its PoE switched on
+
+2. **LBUS Aux Port J1 connects to a microcontroller (ESP32, STM32, Arduino, etc.)**
+   - The microcontroller can optionally receive power from LBUS or its own supply
+   - If it has its own supply (battery, USB wall wart, etc.) LBUS should toggle PoE off
+   - If it does not have a supply, LBUS should toggle PoE on
+
+3. **LBUS Aux Port J1 connects to a Raspberry Pi, Jetson, or Intel NUC**
+   - SBCs typically require their own power supply and draw too much current for PoE on LBUS
+   - Toggle PoE off for these devices to minimize RF interference
+
+4. **LBUS Aux Port J1 connects to another LBUS**
+   - If one LBUS powers the other, keep the total powered devices across both under eight
+   - If more than eight devices are plugged in and using PoE, each LBUS should have a dedicated power supply
+
+Since LBUS has no control over whether a given device conforms to PoE at 5 volts on pin 4, any connected device should toggle PoE off by default and supply its own power unless you have verified its compatibility. LBUS confirms only ESP, STM, and Arduino as PoE-compatible out-of-the-box via the Child Shield. Note that LBUS generally cannot be powered by its child ports unless they are also an LBUS or a Child Shield. There may be exceptions if the device is known to output power on pin 4.
+
+If you choose to deploy a custom microcontroller in your network alongside LBUS, you can start with and modify any PCB template in LBEAST to deploy a PoE-compatible device that also includes your custom functionality.
+
+</div>
+</details>
+
+<details>
+<summary><strong>Child ECUs A.K.A. Smart Modules</strong></summary>
+
+<div style="margin-left: 20px;">
+
+<img src="Packages/com.ajcampbell.lbeast/Runtime/images/child-shield.png" width="100%">
+
+If you need a non-smart peripheral to expand its functions beyond a simple sensor or interface, you can design any embedded PCB and connect it to the motherboard wirelessly or over ethernet. LBEAST module templates can get you started. They have ethernet already mapped for data, power, parent PWM, and parent ADC. Your smart signals will automatically map to the parent according to the CAT-5 Pin Layout.
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>CAT-5 Pin Layout</strong></summary>
+
+<div style="margin-left: 20px;">
+
+Pin 1: Ethernet RX+  
+Pin 2: Ethernet RX-  
+Pin 3: Ethernet TX+  
+Pin 4: GND  
+Pin 5: +3V3 (if you need the motherboard to power your device)  
+Pin 6: Ethernet TX-  
+Pin 7: ADC from the Motherboard  
+Pin 8: PWM from the Motherboard
+
+**Final Pin 7 / Pin 8 Mapping (ESP32-S3 on LBUS)**  
+| Aux Port | Pin 7 (ADC) | Pin 8 (PWM) |
+|----------|-------------|-------------|
+| J1 | GPIO10 (Pin 16) | GPIO14 (Pin 20) |
+| J2 | GPIO9 (Pin 15) | GPIO13 (Pin 19) |
+| J3 | GPIO5 (Pin 5) | GPIO12 (Pin 18) |
+| J4 | GPIO4 (Pin 4) | GPIO11 (Pin 17) |
+| J5 | GPIO8 (Pin 12) | GPIO16 (Pin 9) |
+| J6 | GPIO1 (Pin 26) | GPIO21 (Pin 40) |
+| J7 | GPIO7 (Pin 7) | GPIO2 (Pin 27) |
+| J8 | GPIO6 (Pin 6) | GPIO15 (Pin 8) |
+
+</div>
+
+</details>
+
+### 🤖 Embedded System Philosophy:
 
 <details>
 <summary><strong>Microcontrollers vs. PLCs</strong></summary>
@@ -3379,16 +3466,13 @@ For any experience running one year or longer, LBEAST's author recommends consid
 
 > **📋 Hardware Specifications:** See **[FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md](Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md)** for complete hardware specifications including solenoid selection, PWM driver modules, thermal management, redundancy, and communication architecture.
 
-- [ ] **ESP32 Shield Design (Hardware)**
+- [x] **ESP32 Shield Design (Hardware)**
   - **Example Shield Designs**: Design example shields/breakout boards for ESP32 plus needed modules for both ECU types:
     - **GunshipExperience_ECU**: ESP32 + Ethernet PHY (LAN8720A) + actuator control interfaces + scissor lift control interfaces
     - **Gun_ECU**: ESP32 + Ethernet PHY (LAN8720A) + dual thumb button inputs + N× solenoid PWM driver interfaces + NTC thermistor ADC inputs
   - **Source Files**: Include PCB design source files in KiCAD format (`.kicad_pcb`, `.kicad_sch`) for maximum extensibility
     - **Note**: EasyEDA projects can be exported to KiCAD format for cross-tool compatibility
     - **Alternative**: Include source files in EasyEDA format if preferred, but provide KiCAD export
-  - **Manufacturing Files**: Include GERBER files (industry standard) for direct PCB manufacturing
-    - GERBER files are tool-agnostic and can be used with any PCB manufacturer (JLCPCB, PCBWay, OSH Park, etc.)
-    - Include drill files, pick-and-place files, and assembly drawings
   - **Documentation**: Include schematics (PDF), PCB layouts (PDF), BOM (CSV/Excel), and assembly instructions
   - **Purpose**: Provide reference designs for developers building custom hardware or adapting existing ESP32 boards
   - **File Structure**: Organize in `Hardware/Shields/` directory with subdirectories for each shield type
@@ -3460,20 +3544,6 @@ For any experience running one year or longer, LBEAST's author recommends consid
 </details>
 
 <details>
-<summary><strong>v1.1 (Future)</strong></summary>
-
-<div style="margin-left: 20px;">
-
-### 🔄 In Progress (v1.1)
-- [ ] Meta Quest 3 native integration
-- [ ] Sample Arduino/ESP32 firmware
-- [ ] WebSocket alternative for live actor streaming
-
-</div>
-
-</details>
-
-<details>
 <summary><strong>v2.0 (Future)</strong></summary>
 
 <div style="margin-left: 20px;">
@@ -3481,7 +3551,19 @@ For any experience running one year or longer, LBEAST's author recommends consid
 ### 🎯 Planned (v2.0)
 - [ ] Apple Vision Pro support
 - [ ] **Holographic Render Target Support** - Support for holographic display technologies including swept-plane, swept-volume, Pepper's Ghost, lenticular, and other volumetric display methods. Enables rendering to specialized holographic hardware for immersive product visualization and LBE installations.
+- [ ] **ESP32 DMX Child ECU** - Battery-powered ESP32 Child ECU that receives Art-Net/sACN lighting data wirelessly and outputs standard DMX to fixtures. Designed for scenarios where fixtures must be suspended in air without cables. See `FirmwareExamples/Research/WirelessLighting.md` for design specification.
+- [x] **Universal Shield UART Debug Breakout** - ✅ **COMPLETE (v0.1.3)** - 4-pin header (GND, 3.3V, U0TXD, U0RXD) for serial debug interface, firmware programming, and UART-based module interfacing. Now available on Universal Shield. See `FirmwareExamples/PCBs/LBEAST_Universal_Shield/README.md` for pinout details.
+- [x] **Universal Shield DIP Switch Power Toggling** - ✅ **COMPLETE (v0.1.3)** - DIP switches (one per aux port) to manually enable/disable 5V power output on each aux port, plus Schottky diodes (MBR745) for backfeed protection. Prevents parallel power supply issues when connecting LBUS-to-LBUS and enables flexible power management. Now available on Universal Shield. See `FirmwareExamples/PCBs/LBEAST_Universal_Shield/README.md` for implementation details.
+- [ ] **Universal Shield Personality Adapters** - Design and manufacture adapter PCBs to enable Universal Shield support for ESP32-WROOM-32, Arduino Uno/Mega, and STM32 (Black Pill, Nucleo, etc.) MCU platforms. Adapters handle pin mapping, power regulation (Arduino), and level shifting (Arduino) to provide platform flexibility and cost optimization. See `FirmwareExamples/PCBs/LBEAST_Universal_Shield/README.md` for design specifications.
+- [ ] **Universal Shield Variants (Via vs. Header Mounting)** - Create three mounting variants of the Universal Shield: 1) Current via-mounted design (ESP32-S3 soldered directly), 2) 22-pin male headers variant (removable module), 3) 22-pin female headers variant (stackable configuration). Each variant maintains identical functionality but supports different installation requirements (permanent, removable, or stackable). See `FirmwareExamples/PCBs/LBEAST_Universal_Shield/README.md` for variant specifications.
+- [ ] **Universal Shield 4A Fuse for Aux Power Bus** - Add overcurrent protection (4A fuse) to the 5V aux power bus on Universal Shield. Fuse protects all 8 aux ports from excessive current draw, short circuits, and overcurrent conditions. Fuse rating matches maximum design capacity (4A total across 8 ports). Consider resettable fuse (polyfuse) for easier field maintenance. See `FirmwareExamples/PCBs/LBEAST_Universal_Shield/README.md` for implementation details.
+- [ ] **LBEAST Child Shield (LBCS)** - Create a simplified, cost-optimized variant of the Universal Shield (LBUS) with only 1 aux port instead of 8. Maintains full parent ECU functionality (ESP32-S3, Ethernet, CAN, ADC/PWM) but with reduced connector count, smaller PCB footprint, and lower BOM cost. Ideal for single child ECU installations, cost-sensitive projects, and compact installations. See `FirmwareExamples/PCBs/LBEAST_Universal_Shield/README.md` for design specifications.
+- [ ] **Pico-Click C3 Integration** - Integrate the open-source Pico-Click C3 project (ESP32-C3 based) as the default platform for hidden embedded wireless buttons in clothing and props. Replaces current ESP8266-based implementation with improved performance (160 MHz RISC-V), dual connectivity (WiFi + Bluetooth 5.0), lower power consumption (5 µA deep sleep), and enhanced memory (400 KB SRAM). See `FirmwareExamples/README.md` for current ESP8266 examples that will be migrated.
 - [ ] **GunshipExperience HOTAS Pilot Support** - Add optional 5th player (pilot) support to GunshipExperience with HOTAS controller integration. Enables pilot-controlled flight while 4 gunners operate weapons, expanding gameplay possibilities for multi-crew vehicle experiences.
+- [ ] **Multiplayer FPS Laser Tag/Gun Battle Experience** - Networked arena FPS template with wireless PoE blasters, impact-solenoid haptics, and scoreboard synchronization for team-based laser combat.
+- [ ] **Holographic Multiplayer Tabletop Platformer Party Game Experience** - Mixed-reality platformer where players control miniature avatars projected onto a holographic table, leveraging RenderTexture arrays for volumetric board games.
+- [ ] **Dodge Ball Experience with Fiducial-Tracked Foam Balls** - Physical dodge ball template that uses OpenCV fiducial tracking on foam-lined balls to translate throws into XR-powered power-ups, slow-motion replays, and safety-aware scoring.
+- [ ] **Multiplayer Disc War Experience** - Frisbee-style disc combat template where discs bounce and bank off arena walls like 3D air hockey, with attack/defense modes for player elimination or goal scoring.
 - [ ] Advanced inverse kinematics for custom actuator configs
 - [ ] Visual scripting (Bolt/Visual Scripting) support
 - [ ] Cloud multiplayer (Photon/Mirror)
