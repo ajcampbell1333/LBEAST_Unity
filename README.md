@@ -7,9 +7,9 @@
 <details>
 <summary><strong>⚠️Author Disclaimer:</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 This is a brand new plugin as of November 2025. Parts of it are not fully fleshed out. The author built LBE activations for Fortune 10 brands over the past decade. This is the dream toolchain he wishes we had back then, but it probably still contains unforeseen bugs in its current form. V1.0 is considered Alpha. If you're seeing this message, it's because LBEAST has yet to deploy on a single professional project. Please use this code at your own risk. Also, this plugin provides code that may or may not run on systems your local and state officials may classify as  "amusement rides" or "theme park rides" which may fall under ASTM standards or other local regulations. LBEAST's author disclaims any liability for safety of guests or patrons or regulatory readiness. Please review the local regulations in your area prior to executing this code in any public venue. You are responsible for compliance in your state.
-</div>
+</blockquote>
 
 </details><br>
 
@@ -42,10 +42,10 @@ The LBEAST SDK democratizes LBE development by providing:
 <details>
 <summary><strong>⚠️OpenXR Note:</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through Unity's native XR system (`XRHandSubsystem`, `InputDevices`). If OpenXR is not desired for your LBE deployment for any reason, but you still want to use an LBEAST experience genre template to get started, there may be some customization necessary in `LBEASTHandGestureRecognizer` and in some of the Experience classes. Anywhere OpenXR is referenced, you may need to create an alternative version of that class with your SDK of choice replacing OpenXR usage.
 
-</div>
+</blockquote>
 
 </details><br>
 
@@ -56,7 +56,7 @@ LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through 
 <details>
 <summary><strong>Why LBEAST?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Home console VR usage is nascent and difficult despite being steadily on the rise:
 * 80 million monthly active users in the U.S. in 2025
@@ -94,14 +94,14 @@ We have an chicken-egg situation. A standard spec for VR LBE is what we need.
 Enter LBEAST. Free, open-source, plug-n-play across multiple genres.
 
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Who is LBEAST for?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 LBEAST is for professional teams building commercial Location-Based Entertainment installations. It's a professional-grade toolchain designed for teams of programmers and technical artists.
 
@@ -118,14 +118,14 @@ The SDK provides:
 - ✅ **Content teams** with rapid deployment capabilities
 - ✅ **Commercial projects** with free-to-use, MIT-licensed code
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Who is LBEAST not for?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Developers with little or no experience with C# may struggle to put LBEAST to its fullest use. It is meant for a scale of production that would be challenging for lone developers. However, it can be a great learning tool for educators to prepare students to work on professional team projects.
 
@@ -134,7 +134,7 @@ Developers with little or no experience with C# may struggle to put LBEAST to it
 - LBEAST is designed for **team-based production** with multiple developers, technical artists, and production staff.
 - LBEAST provides prefabs, but it assumes tech art team members have access to C# programmers on the team to back them up for customization.
 
-</div>
+</blockquote>
 
 </details>
 
@@ -160,7 +160,7 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 <details>
 <summary><strong>THIS README</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 - [Prerequisites & Package Dependencies](#-prerequisites--package-dependencies)
 - [Three-Tier Architecture](#-three-tier-architecture)
@@ -174,14 +174,14 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 - [Roadmap](#-roadmap)
 - [License](#-license)
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>OTHER READMEs IN THIS PROJECT</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Low-Level APIs:**
 - [VRPlayerTransport README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md`
@@ -197,7 +197,7 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 - [Base Examples README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md`
 - [Base Templates README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md`
 
-</div>
+</blockquote>
 
 </details>
 
@@ -210,20 +210,20 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 <details>
 <summary><strong>Unity Version Requirements</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 - **Unity 6 LTS (Recommended)** or Unity 2022.3 LTS (Minimum)
 - **Windows 10/11** (Primary platform)
 - **Linux** (Experimental support)
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>LBEAST Package Dependencies</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 LBEAST requires several Unity packages. These are **automatically installed** when you install LBEAST via Package Manager or Git URL. If installing manually, install these via **Window > Package Manager**:
 
@@ -254,14 +254,14 @@ LBEAST requires several Unity packages. These are **automatically installed** wh
 | **Oculus Integration** | Latest | Meta Quest integration (optional, OpenXR handles Quest via OpenXR) | Only if you need Oculus-specific features beyond OpenXR |
 | **XR Interaction Toolkit** | 2.5.0+ | VR interaction helpers | For advanced VR interactions |
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Quick Setup (If You Cloned This Repo)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 If you've cloned the `LBEAST_Unity` repository, everything is already configured:
 
@@ -274,14 +274,14 @@ If you've cloned the `LBEAST_Unity` repository, everything is already configured
 
 For installation in other projects, see the [Installation](#-installation) section below.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Project Settings Configuration</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 After installing packages, configure:
 
@@ -299,14 +299,14 @@ After installing packages, configure:
    - **Edit > Project Settings > Physics**
    - Verify collision layers for VR interactions
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Verification</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 To verify all dependencies are installed:
 
@@ -319,14 +319,14 @@ If you see compilation errors about missing namespaces:
 - `Unity.XR.OpenXR` → Install OpenXR Plugin
 - `UnityEngine.InputSystem` → Install Input System
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Common Issues & Troubleshooting</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 #### **"The type or namespace name 'NetworkBehaviour' could not be found"**
 **Solution:** Install `com.unity.netcode.gameobjects` via Package Manager.
@@ -352,7 +352,7 @@ If you see compilation errors about missing namespaces:
 1. Restart Unity Editor
 2. If that fails, reimport NetCode package: **Package Manager > NetCode for GameObjects > Right-click > Reimport**
 
-</div>
+</blockquote>
 
 </details>
 
@@ -367,7 +367,7 @@ LBEAST uses a modular three-tier architecture for code organization and server/c
 <details>
 <summary><strong>Tier 1: Low-Level APIs (Technical Modules)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Foundation modules providing core functionality:
 - `LBEASTCore` - VR/XR tracking abstraction, networking
@@ -382,14 +382,14 @@ Foundation modules providing core functionality:
 
 **Use these when:** Building custom experiences from scratch with full control.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Tier 2: Experience Genre Templates (Pre-Configured MonoBehaviours)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Ready-to-use complete experiences combining multiple APIs:
 - `AIFacemaskExperience` - Live actor-driven multiplayer VR with wireless trigger buttons controlling automated AI facemask performances
@@ -404,25 +404,25 @@ Ready-to-use complete experiences combining multiple APIs:
 **Use these when:** Rapid deployment of standard LBE genres.
 
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Tier 3: Your Custom Game Logic</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Tier 1).
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>When to Use What?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 | Scenario | Use This | Why |
 |----------|----------|-----|
@@ -438,7 +438,7 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 
 **Rule of thumb:** Start with templates, drop to APIs only when you need customization beyond what templates offer.
 
-</div>
+</blockquote>
 
 </details>
 
@@ -447,7 +447,7 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 <details>
 <summary><strong>Local Command Console</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -472,14 +472,14 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 
 **Use when:** Simple setup, single machine, lightweight network traffic.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Dedicated Server + Separate Local Command Console</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -510,14 +510,14 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 
 **Use when:** Heavy processing workloads, better performance isolation, HMD battery life optimization.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Dedicated Server + Remote Command Console</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -553,14 +553,14 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 
 **Use when:** Off-site monitoring (debugging/testing only - use VPN and authentication for security).
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>When to Use What Configuration?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 | Scenario | Recommended Configuration | Why |
 |----------|---------------------------|-----|
@@ -574,7 +574,7 @@ Build your specific experience (Tier 3) on top of templates (Tier 2) or APIs (Ti
 - **Dedicated + Separate Local:** Server Manager runs on dedicated PC, Command Console runs on separate local PC (same LAN). Networked via UDP (port 7779). Better for heavy processing workloads.
 - **Dedicated + Remote:** Server Manager runs on dedicated PC, Command Console runs on remote PC (over internet). Networked via UDP (port 7779). VPN and authentication recommended.
 
-</div>
+</blockquote>
 
 </details>
 
@@ -592,7 +592,7 @@ LBEAST is applicable to a large variety of venues, but it is designed in particu
 <details>
 <summary><strong>Overview</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 LBEAST is designed for **1-to-4 player co-located VR multiplayer experiences** in publicly accessible venues such as:
 - Trade shows
@@ -616,27 +616,27 @@ LBEAST is designed for **1-to-4 player co-located VR multiplayer experiences** i
 - Establish guardian with 2-foot padding buffer to walls for safety
 - Consider safety cord to prevent players from reaching the Ops console
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Space Recommendations</strong></summary>
-<div style="margin-left: 20px;">
+<blockquote>
 
 - **Play Area:** 100+ square feet of open play space
 - **Ceiling Height:** Sufficient clearance for players swinging long padded props (minimum 10+ feet recommended)
 - **Minimum Total Space:** 50% of total space may be allocated for retail, ingress, and egress infrastructure
 - **Flexible Boundaries:** Play space can be cordoned off with temporary trade-show walls or dividers around the 50% play area
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Minimum Square Footage</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Standard pop-up installation minimum square footage recommendation: ~40' × ~40'**
 
@@ -647,14 +647,14 @@ This includes:
 - **Play space** with enough room for ingress/egress door swing (~18' × ~40')
 - **Lobby/Greeting area** with dual ingress/egress entry/exit (~10' × ~40')
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Modular Wall System</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 The standard installation uses a **modular wall facade system** for rapid setup and teardown:
 
@@ -677,14 +677,14 @@ The standard installation uses a **modular wall facade system** for rapid setup 
 - **Quick Assembly:** Modular panels connect rapidly via QuickConnect system
 - **Graphics Ready:** Vinyl exterior graphics can be applied to panels
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Ingress/Egress Rooms</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 The standard layout includes **two mirror-image ingress/egress stations**:
 
@@ -704,14 +704,14 @@ The standard layout includes **two mirror-image ingress/egress stations**:
 - **Capacity:** Up to four VR harnesses per room (eight total across both rooms)
 - **Chargers:** Four chargers per room (eight total)
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Staffing Requirements</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Minimum Staff:** Two employees during operation hours
 
@@ -731,14 +731,14 @@ The standard layout includes **two mirror-image ingress/egress stations**:
 - **Immersive Actors:** Join players in the experience to enhance immersion
 - Additional support staff as needed for high-traffic venues
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>VR Harness & Power Specifications</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 #### Battery System
 - **Type:** Hot-swap LiFePO4 6S5P 21700 battery packs
@@ -758,28 +758,28 @@ The standard layout includes **two mirror-image ingress/egress stations**:
 - Continuous operation enabled by hot-swap system
 - No reserve battery mode needed due to swap protocol
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Lobby & Retail Area</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 - **Lobby Desk:** Point-of-sale station with tablet or computer
 - **Facade:** 10' tall modular wall facade behind lobby desk
 - **Graphics:** Vinyl exterior graphics on facade panels
 - **Flow:** Customers enter lobby → FOH directs to ingress → Ops Tech assists with setup → Play → Egress → Return to lobby
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Rapid Deployment Benefits</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 This standard format enables:
 - **Fast Setup:** Modular components assemble quickly via QuickConnect system
@@ -788,14 +788,14 @@ This standard format enables:
 - **Professional Appearance:** Clean, branded facade with custom graphics
 - **Operational Efficiency:** Streamlined player flow and battery management
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>LBEAST-Ready Venue Configuration</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 To be considered **LBEAST-ready**, a venue would aim to have at least a handful of 40' × 40' stations:
 
@@ -813,14 +813,14 @@ Just like movie theaters where multiple screens offer variety, VR play spaces ca
 - **Venue** knows many developers are in-progress on new content
 - **Result:** A healthy, thriving market
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Safety Considerations</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 - **QTY2 Up-to-code Fire Emergency Fire Extinguishers:** One at the Ops Tech Console and another near any hydraulic equipment.
 - **Movable stairs:** Any system that causes players to be lifted into the air must have a physical means of egress in an e-stop emergency.
@@ -828,14 +828,14 @@ Just like movie theaters where multiple screens offer variety, VR play spaces ca
 - **Theme park safety regulations vary by state** - take steps to abide by the same rules that apply to carnival equipment in your state.
 - **The author of LBEAST disclaims any liability resulting in the use of this free software.**
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Recommended HMD Hardware Example</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 For standard LBEAST installations, the following hardware configuration provides optimal performance and reliability:
 
@@ -880,7 +880,7 @@ For standard LBEAST installations, the following hardware configuration provides
 - For maximum performance: RTX 5080 configuration (~$3,200) enables highest-quality rendering
 - Bulk purchasing (10+ units) typically provides ~5% discount
 
-</div>
+</blockquote>
 
 </details>
 
@@ -895,49 +895,49 @@ Experience Genre Templates are complete, pre-configured MonoBehaviours that you 
 <details>
 <summary><strong>🎭 AI Facemask Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 <br>
 
 <details>
 <summary><strong>How the Live Actor Controls their AI Face</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 <details>
 <summary><strong>Head and Body Tracking</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 A live actor wears an HMD e.g. Meta Quest or Steam Frame. Any HMD will work as long as it supports 10-finger hand tracking for full-body control. Body tracking may include Ultimate trackers on feet or automated foot IK. Foot tracking is not built-in yet for LBEAST v1.0.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Live Actor Narrative Controls</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 The live actor can wear custom PCBs (sample code and design provided) that allow production to sew hidden wireless buttons into the lining of costumes. In the provided default example, a forward button is sewn into a right wrist band and a reverse button is sewn into a left wrist band. Hidden buttons are necessary because the live actor needs to portray to the player that they ARE the AI character. They are driving the hands, feet, and head direction of the AI in real-time while the AI animates only the face. They are essentially wearing an AI like a Halloween mask. They have zoomed-out control over the AI face. They don't control emotions or face shapes or specific words. That's all automated. They control the overarching story via at least two buttons, forward/reverse. It's sort of like skip buttons on an MP3 player.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>The AI Can Improvise Conversation?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Yes, in the default implementation of the Facemask template, the AI facemask is a fully-functional AI NPC. It has a narrative script that the live actor can see in HUD and control one-sentence-at-a-time via forward/reverse buttons, but the player can also interrupt the AI face with conversation. The default AI face is designed to receive conversation input by processing the player's audio into text, generating a text reply, converting that text reply into an audio voice you've pre-trained, and rendering animation of a neurally-generated face you've also pre-trained. With this method, you can bring historically figures or beloved fictional characters to life, and they can give players haptic feedback with real, physical handshakes, high-fives, etc. You can imagine a beloved fictional character grabbing your hand and taking you on a journey through your favorite fictional setting. The haptic feedback of a fictional character's hand touching yours is next-level immersion that wasn't possible even a few years ago.
 
-</div>
+</blockquote>
 
 </details>
 
-</div>
+</blockquote>
 
 </details>
 
@@ -1222,14 +1222,14 @@ protected override void OnNarrativeStateChanged(string oldState, string newState
 }
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🎢 Moving Platform Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Class:** `MovingPlatformExperience`
 
@@ -1257,14 +1257,14 @@ platform.SendPlatformTilt(0.3f, -0.5f, 0.0f, 2.0f);  // TiltX (right), TiltY (ba
 platform.SendPlatformMotion(5.0f, -3.0f, 20.0f, 2.0f);  // pitch, roll, vertical, duration
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🚁 Gunship Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Class:** `GunshipExperience`
 
@@ -1290,14 +1290,14 @@ gunship.SendGunshipTilt(0.5f, 0.8f, 0.2f, 0.1f, 1.5f);  // TiltX (roll), TiltY (
 gunship.SendGunshipMotion(8.0f, 5.0f, 10.0f, 15.0f, 1.5f);  // pitch, roll, forwardOffset (cm), verticalOffset (cm), duration
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🏎️ Car Sim Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Class:** `CarSimExperience`
 
@@ -1324,14 +1324,14 @@ carSim.SimulateCorner(-8.0f, 0.5f);         // Left turn (degrees)
 carSim.SimulateAcceleration(5.0f, 0.5f);    // Accelerate (degrees)
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>✈️ Flight Sim Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Class:** `FlightSimExperience`
 
@@ -1363,14 +1363,14 @@ float throttle = flightSim.GetThrottleInput();
 flightSim.SendContinuousRotation(720.0f, 360.0f, 4.0f);  // Two barrel rolls!
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🚪 Escape Room Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Class:** `EscapeRoomExperience`
 
@@ -1419,14 +1419,14 @@ protected override void OnNarrativeStateChanged(string oldState, string newState
 }
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🏎️ Go-Kart Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Class:** `GoKartExperience`
 
@@ -1462,14 +1462,14 @@ goKart.SwitchTrack(1);  // Switch to track index 1
 - Race boat experiences with AR overlays
 - Bumper boat attractions with virtual combat
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🦸 Superhero Flight Experience</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Class:** `SuperheroFlightExperience`
 
@@ -1515,7 +1515,7 @@ superheroFlight.AcknowledgeStandingGroundHeight();
 - Buttons mapped to "HeightUp" and "HeightDown" functions
 - Calibration mode automatically disabled after 5 minutes of inactivity
 
-</div>
+</blockquote>
 
 </details>
 
@@ -1528,7 +1528,7 @@ When you need full control or custom hardware configurations, use the low-level 
 <details>
 <summary><strong>Core Module (`LBEAST.Core`)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Core Module (`LBEAST.Core`)
 
@@ -1552,14 +1552,14 @@ Quaternion hmdRot = tracking.GetHMDRotation();
 bool triggerPressed = tracking.IsTriggerPressed(XRNode.RightHand);
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🎛️ LargeHaptics API</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Module:** `LBEAST.LargeHaptics`
 
@@ -1568,7 +1568,7 @@ Manual control of individual hydraulic actuators, gyroscopes, and scissor lift t
 <details>
 <summary><strong>🎮 Hardware-Agnostic Input System - Normalized Tilt Control (-1 to +1)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 LBEAST uses a **joystick-style normalized input system** for all 4DOF hydraulic platforms. This means you write your game code once, and it works on any hardware configuration:
 
@@ -1596,7 +1596,7 @@ platform.SendPlatformTilt(0.5f, 0.8f, 0.0f, 1.0f);
 
 **Advanced Users:** If you need precise control and know your hardware specs, angle-based APIs are available in the `Advanced` category.
 
-</div>
+</blockquote>
 
 </details>
 
@@ -1659,14 +1659,14 @@ GyroState gyroState = new GyroState
 flightSimController.SendGyroStruct(gyroState, 102);
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🤖 LBEASTAI API</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Module:** `LBEAST.LBEASTAI`
 
@@ -1733,14 +1733,14 @@ containerManager.StartContainer(config);
 
 **Hot-Swapping:** All providers support hot-swapping at runtime by changing endpoint URLs - perfect for NVIDIA NIM containerized models.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🎭 AI Face Controller (AIFacemask Module)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Module:** `LBEAST.AIFacemask`
 
@@ -1768,14 +1768,14 @@ faceController.InitializeAIFace(config);
 
 **Note:** This component is part of the `AIFacemask` module, which is used by `AIFacemaskExperience`. The `LBEASTAI` API provides the underlying AI services (LLM, ASR, TTS) that generate the content for facial animation.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🔌 Embedded Systems Module (`LBEAST.EmbeddedSystems`)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Embedded Systems Module (`LBEAST.EmbeddedSystems`)
 
@@ -1813,14 +1813,14 @@ device.SetLEDColor(0, 255, 0, 0);  // Red LED
 device.SendCustomCommand("PLAY:SOUND:1");
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🎚️ Pro Audio Module (`LBEAST.ProAudio`)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Pro Audio Module (`LBEAST.ProAudio`)
 
@@ -1922,14 +1922,14 @@ audioController.OnMasterFaderChanged += (level) =>
 
 **Next Steps:** See `ProAudioNextSteps.md` for UI Toolkit template implementation guide.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>💡 Pro Lighting Module (`LBEAST.ProLighting`)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Pro Lighting Module (`LBEAST.ProLighting`)
 
@@ -1983,14 +1983,14 @@ lightingController.StartFixtureFade(fixtureId, 0.0f, 1.0f, 2.0f);  // Fade from 
 - ✅ **Art-Net Discovery** - Auto-detect Art-Net nodes on network
 - ✅ **Multiple Fixture Types** - Dimmable, RGB, RGBW, Moving Head, Custom
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>💳 Retail API</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Module:** `LBEAST.Retail`
 
@@ -2043,14 +2043,14 @@ The payment manager automatically starts an in-process HTTP webhook server on po
 - ✅ **Automatic Payment Processing** - Webhook triggers payment confirmation callback on successful payment
 - ✅ **Unity-Friendly** - Easy integration via MonoBehaviour component
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>🎤 VOIP API</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Module:** `LBEAST.VOIP`
 
@@ -2146,14 +2146,14 @@ protected override bool InitializeExperienceImpl()
 - Steam Audio plugin (git submodule)
 - MumbleLink plugin (git submodule)
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>📡 RF433MHz API</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 **Module:** `LBEAST.RF433MHz`
 
@@ -2245,7 +2245,7 @@ rfReceiver.SaveButtonMappings("/path/to/custom/file.json");
 - Custom button interfaces for LBE installations
 - Safety interlock controls (emergency stop, calibration mode)
 
-</div>
+</blockquote>
 
 </details>
 
@@ -2262,7 +2262,7 @@ LBEAST is distributed as a Unity Package, making it easy to integrate into your 
 <details>
 <summary><strong>Option 1: Git Clone (Recommended - Simple One-Command Install)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 The LBEAST repository root **is** the package folder. Simply clone directly into your project's `Packages/` directory:
 
@@ -2292,14 +2292,14 @@ cd Packages/com.ajcampbell.lbeast
 git pull
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Option 2: Git Submodule (Recommended for Git-based Projects)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 If your project uses Git, add LBEAST as a submodule:
 
@@ -2332,14 +2332,14 @@ git submodule update --remote
 git clone --recursive https://github.com/yourusername/yourproject.git
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Option 3: Git URL Installation (Package Manager)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Install LBEAST directly from a Git repository via Unity Package Manager:
 
@@ -2371,14 +2371,14 @@ https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.
 git@github.com:ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Option 4: Download ZIP (Manual Installation)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 1. **Download** the repository as a ZIP from GitHub
 2. **Extract** the ZIP to a temporary location
@@ -2396,14 +2396,14 @@ git@github.com:ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbea
 5. Unity will automatically detect and import the package
 6. Verify in **Window > Package Manager > "In Project"**
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Verifying Installation</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### **Verifying Installation**
 
@@ -2427,14 +2427,14 @@ After installation, verify LBEAST is properly installed:
    }
    ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Package Dependencies</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### **Package Dependencies**
 
@@ -2454,14 +2454,14 @@ LBEAST requires several Unity packages. These will be **automatically installed*
 3. Enter package name (e.g., `com.unity.inputsystem`)
 4. Click **"Add"**
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Troubleshooting Installation</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### **Troubleshooting Installation**
 
@@ -2484,7 +2484,7 @@ LBEAST requires several Unity packages. These will be **automatically installed*
 - **Solution:** Install dependencies manually (see table above)
 - **Solution:** Check `package.json` in the LBEAST package for the `dependencies` section
 
-</div>
+</blockquote>
 
 </details>
 
@@ -2495,7 +2495,7 @@ LBEAST requires several Unity packages. These will be **automatically installed*
 <details>
 <summary><strong>Example 1: Simple Moving Platform</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Example 1: Simple Moving Platform
 
@@ -2525,14 +2525,14 @@ public class SimplePlatformDemo : MonoBehaviour
 }
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Example 2: Car Racing with Input</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Example 2: Car Racing with Input
 
@@ -2567,14 +2567,14 @@ public class RacingGameController : MonoBehaviour
 }
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Example 3: Multiplayer Gunship</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Example 3: Multiplayer Gunship
 
@@ -2604,7 +2604,7 @@ public class GunshipGameController : MonoBehaviour
 }
 ```
 
-</div>
+</blockquote>
 
 </details>
 
@@ -2615,7 +2615,7 @@ public class GunshipGameController : MonoBehaviour
 <details>
 <summary><strong>Module Structure</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ## 📦 Module Structure
 
@@ -2640,14 +2640,14 @@ LBEAST/
     └── SuperheroFlightExperience
 ```
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Networking</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ## 🌐 Networking
 
@@ -2657,14 +2657,14 @@ LBEAST v0.1.0 focuses on **local LAN multiplayer** using Unity NetCode for GameO
 - No web-hosting or online matchmaking in v0.1.0
 - Future versions may add cloud deployment
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Hardware Integration</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ## ⚙️ Hardware Integration
 
@@ -2682,14 +2682,14 @@ This allows you to:
 
 > **⚠️ OpenXR Requirement:** LBEAST uses OpenXR exclusively for HMD and hand tracking. If your deployment requires a different XR SDK (SteamVR native, Meta SDK, etc.), you will need to create alternative versions of classes that use OpenXR APIs. See the main Overview section for details.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Use Cases</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ## 💡 Use Cases
 
@@ -2702,14 +2702,14 @@ LBEAST is designed for **commercial LBE installations** including:
 - 🏢 **Corporate Events** and brand experiences
 - 🚀 **Research Labs** and academic projects
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Dedicated Server & Server Manager</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ## 🖥️ Dedicated Server & Server Manager
 
@@ -2902,7 +2902,7 @@ The Command Protocol (UDP port 7779) **can work over the internet** with proper 
 - Firewall must allow UDP port 7779 inbound
 - NAT traversal may require port forwarding or UPnP configuration
 
-</div>
+</blockquote>
 
 </details>
 
@@ -2919,7 +2919,7 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 <details>
 <summary><strong>Overview</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Overview
 
@@ -2935,14 +2935,14 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 - **Connection Verification**: System verifies all device connections at session start
 - **NAT Punchthrough**: Optional fallback for remote connections through firewalls
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Consumer Router Setup (Manual Configuration)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Consumer Router Setup (Manual Configuration)
 
@@ -3006,14 +3006,14 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 - ✅ Works with any consumer router
 - ✅ No special router features required
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Professional Router Setup (API Integration)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Professional Router Setup (API Integration)
 
@@ -3081,14 +3081,14 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 - Supports multiple router vendors (UniFi, Cisco, pfSense, etc.)
 - Fallback to manual mode if API unavailable
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>UDP Port Configuration</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### UDP Port Configuration
 
@@ -3106,14 +3106,14 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 - All ports configurable per device
 - Port changes require device restart to take effect
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>NAT Punchthrough (Optional)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### NAT Punchthrough (Optional)
 
@@ -3133,14 +3133,14 @@ LBEAST requires reliable network communication between game engine servers, ECUs
 - Configure punchthrough server (if using relay server)
 - Devices automatically attempt punchthrough if direct connection fails
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Best Practices</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Best Practices
 
@@ -3174,7 +3174,7 @@ LBEAST requires reliable network communication between game engine servers, ECUs
    - Bulk operations save time
    - Better suited for multi-device deployments
 
-</div>
+</blockquote>
 
 </details>
 
@@ -3195,7 +3195,7 @@ Full hardware design details, KiCAD files, and pin maps live in the dedicated [U
 <details>
 <summary><strong>How LBUS handles Power-over-Ethernet (PoE):</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 LBUS has togglable power output capability on every one of its 8 ports individually. 5 volts goes out on pin 4 of the connected CAT5 cable when the port switch is on (DIP switch beside the port). There are a handful of power situations you might run into:
 
@@ -3221,26 +3221,26 @@ Since LBUS has no control over whether a given device conforms to PoE at 5 volts
 
 If you choose to deploy a custom microcontroller in your network alongside LBUS, you can start with and modify any PCB template in LBEAST to deploy a PoE-compatible device that also includes your custom functionality.
 
-</div>
+</blockquote>
 </details>
 
 <details>
 <summary><strong>Child ECUs A.K.A. Smart Modules</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 <img src="Packages/com.ajcampbell.lbeast/Runtime/images/child-shield.png" width="100%">
 
 If you need a non-smart peripheral to expand its functions beyond a simple sensor or interface, you can design any embedded PCB and connect it to the motherboard wirelessly or over ethernet. LBEAST module templates can get you started. They have ethernet already mapped for data, power, parent PWM, and parent ADC. Your smart signals will automatically map to the parent according to the CAT-5 Pin Layout.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>CAT-5 Pin Layout</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Pin 1: Ethernet RX+  
 Pin 2: Ethernet RX-  
@@ -3263,7 +3263,7 @@ Pin 8: PWM from the Motherboard
 | J7 | GPIO7 (Pin 7) | GPIO2 (Pin 27) |
 | J8 | GPIO6 (Pin 6) | GPIO15 (Pin 8) |
 
-</div>
+</blockquote>
 
 </details>
 
@@ -3272,62 +3272,62 @@ Pin 8: PWM from the Motherboard
 <details>
 <summary><strong>Microcontrollers vs. PLCs</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 It is the LBEAST author's opinion that microcontrollers are generally a fine alternative to PLCs in most cases for XR LBE. It may be that an extremely permanent attraction (a roller coaster or other large-scale ride) may benefit from PLCs ahead of microcontrollers as PLCs typically come with certified 100%-uptime guaranteed by reliable and well-regulated corporate entities. However, LBEAST does not integrate PLCs since each PLC provider typically operates in its own closed-hardware ecosystem. That said, any team that requires PLC design can still integrate with LBEAST templates. They'll just need to code their own embedded system interface rather than using LBEAST's provided Embedded Systems API.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Open-Source Hardware</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 The open-source community has been ascendant for decades in software, but is on the cusp of becoming a powerhouse in hardware as well. LBEAST aims to be an early player in the ecosystem that proves 21st-century professional hardware systems do not need to remain closed-source. LBEAST encourages interoperability for both software and hardware. It targets deployment for everyone who can't afford half-a-billion-dollar budgets for gigantic installations backed by enterprise-level PLC providers. LBEAST can even be useful for large-scale theme park teams who find themselves under deep budget constraints. Opting for microcontrollers over PLCs is a large cost-savings factor in many cases, though regulatory red tape may eclipse cost savings for the largest rides. Production staff should work with engineering staff to weigh pros and cons.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Brand Lock-In</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Locking into a given PLC provider's brand generally means adopting all the associated hardware and wiring infrastructure that comes part-and-parcel. PLC choice ossifies infrastructure from Day-1, making updates to a given attraction in the fast-paced landscape of XR LBE quite difficult. LBEAST targets rapid pop-up capability for experiences in new and changing spaces. PLCs discourage modularity and flexibility. They're perfect for factories where the same, simple ops must occur uninterrupted 24-7 for decades. Microcontrollers, on the other hand (ESP32, STM32, Pi, Jetson, etc.) can be extremely reliable (though not quite as much-so as PLCs) as long as embedded systems are well-designed with care to protect against EMF and heat, and they offer excellent flexibility to deploy similar hardware for both prototyping and production.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Short-Term LBE Deliveries</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 For trade show experiences running for a few days at most, prototype PCB shields tend to satisfy all requirements as long as glue or heat-safe tape is applied to show-approved socket connectors that might shake loose under vibration. When using Kapton tape, multiple full wraps are ideal. For longer production runs (semi-permanent installations showing the same experience for weeks or months), LBEAST provides example firmware PCBs in both socket-mount and through-hole mount form. For long-term production, LBEAST's author recommends developers produce several redundant copies of show-ready through-hole mounted versions of final boards. Off-the-shelf microcontroller modules can be reliably soldered to shields with confidence the system will last for years if well-tested for heat dissipation and interference protection.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Upgrading From Socket-Mount</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Given enough time and vibration, socket-mount shields are likely to shake loose even when glued. Full wraps of Kapton tape are more reliable, but still not considered "safe" for long runs. Solder-mounted equivalents give a small-batch run of custom PCBs a much longer shelf life, arguably similar to final PCB design, just slightly bulkier. As soon as a firmware build is locked for show, a handful of copies should be solder-mounted.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Maintenance</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 Even with long-term shows, LBEAST expects developers and venues will need to coordinate regularly for occasional OTA firmware flashing, board replacements, etc. Some developers may desire to upgrade from shields to fully custom PCBs simply because that is the gold standard practice in PCB product design. Firmware engineering staff may want to upgrade simply because it seems more professional. LBEAST's author cautions against this, though it may seem counterintuitive.
 
@@ -3341,40 +3341,40 @@ Even with long-term shows, LBEAST expects developers and venues will need to coo
 <li>Regular maintenance, upgrade-flashing, and emergency replacements become complex and costly if developers upgrade from shields to fully custom PCBs.</li>
 </ol>
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Upgrading From Soldered Shields?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 In most cases, fully custom PCBs may be unnecessary for just about any XR LBE installation. In fact, conforming to default LBEAST shield design could mean venues with multiple play-spaces can keep white-label LBEAST shields and module copies on-hand as ultimate venue-wide backup-for-all-the-backups. Shield interop guarantees unlimited hot-swap capability. If all developer-provided backups run out, the venue can always flash more because they'll have spare LBEAST shields on-hand. Supporting common LBEAST default shields as delivery targets means greater flexibility for on-site Operations Technicians, which yields higher likelihood of customers never needing to wait for technical difficulties. Ops Techs don't necessarily need to know how to solder either. Since the LBEAST specs are open-source, service providers can pre-solder targeted ready-to-flash microcontroller modules to default shields and stock venues up as needed. On top of that, old hardware from last year's experience may be pulled from a closet and reused as backup for a new experience if both are built on the same shields. It's very similar to arcade venues that locked into the practice of stocking spare JAMMA-spec parts to interop with almost any arcade cabinet.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Why a Universal Shield for almost all LBE installations?</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 In the 80s, the JAMMA spec allowed new games to hot-swap into existing arcade boxes as PCB cards that could be easily pulled and placed. The LBEAST Universal Shield aims to accomplish the same goal, but for a much larger variety of hardware. A given experience might have hydraulics, haptics, various power sources, and/or need to connect multiple MCUs in a network. Also, a development team may prefer this or that MCU dev kit as their go-to default platform. It would be marvelous for a single shield to support MOST use cases of any-MCU-to-any-collection-of-hardware. LBEAST Universal Shield recommends ESP32-S3 by default since it has the most robust onboard wireless capabilities, but dev teams may have unique requirements for which they prefer a different MCU. In such cases, they need only an adapter to fit to the ESP32's slot on the Universal Shield. Obviously, there may be moments of necessary customization (e.g. a custom STM-based PCB that self-contains an adpater to the shield), but if you can use the exact same board to power most LBE stations at a venue that has several stations, then just like 80s arcades... the venue's job installing a new experience at a given station becomes drastically simplified, not to mention the dev team is far less likely to need to design any custom PCBs from scratch. Interoperability is the future!
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Extra Protection Against Elements</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 For any experience running one year or longer, LBEAST's author recommends considering conformal coating or potting for several copies of show board back-ups with exposed hot-swap connectors. With half a dozen hot-swap copies of well-designed module/shield combos, an Ops Tech can count on nearly uninterrupted show control. They may not achieve 100% up-time as is promised with PLCs, but PLCs also rarely achieve ACTUAL 100% up-time. They simply come with contingencies provided by brands. With microcontrollers, you could save a lot of budget, but the contingencies are roll-your-own or roll-the-dice. LBEAST's author encourages developers and venues not to roll the dice: use backups on backups when deploying small-batch microcontroller PCB shields and modules.
 
-</div>
+</blockquote>
 
 </details>
 
@@ -3385,7 +3385,7 @@ For any experience running one year or longer, LBEAST's author recommends consid
 <details>
 <summary><strong>v0.1.0 (Complete)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### ✅ Completed (v0.1.0)
 - ✅ Core VR tracking abstraction
@@ -3406,14 +3406,14 @@ For any experience running one year or longer, LBEAST's author recommends consid
 - ✅ **433MHz RF Trigger API** - Hardware-agnostic 433MHz wireless remote/receiver integration with rolling code validation, button learning, and function mapping
 - ✅ **VR Player Transport (Server ↔ VR Clients)** - Bidirectional communication between game server and VR players for replicating OpenXR HMD and hand tracking data across LAN multiplayer experiences. Integrates with Unity NetCode for GameObjects for state synchronization. Enables gesture recognition for remote players in 6DOF multiplayer experiences.
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>v0.1.1 (Complete)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### ✅ Completed (v0.1.1)
 - ✅ **24V Large Solenoid Kicker with Dual-Handle Thumb Triggers** - 24V large solenoid kicker with dual-handle thumb triggers connected to an embedded system to simulate a large gun/rocket/laser/plasma mini-gun/rifle/launcher mounted to the hydraulic rig in the GunshipExperience
@@ -3424,14 +3424,14 @@ For any experience running one year or longer, LBEAST's author recommends consid
 - ✅ **10-Finger OpenXR Gesture Recognition Mapping** - An alpha system for calculating angle and distances relationships between various hand and head nodes to trigger desired events e.g. transition from closed-fist-to-open-palm
 - ✅ **433MHz RF Communication** - In addition to embedded comms across WiFi and Bluetooth, LBEAST now has the ability to integrate inexpensive keychain-style RF button clickers and any other devices using old-school 433MHz comms with replay encryption protection
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>v0.1.2 (Complete)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### ✅ Completed (v0.1.2)
 - ✅ **VR Player Transport (Server ↔ VR Clients)** - Bidirectional communication between game server and VR players for replicating OpenXR HMD and hand tracking data across LAN multiplayer experiences. Integrates with Unity NetCode for GameObjects for state synchronization. Enables gesture recognition for remote players in 6DOF multiplayer experiences.
@@ -3449,7 +3449,7 @@ For any experience running one year or longer, LBEAST's author recommends consid
   - **Optimization**: Optimize blend shape application (batch updates, interpolation, caching), texture streaming optimization (efficient texture updates, compression)
   - **Live Actor HUD Overlay**: Create stereo VR HUD overlay for live actors showing upcoming AI dialogue line, forward/backward arrow buttons with visual feedback on wrist button presses, and current narrative state (name + index). Uses Unity UI Canvas attached to live actor's camera for stereo rendering. Procedurally generated in C# (AIFacemaskLiveActorHUD widget class + AIFacemaskLiveActorHUDComponent MonoBehaviour component). Client-only, visible only to live actor HMD clients.
 
-</div>
+</blockquote>
 
 </details>
 
@@ -3458,7 +3458,7 @@ For any experience running one year or longer, LBEAST's author recommends consid
 <details>
 <summary><strong>v0.1.3 (In-Progress)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### 🎯 Planned (v0.1.3 - In-Progress)
 
@@ -3481,14 +3481,14 @@ For any experience running one year or longer, LBEAST's author recommends consid
   - **MovingPlatform_ECU**: Motion platform controller for MovingPlatformExperience (similar to GunshipExperience_ECU, uses same 4-gang actuator system, single-player standing platform)
   - **CarSim_ECU**: Motion platform controller for CarSimExperience (similar to GunshipExperience_ECU, uses same 4-gang actuator system, optimized for driving simulation motion profiles)
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>v1.0 (Alpha)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### 🎯 Planned Alpha (v1.0)
 - [ ] **Adding Weight & Height Safety Check Embedded Firmware** - Safety firmware for motion platforms to prevent operation if weight/height limits are exceeded
@@ -3539,14 +3539,14 @@ For any experience running one year or longer, LBEAST's author recommends consid
   - **Toolbar**: Quick access toolbar for common operations (start/stop experiences, emergency stop, system reset)
   - **Multi-Experience Support**: Ability to monitor and control multiple experiences simultaneously from single console interface
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>v2.0 (Future)</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### 🎯 Planned (v2.0)
 - [ ] Apple Vision Pro support
@@ -3572,7 +3572,7 @@ For any experience running one year or longer, LBEAST's author recommends consid
 - [ ] **OTA Firmware Updates** - Implement and test OTA (Over-The-Air) firmware flashing for ESP32-based reference design, APT package management for Raspberry Pi and Jetson Nano, and ESP32-as-wireless-adapter for STM32 OTA based on the rounakdatta open-source project. **Note:** The rounakdatta project will be included as a git submodule when implementing OTA functionality.
 - [ ] **3D-Printable 1/8th-Scale Platform Model** - Design a 3D-printable 1/8th-scale model of the scissor lift and tilt platform with complete ECU prototype integration capability for use in off-site network debugging. Enables developers to test network configurations, firmware updates, and communication protocols without requiring access to full-scale hardware. Includes mounting points for ESP32 ECUs, mock actuators, and all necessary interfaces for full system validation.
 
-</div>
+</blockquote>
 
 </details>
 
@@ -3603,7 +3603,7 @@ LBEAST is open-source under the MIT License. Got ideas for how to make LBEAST be
 <details>
 <summary><strong>Development Workflow</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Development Workflow
 
@@ -3615,14 +3615,14 @@ LBEAST is open-source under the MIT License. Got ideas for how to make LBEAST be
 5. Push to the branch (`git push origin feature/AmazingFeature`)
 6. Open a Pull Request
 
-</div>
+</blockquote>
 
 </details>
 
 <details>
 <summary><strong>Code Standards</strong></summary>
 
-<div style="margin-left: 20px;">
+<blockquote>
 
 ### Code Standards
 
@@ -3631,7 +3631,7 @@ LBEAST is open-source under the MIT License. Got ideas for how to make LBEAST be
 - Write Unity-friendly code with proper MonoBehaviour lifecycle awareness
 - Test with both C# and Unity Inspector workflows
 
-</div>
+</blockquote>
 
 </details>
 
