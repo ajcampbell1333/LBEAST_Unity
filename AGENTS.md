@@ -10,7 +10,7 @@
   - /Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/Gunship_Hardware_Specs.md – Hardware integration (ESP32 shields, solenoids, PWM drivers).
   - /docs/contributing.md (future) – Branching rules, testing with Unity Test Runner, PR guidelines.
 
-Use this tree for context: Root → Runtime Modules → Templates/Hardware. Prioritize OpenXR for VR tasks; use NetCode for multiplayer sims. For cross-engine parity, reference sibling Unreal repo (github.com/ajcampbell1333/LBEAST_Unreal) via shared API mappings in /src/common (if added).
+Use this tree for context: Root → Runtime Modules → Templates/Hardware. Prioritize OpenXR for VR tasks; use NetCode for multiplayer sims. For cross-engine parity, reference sibling Unreal repo (github.com/scifiuiguy/LBEAST_Unreal) via shared API mappings in /src/common (if added).
 
 ## Table of Contents
 

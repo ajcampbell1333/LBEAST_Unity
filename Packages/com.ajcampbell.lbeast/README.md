@@ -13,7 +13,7 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 
 </details><br>
 
-[![LBEAST](https://img.shields.io/github/v/tag/ajcampbell1333/lbeast_unreal?label=LBEAST&color=lightgreen)](https://github.com/ajcampbell1333/lbeast_unreal/releases)
+[![LBEAST](https://img.shields.io/github/v/tag/scifiuiguy/lbeast_unreal?label=LBEAST&color=lightgreen)](https://github.com/scifiuiguy/lbeast_unreal/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.5.4-blue.svg)](https://www.unrealengine.com/)
 
@@ -46,7 +46,7 @@ LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through 
 </details>   
 <br>
 
-> **🔗 Unity Version:** Also available at [github.com/ajcampbell1333/lbeast_unity](https://github.com/ajcampbell1333/lbeast_unity)
+> **🔗 Unity Version:** Also available at [github.com/scifiuiguy/lbeast_unity](https://github.com/scifiuiguy/lbeast_unity)
 
 ## 📚 Table of Contents
 
@@ -87,27 +87,27 @@ LBEAST uses **OpenXR exclusively** for all HMD and hand tracking access through 
 <div style="margin-left: 20px;">
 
 **Low-Level APIs:**
-- [LBEASTAI API README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTAI/README.md) - `Plugins/LBEAST/Source/LBEASTAI/README.md`
-- [VRPlayerTransport README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTCore/Public/VRPlayerTransport/README.md) - `Plugins/LBEAST/Source/LBEASTCore/Public/VRPlayerTransport/README.md`
-- [Input README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTCore/Public/Input/README.md) - `Plugins/LBEAST/Source/LBEASTCore/Public/Input/README.md`
-- [VOIP README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/VOIP/README.md) - `Plugins/LBEAST/Source/VOIP/README.md`
-- [EmbeddedSystems README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/EmbeddedSystems/README.md) - `Plugins/LBEAST/Source/EmbeddedSystems/README.md`
-- [ProLighting README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/ProLighting/README.md) - `Plugins/LBEAST/Source/ProLighting/README.md`
+- [LBEASTAI API README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTAI/README.md) - `Plugins/LBEAST/Source/LBEASTAI/README.md`
+- [VRPlayerTransport README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTCore/Public/VRPlayerTransport/README.md) - `Plugins/LBEAST/Source/LBEASTCore/Public/VRPlayerTransport/README.md`
+- [Input README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTCore/Public/Input/README.md) - `Plugins/LBEAST/Source/LBEASTCore/Public/Input/README.md`
+- [VOIP README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/VOIP/README.md) - `Plugins/LBEAST/Source/VOIP/README.md`
+- [EmbeddedSystems README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/EmbeddedSystems/README.md) - `Plugins/LBEAST/Source/EmbeddedSystems/README.md`
+- [ProLighting README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/ProLighting/README.md) - `Plugins/LBEAST/Source/ProLighting/README.md`
 
 **Experience Genre Templates:**
-- [AIFacemask Experience README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTExperiences/Private/AIFacemask/README.md) - `Plugins/LBEAST/Source/LBEASTExperiences/Private/AIFacemask/README.md`
+- [AIFacemask Experience README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/LBEASTExperiences/Private/AIFacemask/README.md) - `Plugins/LBEAST/Source/LBEASTExperiences/Private/AIFacemask/README.md`
 
 **Firmware Examples:**
-- [FirmwareExamples README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/README.md) - `Plugins/LBEAST/FirmwareExamples/README.md`
-- [GunshipExperience README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/GunshipExperience/README.md) - `Plugins/LBEAST/FirmwareExamples/GunshipExperience/README.md`
-- [FlightSimExperience README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/FlightSimExperience/README.md) - `Plugins/LBEAST/FirmwareExamples/FlightSimExperience/README.md`
-- [SuperheroFlightExperience README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/SuperheroFlightExperience/README.md) - `Plugins/LBEAST/FirmwareExamples/SuperheroFlightExperience/README.md`
-- [EscapeRoom README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/EscapeRoom/README.md) - `Plugins/LBEAST/FirmwareExamples/EscapeRoom/README.md`
-- [Base Examples README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/Base/Examples/README.md) - `Plugins/LBEAST/FirmwareExamples/Base/Examples/README.md`
-- [Base Templates README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/Base/Templates/README.md) - `Plugins/LBEAST/FirmwareExamples/Base/Templates/README.md`
+- [FirmwareExamples README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/README.md) - `Plugins/LBEAST/FirmwareExamples/README.md`
+- [GunshipExperience README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/GunshipExperience/README.md) - `Plugins/LBEAST/FirmwareExamples/GunshipExperience/README.md`
+- [FlightSimExperience README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/FlightSimExperience/README.md) - `Plugins/LBEAST/FirmwareExamples/FlightSimExperience/README.md`
+- [SuperheroFlightExperience README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/SuperheroFlightExperience/README.md) - `Plugins/LBEAST/FirmwareExamples/SuperheroFlightExperience/README.md`
+- [EscapeRoom README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/EscapeRoom/README.md) - `Plugins/LBEAST/FirmwareExamples/EscapeRoom/README.md`
+- [Base Examples README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/Base/Examples/README.md) - `Plugins/LBEAST/FirmwareExamples/Base/Examples/README.md`
+- [Base Templates README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/FirmwareExamples/Base/Templates/README.md) - `Plugins/LBEAST/FirmwareExamples/Base/Templates/README.md`
 
 **Examples & Utilities:**
-- [ServerManager README](https://github.com/ajcampbell1333/lbeast_unreal/blob/main/Plugins/LBEAST/Source/Examples/ServerManager/README.md) - `Plugins/LBEAST/Source/Examples/ServerManager/README.md`
+- [ServerManager README](https://github.com/scifiuiguy/lbeast_unreal/blob/main/Plugins/LBEAST/Source/Examples/ServerManager/README.md) - `Plugins/LBEAST/Source/Examples/ServerManager/README.md`
 
 </div>
 
@@ -2380,14 +2380,14 @@ The LBEAST repository root **is** the plugin folder. Simply clone directly into 
 ```bash
 # From your Unreal project root
 cd Plugins
-git clone https://github.com/ajcampbell1333/lbeast_unreal.git LBEAST
+git clone https://github.com/scifiuiguy/lbeast_unreal.git LBEAST
 ```
 
 **Windows PowerShell:**
 ```powershell
 # From your Unreal project root
 cd Plugins
-git clone https://github.com/ajcampbell1333/lbeast_unreal.git LBEAST
+git clone https://github.com/scifiuiguy/lbeast_unreal.git LBEAST
 ```
 
 That's it! The plugin is ready to use.
@@ -2417,14 +2417,14 @@ If your project uses Git, add LBEAST as a submodule:
 ```bash
 # From your Unreal project root
 cd Plugins
-git submodule add https://github.com/ajcampbell1333/lbeast_unreal.git LBEAST
+git submodule add https://github.com/scifiuiguy/lbeast_unreal.git LBEAST
 ```
 
 **Windows PowerShell:**
 ```powershell
 # From your Unreal project root
 cd Plugins
-git submodule add https://github.com/ajcampbell1333/lbeast_unreal.git LBEAST
+git submodule add https://github.com/scifiuiguy/lbeast_unreal.git LBEAST
 ```
 
 Then:
@@ -3569,9 +3569,9 @@ Some experiences may require best-in-class latency between the Universal Shield 
 
 ## 💬 Support
 
-- **Issues:** [github.com/ajcampbell1333/lbeast_unreal/issues](https://github.com/ajcampbell1333/lbeast_unreal/issues)
-- **Discussions:** [github.com/ajcampbell1333/lbeast_unreal/discussions](https://github.com/ajcampbell1333/lbeast_unreal/discussions)
-- **Unity Version:** [github.com/ajcampbell1333/lbeast_unity](https://github.com/ajcampbell1333/lbeast_unity)
+- **Issues:** [github.com/scifiuiguy/lbeast_unreal/issues](https://github.com/scifiuiguy/lbeast_unreal/issues)
+- **Discussions:** [github.com/scifiuiguy/lbeast_unreal/discussions](https://github.com/scifiuiguy/lbeast_unreal/discussions)
+- **Unity Version:** [github.com/scifiuiguy/lbeast_unity](https://github.com/scifiuiguy/lbeast_unity)
 
 The LBEAST Author may be available for dev contracts and consultations: [https://ajcampbell.info](https://ajcampbell.info)
 

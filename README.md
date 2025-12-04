@@ -13,12 +13,12 @@ This is a brand new plugin as of November 2025. Parts of it are not fully fleshe
 
 </details><br>
 
-[![LBEAST](https://img.shields.io/github/v/tag/ajcampbell1333/lbeast_unity?label=LBEAST&color=lightgreen)](https://github.com/ajcampbell1333/lbeast_unity/releases)
+[![LBEAST](https://img.shields.io/github/v/tag/scifiuiguy/lbeast_unity?label=LBEAST&color=lightgreen)](https://github.com/scifiuiguy/lbeast_unity/releases)
 [![Unity](https://img.shields.io/badge/Unity-6%20LTS-black?logo=unity)](https://unity.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://microsoft.com/windows)
 
-> **🔗 Unreal Version:** Also available at [github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
+> **🔗 Unreal Version:** Also available at [github.com/scifiuiguy/lbeast_unreal](https://github.com/scifiuiguy/lbeast_unreal)
 
 ---
 
@@ -184,18 +184,18 @@ platform.SendPlatformTilt(0.5f, -0.3f, 0f, 1.5f);  // TiltX, TiltY, Vertical, Du
 <blockquote>
 
 **Low-Level APIs:**
-- [VRPlayerTransport README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md`
-- [Input README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/Core/Input/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/Core/Input/README.md`
-- [VOIP README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/VOIP/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/VOIP/README.md`
-- [EmbeddedSystems README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/EmbeddedSystems/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/EmbeddedSystems/README.md`
+- [VRPlayerTransport README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/Core/VRPlayerTransport/README.md`
+- [Input README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/Core/Input/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/Core/Input/README.md`
+- [VOIP README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/VOIP/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/VOIP/README.md`
+- [EmbeddedSystems README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/EmbeddedSystems/README.md) - `Packages/com.ajcampbell.lbeast/Runtime/EmbeddedSystems/README.md`
 
 **Firmware Examples:**
-- [FirmwareExamples README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/README.md`
-- [GunshipExperience README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/README.md`
-- [FlightSimExperience README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/FlightSimExperience/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/FlightSimExperience/README.md`
-- [EscapeRoom README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/EscapeRoom/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/EscapeRoom/README.md`
-- [Base Examples README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md`
-- [Base Templates README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md`
+- [FirmwareExamples README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/README.md`
+- [GunshipExperience README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/GunshipExperience/README.md`
+- [FlightSimExperience README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/FlightSimExperience/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/FlightSimExperience/README.md`
+- [EscapeRoom README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/EscapeRoom/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/EscapeRoom/README.md`
+- [Base Examples README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Examples/README.md`
+- [Base Templates README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md) - `Packages/com.ajcampbell.lbeast/FirmwareExamples/Base/Templates/README.md`
 
 </blockquote>
 
@@ -656,6 +656,10 @@ This includes:
 
 <blockquote>
 
+<img src="Packages/com.ajcampbell.lbeast/Runtime/images/lbeast_standard_layout_framing.png" alt="LBEAST Standard Layout Framing CAD Model" width="100%">
+
+The modular wall frame shown above is a procedurally generated CAD model created using OnShape FeatureScript. This model demonstrates the structural steel framing system used in the standard LBEAST pop-up layout, with configurable dimensions for rapid customization. The complete CAD models and FeatureScript source code are available in the [LBEAST OnShape repository](https://github.com/scifiuiguy/LBEAST_OnShape).
+
 The standard installation uses a **modular wall facade system** for rapid setup and teardown:
 
 #### Wall Components
@@ -884,6 +888,90 @@ For standard LBEAST installations, the following hardware configuration provides
 
 </details>
 
+<details>
+<summary><strong>Why should any given arcade venue integrate LBEAST?</strong></summary>
+
+<blockquote>
+
+<details>
+<summary><strong>Why Should a Venue Integrate VR at All?</strong></summary>
+
+<blockquote>
+
+It's surprisingly difficult to make VR LBE economically viable for current arcades:
+
+1. **Customer Comfort Concerns:** Not all customers want a heavy HMD on their face, messing up their hair.
+
+2. **Hygiene Challenges:** Gaskets or personal-use eye-pads are a hassle for venues new to VR.
+
+3. **Space Requirements:** A next-level experience takes up valuable square footage. You can fit ~15 arcade boxes in the bare minimum footage of an LBEAST installation even though LBEAST is fairly economical for rapid multiplayer ingress/egress.
+
+4. **Staffing Requirements:** Next-level VR can't operate stand-alone. A minimum of two employees must be on-hand per experience throughout daily operation. With next-level VR (especially w/ machines involving motion simulation), at least one of the employees needs to be decently tech-savvy. Employing full-time technicians hasn't been a thing in mall arcades since the early 90s, back when industry demand was super-hot.
+
+With these constraints, it's hard enough to turn profit at all (though not impossible), let alone draw as much revenue as near-zero-maintenance coin-op machines. But if we want a new Arcade Renaissance, it has to start somewhere.
+
+</blockquote>
+
+</details>
+
+<details>
+<summary><strong>Here's Why</strong></summary>
+
+<blockquote>
+
+1) **Customers Don't Know What They're Missing Yet:** Many customers think of "zombie-shoot-em-up" games when they think of VR. That only appeals to a certain demo. They don't know there's an incredible variety of action, puzzle, comedy, adventure, wonder, and narrative gengres too. Like movies, centrain genres will wow ANYONE beyond their wildest dreams when they realize what they've been missing.
+
+2) **Hygiene Challenges Are Easy:** Hygiene is very solvable, especially now that HMD makers are making modular face guard attachments. Every venue is recommended to provide customers their own personal foam snap-in faceguards (integrated into cost of admission) and tell them to keep it handy until end-of-day. No more sweat tranfer concerns. Currently, snap-ins are unique to each manufacturer, but the industry will hopefully standardize soon on a universal face guard design. Venues should pressure HMD makers to make that happen ASAP.
+
+3) **Space Is Just Another Balance Sheet Cell (as long as it's feasibly black not red):** Movie theaters necessarily take up immense space. If you want a 21st-century arcade, next-level VR is the new best-in-show. It's the only way to prove your arcade is the best in the country. VR requires sacrificing coin-op space OR possibly upgrading to a larger lease, but it can be done without loss leaders if done carefully.
+
+4) **Premium Technical Staff are a Feature not a Bug** Yes, you'll need full-time techincians. No, it's not a deal-breaker. In fact, having staff who can service/repair VR machinery can also keep the coin-op boxes in top shape. Customers today are already paying $20-50 per playthrough for modern VR LBE, and that's usually for blank-play-area experiences that have no hydraulic motion sims. Experiences may run 10-30-minutes-a-pop, 4-8 simultaneous players. Add coin-op multiplayer integration, and there's plenty of room for a technician's wage in that revenue stream. It's fairly low-margin compared to other options, but other options embrace the past. This is the future.
+
+Coin-op is an easy revenue stream because it's 1/2 a century old. It's tried-and-true, but it's also dusty, crusty, and dull in the customer's eyes. Coin-op boxes are a great blast from the past if you have the right games. They'll give nostalgic vibes and keep customers at the venue, but they won't **BRING CUSTOMERS TO** the venue. VR will, if next-level VR attractions are installed correctly with enough variety.
+
+
+
+</blockquote>
+
+</details>
+
+<details>
+<summary><strong>The Variety Challenge</strong></summary>
+
+<blockquote>
+
+Small arcades may only have room for one LBEAST attraction. VR LBE will remain challenging with only one play space. Customers need variety, like a movie theater. Any single-VR-space venue is highly encouraged to invite other VR providers to set up shop right next door in the same mall. It might seem like competition, but with the industry in recession, there is strength in numbers. Circle the wagons to lift all boats.
+
+</blockquote>
+
+</details>
+
+<details>
+<summary><strong>The Movie Theater Analogy</strong></summary>
+
+<blockquote>
+
+Just as movie theaters with only one screen will struggle to get customers off the couch, arcade venues with only one VR experience will struggle too. If multiple venues need to come together at a single mall to bring variety, it's worth it. LBEAST's author recommends you dedicate at least 800 square feet (400 each) to two play spaces. 1600 square feet is much more viable, just as a 4-screen theater is much better than a 1- or 2-screen. Small venues may need to work with a single multi-purpose play space, which means if you have hydraulic rigs, you may need to move them throughout the day for experiences that don't need them. If you have at least two spaces, you can dedicate one to semi-stationary hydraulic systems, and the other to an open play area. Then, if you upgrade to four play spaces later, you can do 2-and-2.
+
+</blockquote>
+
+</details>
+
+<details>
+<summary><strong>Integrating Coin-Op with VR</strong></summary>
+
+<blockquote>
+
+You can also line the perimeter of any VR play space with classic coin-op boxes. You can hang banners/marquees/live-play-jumbotrons high enough overhead for all peripheral players to view the premium content they're missing in the center. Coin-op is fun, but the layout of the venue should encourage customer eyelines at all times not to miss the most premium content at the venue. It is even feasible and encouraged to design multiplayer experiences that allow coin-op-style joystick boxes to play in the same sessions as the VR players for a greater multiplayer experience that could never be achieved with home VR. The peripheral joystick stations could serve as peripheral support or peripheral challenge to the VR players, giving each player type levels of value for the level of pay.
+
+</blockquote>
+
+</details>
+
+</blockquote>
+
+</details>
+
 ---
 
 ## ✨ Features
@@ -944,8 +1032,8 @@ Yes, in the default implementation of the Facemask template, the AI facemask is 
 <br>
 
 **📚 Documentation:**
-- [LBEASTAI API README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/LBEASTAI/README.md) - Low-level AI API documentation (LLM, ASR, TTS, container management)
-- [AIFacemask Experience README](https://github.com/ajcampbell1333/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/ExperienceTemplates/AIFacemaskExperience/README.md) - Complete AIFacemask experience documentation
+- [LBEASTAI API README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/LBEASTAI/README.md) - Low-level AI API documentation (LLM, ASR, TTS, container management)
+- [AIFacemask Experience README](https://github.com/scifiuiguy/lbeast_unity/blob/main/Packages/com.ajcampbell.lbeast/Runtime/ExperienceTemplates/AIFacemaskExperience/README.md) - Complete AIFacemask experience documentation
 
 **Class:** `AIFacemaskExperience`
 
@@ -2269,14 +2357,14 @@ The LBEAST repository root **is** the package folder. Simply clone directly into
 ```bash
 # From your Unity project root
 cd Packages
-git clone https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+git clone https://github.com/scifiuiguy/lbeast_unity.git com.ajcampbell.lbeast
 ```
 
 **Windows PowerShell:**
 ```powershell
 # From your Unity project root
 cd Packages
-git clone https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+git clone https://github.com/scifiuiguy/lbeast_unity.git com.ajcampbell.lbeast
 ```
 
 That's it! The package is ready to use.
@@ -2306,14 +2394,14 @@ If your project uses Git, add LBEAST as a submodule:
 ```bash
 # From your Unity project root
 cd Packages
-git submodule add https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+git submodule add https://github.com/scifiuiguy/lbeast_unity.git com.ajcampbell.lbeast
 ```
 
 **Windows PowerShell:**
 ```powershell
 # From your Unity project root
 cd Packages
-git submodule add https://github.com/ajcampbell1333/lbeast_unity.git com.ajcampbell.lbeast
+git submodule add https://github.com/scifiuiguy/lbeast_unity.git com.ajcampbell.lbeast
 ```
 
 Then:
@@ -2349,7 +2437,7 @@ Install LBEAST directly from a Git repository via Unity Package Manager:
 4. Select **"Add package from git URL..."**
 5. Enter the Git URL:
    ```
-   https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
+   https://github.com/scifiuiguy/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
    ```
 6. Click **"Add"**
 7. Unity will download and install the package
@@ -2358,17 +2446,17 @@ Install LBEAST directly from a Git repository via Unity Package Manager:
 
 **For a specific branch:**
 ```
-https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast#main
+https://github.com/scifiuiguy/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast#main
 ```
 
 **For a specific version tag (when available):**
 ```
-https://github.com/ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast#v0.1.0
+https://github.com/scifiuiguy/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast#v0.1.0
 ```
 
 **Using SSH:**
 ```
-git@github.com:ajcampbell1333/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
+git@github.com:scifiuiguy/lbeast_unity.git?path=Packages/com.ajcampbell.lbeast
 ```
 
 </blockquote>
@@ -3571,6 +3659,7 @@ For any experience running one year or longer, LBEAST's author recommends consid
 - [ ] Cloud multiplayer (Photon/Mirror)
 - [ ] Prefab packages (ready-to-use scene templates)
 - [ ] **RenderTexture Arrays and Matrices** - Support for RenderTexture arrays and matrices with hardware-agnostic output to video spheres, 360 video, stereoscopic 3D billboards, stereoscopic 360 video, LED walls, projectors (front projection, rear projection, variable-depth projection), and drone swarm renderers. Enables synchronized multi-display installations for immersive LBE experiences.
+- [ ] **Multi-Render-Target API for Marketing Display Screens/Projectors** - Add a multi-render-target API for marketing display screens/projectors showing live 1st- and 3rd-person gameplay from views preset by the developer. Enables venues to display live gameplay feeds on external displays for marketing and spectator engagement.
 - [ ] **OTA Firmware Updates** - Implement and test OTA (Over-The-Air) firmware flashing for ESP32-based reference design, APT package management for Raspberry Pi and Jetson Nano, and ESP32-as-wireless-adapter for STM32 OTA based on the rounakdatta open-source project. **Note:** The rounakdatta project will be included as a git submodule when implementing OTA functionality.
 - [ ] **3D-Printable 1/8th-Scale Platform Model** - Design a 3D-printable 1/8th-scale model of the scissor lift and tilt platform with complete ECU prototype integration capability for use in off-site network debugging. Enables developers to test network configurations, firmware updates, and communication protocols without requiring access to full-scale hardware. Includes mounting points for ESP32 ECUs, mock actuators, and all necessary interfaces for full system validation.
 
@@ -3582,9 +3671,9 @@ For any experience running one year or longer, LBEAST's author recommends consid
 
 ## 💬 Support
 
-- **Issues:** [github.com/ajcampbell1333/lbeast_unity/issues](https://github.com/ajcampbell1333/lbeast_unity/issues)
-- **Discussions:** [github.com/ajcampbell1333/lbeast_unity/discussions](https://github.com/ajcampbell1333/lbeast_unity/discussions)
-- **Unreal Version:** [github.com/ajcampbell1333/lbeast_unreal](https://github.com/ajcampbell1333/lbeast_unreal)
+- **Issues:** [github.com/scifiuiguy/lbeast_unity/issues](https://github.com/scifiuiguy/lbeast_unity/issues)
+- **Discussions:** [github.com/scifiuiguy/lbeast_unity/discussions](https://github.com/scifiuiguy/lbeast_unity/discussions)
+- **Unreal Version:** [github.com/scifiuiguy/lbeast_unreal](https://github.com/scifiuiguy/lbeast_unreal)
 
 The LBEAST Author may be available for dev contracts and consultations: [https://ajcampbell.info](https://ajcampbell.info)
 
